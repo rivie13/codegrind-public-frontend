@@ -1,0 +1,788 @@
+:root {
+  --cg-viewport-height: 100vh;
+  --cg-font-retro-display: 'Microsoft Sans Serif', 'MS Sans Serif', Tahoma, Verdana, sans-serif;
+  --cg-font-retro-terminal: 'Lucida Console', Monaco, 'Courier New', monospace;
+  --cg-font-size-xs: 0.75rem;
+  --cg-font-size-sm: 0.875rem;
+  --cg-font-size-md: 1rem;
+  --cg-font-size-micro: 10px;
+  --cg-font-size-meta: 11px;
+  --cg-font-size-ui: 12px;
+  --cg-font-size-copy: 13px;
+  --cg-font-size-copy-strong: 14px;
+  --cg-desktop-top: #128692;
+  --cg-desktop-bottom: #0b5266;
+  --cg-window: #c9c3ba;
+  --cg-window-face: #d6d1c8;
+  --cg-window-face-strong: #ece9d8;
+  --cg-panel-shell: #f3efe7;
+  --cg-window-light: #ffffff;
+  --cg-window-mid: #b8b2a9;
+  --cg-window-dark: #7a7a7a;
+  --cg-window-shadow: #111111;
+  --cg-header-start: #000080;
+  --cg-header-end: #2a56d1;
+  --cg-header-text: #f7f7f7;
+  --cg-text: #1e1e1e;
+  --cg-muted: #595959;
+  --cg-link: #000080;
+  --cg-accent-blue: #000080;
+  --cg-accent-teal: #0b7b86;
+  --cg-accent-green: #246a2a;
+  --cg-accent-red: #8b1f1f;
+  --cg-accent-amber: #765100;
+  --cg-window-outset: inset 1px 1px 0 var(--cg-window-light), inset 2px 2px 0 #f8f5ef,
+    inset -1px -1px 0 #404040, inset -2px -2px 0 var(--cg-window-dark);
+  --cg-window-inset: inset 1px 1px 0 #6d6d6d, inset 2px 2px 0 #3d3d3d,
+    inset -1px -1px 0 var(--cg-window-light), inset -2px -2px 0 #f4efe7;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --cg-viewport-height: 100dvh;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --cg-font-size-xs: 0.8125rem;
+    --cg-font-size-sm: 0.9375rem;
+    --cg-font-size-md: 1rem;
+    --cg-font-size-micro: 11px;
+    --cg-font-size-meta: 12px;
+    --cg-font-size-ui: 13px;
+    --cg-font-size-copy: 14px;
+    --cg-font-size-copy-strong: 15px;
+  }
+}
+
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  min-width: 100%;
+  background: linear-gradient(180deg, var(--cg-desktop-top) 0%, var(--cg-desktop-bottom) 100%);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden !important;
+  position: relative;
+  min-width: 100%;
+  color: var(--cg-text);
+  font-family: var(--cg-font-retro-display);
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 32%),
+    linear-gradient(180deg, var(--cg-desktop-top) 0%, var(--cg-desktop-bottom) 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.12;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--cg-viewport-height);
+  width: 100%;
+  min-width: 100%;
+  align-items: stretch;
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+  background: var(--cg-window);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d8d2c9 0%, #b7b0a7 100%);
+  border: 1px solid var(--cg-window-shadow);
+  box-shadow: var(--cg-window-outset);
+  min-height: 48px;
+  min-width: 48px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ece7df 0%, #c3bcb2 100%);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cg-window-face);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--cg-window);
+}
+
+.page-container {
+  width: 100%;
+  min-width: 100%;
+  margin: 0 auto;
+  background: transparent;
+  position: relative;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.cg-site-shell {
+  position: relative;
+}
+
+.cg-site-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 18%);
+  opacity: 0.6;
+}
+
+.cg-page-template {
+  position: relative;
+}
+
+.cg-page-template-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cg-desktop-workspace {
+  position: relative;
+}
+
+.app-container.cg-desktop-workspace {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.16) 0, rgba(255, 255, 255, 0.16) 2%, transparent 18%),
+    radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 3%, transparent 22%),
+    linear-gradient(180deg, #008080 0%, #0b6b72 100%);
+}
+
+.app-container.cg-desktop-workspace::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.028) 0 10px, rgba(255, 255, 255, 0) 10px 20px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 18%);
+  opacity: 0.75;
+  z-index: 0;
+}
+
+.app-container.cg-desktop-workspace > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cg-panel-window {
+  background: linear-gradient(180deg, var(--cg-window) 0%, var(--cg-window-face) 100%);
+  border: 2px solid var(--cg-window-shadow);
+  box-shadow: var(--cg-window-outset), 12px 12px 0 rgba(0, 0, 0, 0.16);
+}
+
+.cg-titlebar {
+  background: linear-gradient(90deg, var(--cg-header-start) 0%, var(--cg-header-end) 100%);
+  color: var(--cg-header-text);
+}
+
+.chat-message.user {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+}
+
+.chat-message.ai {
+  background-color: #f0f0f0;
+  color: #333;
+  align-self: flex-start;
+}
+
+@media (min-width: 1200px) {
+  html {
+    overflow-x: auto;
+    min-width: 1200px;
+  }
+
+  body {
+    overflow-x: visible !important;
+    min-width: 1200px;
+  }
+
+  #root {
+    min-width: 1200px;
+  }
+
+  .page-container {
+    min-width: 1200px;
+  }
+}
+
+.nav-container {
+    background-color: #000; /* Black background for the nav */
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links a {
+  overflow: visible;
+    color: #00ff00; /* Green links */
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.nav-links a:hover {
+    background-color: #00cc00; /* Darker green on hover */
+}
+
+.panel {
+    background: #2a2a2a; /* Darker panel background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem;
+}
+
+.problem-card {
+    background: #333; /* Dark card background */
+    border: 1px solid #00ff00; /* Green border */
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+}
+
+.problem-card h3 {
+    color: #00ff00; /* Green title */
+}
+
+.difficulty {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.difficulty.EASY {
+    background-color: #2ecc71; /* Green for easy */
+    color: white;
+}
+
+.difficulty.MEDIUM {
+    background-color: #f1c40f; /* Yellow for medium */
+    color: black;
+}
+
+.difficulty.HARD {
+    background-color: #e74c3c; /* Red for hard */
+    color: white;
+}
+
+.chat-message {
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.editor-controls {
+    background: #000; /* Black background for editor controls */
+    padding: 10px;
+    border-top: 1px solid #00ff00; /* Green border */
+}
+
+.editor-controls select {
+    background: #333; /* Dark background for select */
+    color: #00ff00; /* Green text */
+    border: 1px solid #00ff00; /* Green border */
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.primary-button {
+    background-color: #00cc00; /* Bright green button */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background-color: #00ff00; /* Lighter green on hover */
+}
+
+.error-message {
+    color: #e74c3c; /* Red for error messages */
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Problem workspace layout */
+.problem-workspace {
+    display: flex;
+    height: calc(100vh - 64px); /* Adjust based on your nav height */
+    width: 100%;
+    overflow: hidden;
+    background: #1e1e1e;
+}
+
+/* Panel styles */
+.panel {
+    background: #2a2a2a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin: 0; /* Remove margin to avoid gaps */
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Problem panel */
+.problem-panel {
+    width: 30%;
+    min-width: 300px;
+    overflow-y: auto;
+    border-right: 1px solid #404040;
+}
+
+/* Editor panel */
+.editor-panel {
+    width: 45%;
+    min-width: 400px;
+    padding: 0; /* Remove padding for editor */
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+}
+
+/* Chat panel */
+.chat-panel {
+    width: 25%;
+    min-width: 250px;
+    border-left: 1px solid #404040;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Editor specific styles */
+#monaco-editor {
+    flex-grow: 1;
+    height: calc(100% - 50px) !important; /* Force height for Monaco */
+}
+
+.editor-controls {
+    height: 50px;
+    padding: 8px;
+    background: #252526;
+    border-top: 1px solid #404040;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Chat panel layout */
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chat-input {
+    padding: 1rem;
+    border-top: 1px solid #404040;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input textarea {
+    flex-grow: 1;
+    background: #333;
+    color: #00ff00;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    padding: 0.5rem;
+    resize: none;
+}
+
+/* Problem content styles */
+.problem-description {
+    color: #00ff00;
+    line-height: 1.6;
+}
+
+.problem-description pre {
+    background: #333;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.problem-description code {
+    font-family: 'Courier New', monospace;
+    background: #333;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+}
+
+/* Make sure buttons and selects are consistent */
+.editor-controls select,
+.editor-controls button {
+    height: 34px;
+    padding: 0 12px;
+}
+
+/* Ensure proper spacing between editor controls */
+.editor-controls > * + * {
+    margin-left: 8px;
+}
+
+/* Update resize handle styles */
+.resize-handle {
+  width: 4px;
+  background: #404040;
+  transition: background-color 0.2s;
+  cursor: col-resize;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
+}
+
+.resize-handle:hover,
+.resize-handle[data-resize-handle-active] {
+  background: #666666;
+  width: 4px;
+}
+
+/* Update panel styles */
+.problem-panel {
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.5rem;
+  color: #00ff00;
+  font-size: 1rem;
+  line-height: 1.6;
+  background: #1e1e1e;
+}
+
+/* Remove any margins/padding from panel containers */
+[data-panel-id] {
+  margin: 0;
+  padding: 0;
+  background: #1e1e1e;
+  width: 100%;
+}
+
+/* Ensure panels are flush against each other */
+[data-panel-group] {
+  gap: 0;
+  width: 100%;
+}
+
+.problem-panel h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #00ff00;
+}
+
+.problem-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.problem-content {
+  color: #00ff00;
+}
+
+.problem-content pre {
+  background: #1e1e1e;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid #404040;
+}
+
+.problem-content code {
+  font-family: 'Courier New', monospace;
+  background: #1e1e1e;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+}
+
+/* Make sure the panels fill the height */
+.chakra-box {
+  height: 100%;
+}
+
+/* Panel content styles */
+.panel-content {
+  height: 100%;
+  background: #1e1e1e;
+  overflow: hidden;
+  width: 100%; /* Ensure full width */
+}
+
+/* Problem panel styles */
+.problem-panel {
+  height: 100%;
+  width: 100%; /* Ensure full width */
+  overflow-y: auto;
+  padding: 1.5rem;
+  padding-right: 1rem; /* Reduced right padding to account for scrollbar */
+  color: #00ff00;
+  font-size: 1rem;
+  line-height: 1.6;
+  background: #1e1e1e;
+}
+
+/* Problem content styles */
+.problem-content {
+  width: 100%;
+  min-width: min-content;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.matrix-effect {
+    position: relative;
+}
+
+.matrix-line {
+    background: #1e1e1e !important;
+    color: transparent !important;
+    width: 100% !important;
+    position: relative;
+    z-index: 1;
+}
+
+.matrix-char {
+    color: transparent !important;
+    background: #1e1e1e !important;
+}
+
+.matrix-overlay {
+    color: #00ff00 !important;
+    font-family: 'Courier New', monospace;
+    background: #1e1e1e !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+    white-space: pre;
+    display: block;
+}
+
+.ai-problems-create-page {
+  min-width: 900px;
+  width: 100%;
+  overflow-x: auto !important;
+}
+
+/* Additional class for specific pages like AIProblemsCreate */
+.fixed-width-page {
+  min-width: 1200px;
+  width: 100%;
+  overflow-x: visible;
+}
+
+/* Add better padding to form components and containers */
+.problem-card, .panel, form > div, .form-group {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Add spacing to UI elements to prevent squishing */
+select, input, button, .form-control {
+  margin: 10px 0;
+  padding: 10px;
+}
+
+/* Improve spacing on the AI problem create page specifically */
+.problem-parameters-container {
+  padding: 20px;
+  margin-right: 30px;
+}
+
+.generate-problem-container {
+  padding: 20px;
+}
+
+/* Fix scrollbar positioning to make them more accessible */
+.scrollable-content {
+  overflow: auto;
+  padding-right: 14px; /* Make space for scrollbar */
+}
+
+/* Fix footer positioning to not reveal background */
+.app-footer {
+  background-color: #1a1a1a;
+  width: 100%;
+  bottom: 0;
+  position: fixed;
+  z-index: 1000;
+}
+
+/* Control reCAPTCHA badge visibility/stacking across boot states and mobile layout. */
+.grecaptcha-badge {
+  display: none !important;
+}
+
+/* Keep hidden while the homepage black-screen intro and boot sequence are active. */
+body[data-home-demo-boot-sequence-active='true'] .grecaptcha-badge,
+body[data-home-demo-boot-sequence-active='true'] .cg-recaptcha-retro-shell {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Allow mobile users to hide the badge anywhere in the app. */
+body[data-mobile-recaptcha-hidden='true'] .grecaptcha-badge,
+body[data-mobile-recaptcha-hidden='true'] .cg-recaptcha-retro-shell {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 991px) {
+  .grecaptcha-badge {
+    bottom: 96px !important;
+    right: 12px !important;
+    transform: scale(0.9);
+    transform-origin: right bottom;
+    z-index: 1699 !important;
+  }
+
+  .cg-recaptcha-retro-shell {
+    bottom: 96px !important;
+    right: 12px !important;
+  }
+}
+
+/* Ensure content fills viewport height to avoid showing background */
+main, .content-area {
+  flex: 1 0 auto;
+  min-height: calc(100vh - 150px); /* Account for footer and header */
+  background-color: #121212;
+}
+
+/* Update AI Problems Create page styles */
+.ai-problems-create-container {
+  width: 100%;
+  position: relative;
+  padding-bottom: 50px; /* Add space for horizontal scrollbar */
+}
+
+/* Ensure all grid items in AI problems create are visible */
+.ai-problems-create-container .chakra-grid {
+  min-width: 1200px;
+  width: 100%;
+}
+
+/* Make sure the chat assistant is always visible */
+.ai-problems-create-container [role="gridcell"] {
+  min-width: 250px;
+  overflow: visible;
+}
+
+/* Fix grid items to prevent disappearing on resize */
+.ai-problems-create-container .chakra-grid > .chakra-grid {
+  min-width: 900px;
+  width: 100%;
+}
+
+/* Ensure main content column never disappears */
+.ai-problems-create-container .chakra-grid > .chakra-grid > [role="gridcell"]:first-of-type {
+  min-width: 500px;
+  width: 70%;
+}
+
+/* Ensure chat column never disappears */
+.ai-problems-create-container .chakra-grid > .chakra-grid > [role="gridcell"]:last-of-type {
+  min-width: 250px;
+  width: 30%;
+  display: block !important;
+}
+
+/* Set component minimum widths */
+.ai-problems-create-container .chakra-card,
+.ai-problems-create-container .chakra-box[bg="#1e1e1e"] {
+  min-width: fit-content;
+}
+
+@media (max-width: 991px) {
+  .ai-problems-create-page,
+  .fixed-width-page {
+    min-width: 0;
+    overflow-x: visible !important;
+  }
+
+  .ai-problems-create-container .chakra-grid,
+  .ai-problems-create-container .chakra-grid > .chakra-grid {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .ai-problems-create-container [role="gridcell"],
+  .ai-problems-create-container .chakra-grid > .chakra-grid > [role="gridcell"]:first-of-type,
+  .ai-problems-create-container .chakra-grid > .chakra-grid > [role="gridcell"]:last-of-type {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .ai-problems-create-container .chakra-card,
+  .ai-problems-create-container .chakra-box[bg="#1e1e1e"] {
+    min-width: 0 !important;
+  }
+}
+
+/* Code background styling */
+.code-background .keyword {
+  color: #ff00de;
+  text-shadow: 0 0 5px rgba(255, 0, 222, 0.7);
+}
+
+.code-background .function {
+  color: #00ffff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+}
+
+.code-background .string {
+  color: #00ff8c;
+  text-shadow: 0 0 5px rgba(0, 255, 140, 0.7);
+}
+
+/* Add blinking cursor animation in regular CSS */
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.code-background span {
+  animation: blink 1s step-end infinite;
+}

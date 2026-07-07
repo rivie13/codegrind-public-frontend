@@ -1,0 +1,601 @@
+{
+  "name": "Pixel Edge City - Machinery Refined",
+  "description": "Rebuilds PEC machinery, rooftop attachments, traffic lights, and building light-strip assets into focused authoring tilesets.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-machinery.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-machinery-rooftop-static",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Rooftop attachments",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/rooftop-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-rooftop-static.tsj",
+      "exclude": "^RoofTopACUnit_\\d+_animation_sheet\\.png$"
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-machinery-street-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Machines and misc/Machines_and_Misc_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/street-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-street-static.tsj",
+      "fileNamePrefix": "machinery-street-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-machinery-traffic-lights-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/TrafficLights_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-lights-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-traffic-lights-static.tsj",
+      "fileNamePrefix": "traffic-lights-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-machinery-traffic-light-states-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/TrafficLights_States_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-states-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-traffic-light-states-static.tsj",
+      "fileNamePrefix": "traffic-light-states-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-rooftop-ac-unit-1-frames",
+      "previewName": "d01-pec-rooftop-ac-unit-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Rooftop attachments/Animated Spritesheets and GIFS/RoofTopACUnit_1_animation_sheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/Animated/RoofTopACUnit_1_animation_sheet.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-rooftop-ac-unit-2-frames",
+      "previewName": "d01-pec-rooftop-ac-unit-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Rooftop attachments/Animated Spritesheets and GIFS/RoofTopACUnit_2_animation_sheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/Animated/RoofTopACUnit_2_animation_sheet.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-rooftop-ac-unit-3-frames",
+      "previewName": "d01-pec-rooftop-ac-unit-3-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Rooftop attachments/Animated Spritesheets and GIFS/RoofTopACUnit_3_animation_sheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/Animated/RoofTopACUnit_3_animation_sheet.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-3-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-3-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-building-ac-unit-1-frames",
+      "previewName": "d01-pec-building-ac-unit-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Building_ACunit_1_sheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/Animated/Building_ACunit_1_sheet.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-building-ac-unit-2-frames",
+      "previewName": "d01-pec-building-ac-unit-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Building_ACunit_2_sheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/Animated/Building_ACunit_2_sheet.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-building-ac-unit-side-frames",
+      "previewName": "d01-pec-building-ac-unit-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Building_ACunit_SIDE_1_sheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/Animated/Building_ACunit_SIDE_1_sheet.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-side-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-blue-door-1-frames",
+      "previewName": "d01-pec-blue-door-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Blue/Blue_Door_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Blue_Door_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-door-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-door-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-blue-door-2-frames",
+      "previewName": "d01-pec-blue-door-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Blue/Blue_Door_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Blue_Door_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-door-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-door-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-blue-window-1-frames",
+      "previewName": "d01-pec-blue-window-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Blue/Blue_Window_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Blue_Window_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-window-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-window-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-blue-window-2-frames",
+      "previewName": "d01-pec-blue-window-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Blue/Blue_Window_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Blue_Window_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-window-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-window-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-pink-door-1-frames",
+      "previewName": "d01-pec-pink-door-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Pink/Pink_Door_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Pink_Door_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-door-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-door-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-pink-door-2-frames",
+      "previewName": "d01-pec-pink-door-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Pink/Pink_Door_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Pink_Door_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-door-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-door-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-pink-window-1-frames",
+      "previewName": "d01-pec-pink-window-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Pink/Pink_Window_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Pink_Window_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-window-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-window-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-pink-window-2-frames",
+      "previewName": "d01-pec-pink-window-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Pink/Pink_Window_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Pink_Window_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-window-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-window-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-white-door-1-frames",
+      "previewName": "d01-pec-white-door-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/White/White_Door_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/White_Door_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-door-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-door-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-white-door-2-frames",
+      "previewName": "d01-pec-white-door-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/White/White_Door_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/White_Door_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-door-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-door-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-white-window-1-frames",
+      "previewName": "d01-pec-white-window-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/White/White_Window_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/White_Window_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-window-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-window-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-white-window-2-frames",
+      "previewName": "d01-pec-white-window-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/White/White_Window_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/White_Window_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-window-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-window-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-yellow-door-1-frames",
+      "previewName": "d01-pec-yellow-door-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Yellow/Yellow_Door_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Yellow_Door_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-door-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-door-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-yellow-door-2-frames",
+      "previewName": "d01-pec-yellow-door-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Yellow/Yellow_Door_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Yellow_Door_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-door-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-door-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-yellow-window-1-frames",
+      "previewName": "d01-pec-yellow-window-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Yellow/Yellow_Window_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Yellow_Window_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-window-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-window-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-yellow-window-2-frames",
+      "previewName": "d01-pec-yellow-window-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Yellow/Yellow_Window_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Yellow_Window_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-window-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-window-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-light-off-door-1-frames",
+      "previewName": "d01-pec-light-off-door-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Light Turned off/Door_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Door_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-door-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-door-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-light-off-door-2-frames",
+      "previewName": "d01-pec-light-off-door-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Light Turned off/Door_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Door_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-door-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-door-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-light-off-window-1-frames",
+      "previewName": "d01-pec-light-off-window-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Light Turned off/Window_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Window_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-window-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-window-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-light-off-window-2-frames",
+      "previewName": "d01-pec-light-off-window-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Building attachments/Animated Sprite sheets and GIFS/Light Turned off/Window_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/building-lights/Window_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-window-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-window-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-1-frames",
+      "previewName": "d01-pec-traffic-light-state-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_1.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_1.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-1-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-2-left-frames",
+      "previewName": "d01-pec-traffic-light-state-2-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_2_LEFT.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_2_LEFT.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-2-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-2-left-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-2-right-frames",
+      "previewName": "d01-pec-traffic-light-state-2-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_2_RIGHT.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_2_RIGHT.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-2-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-2-right-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-3-frames",
+      "previewName": "d01-pec-traffic-light-state-3-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_3.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_3.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-3-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-3-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-3-side-frames",
+      "previewName": "d01-pec-traffic-light-state-3-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_3_SIDE.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_3_SIDE.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-3-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-3-side-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-4-frames",
+      "previewName": "d01-pec-traffic-light-state-4-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_4.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_4.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-4-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-4-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-traffic-light-state-5-left-frames",
+      "previewName": "d01-pec-traffic-light-state-5-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Machinery and Attachments/Street Machines/Traffic Lights/Traffic Light states Animations/TrafficLight_states_5_LEFT.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/machinery/traffic-light-animations/TrafficLight_states_5_LEFT.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-5-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-5-left-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-rooftop-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-street-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-traffic-lights-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-machinery-traffic-light-states-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-rooftop-ac-unit-3-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-ac-unit-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-door-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-door-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-window-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-blue-window-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-door-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-door-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-window-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-pink-window-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-door-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-door-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-window-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-window-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-door-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-door-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-window-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-yellow-window-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-door-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-door-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-window-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-light-off-window-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-2-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-2-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-3-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-3-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-4-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-traffic-light-state-5-left-frames.tsj"
+    }
+  ]
+}

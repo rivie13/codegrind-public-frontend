@@ -1,0 +1,139 @@
+{
+  "name": "Pixel Edge City - Premade Buildings Refined",
+  "description": "Rebuilds PEC premade building art into focused collection tilesets and building-aligned frame authoring tilesets for animated charging station layers.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-buildings.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-premade-casino-layers",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Casino/Layers",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/casino/layers",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-casino-layers.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-premade-casino-extra",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Casino/Extra",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/casino/extra",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-casino-extra.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-premade-casino-holograms",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Casino/Holograms",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/casino/holograms",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-casino-holograms.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-premade-charging-full",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Charging station",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/charging/full",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-charging-full.tsj",
+      "match": "^Charging_Station\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-premade-charging-static",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Charging station/Layers",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/charging/static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-charging-static.tsj",
+      "exclude": "(_anim|_GIF_|_readme_)"
+    },
+    {
+      "type": "frameAtlasCollectionTileset",
+      "name": "d01-pec-charging-layer-4-frames",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Charging station/Layers/Charging_Station_Layer_4_anim.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/charging/layer-4-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-4-frames.tsj",
+      "fileNamePrefix": "charging-layer-4-static",
+      "frameWidth": 272,
+      "frameHeight": 192,
+      "frameIndex": 0,
+      "minOpaquePixels": 12
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-charging-carwash-door-frames",
+      "previewName": "d01-pec-charging-carwash-door-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Charging station/Layers/Charging_Station_Layer_5_CarWash_Door_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/charging/animated/Charging_Station_Layer_5_CarWash_Door_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-carwash-door-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-carwash-door-preview.tsj",
+      "tileWidth": 64,
+      "tileHeight": 64
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-charging-layer-5-charging-frames",
+      "previewName": "d01-pec-charging-layer-5-charging-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Charging station/Layers/Charging_Station_Layer_5_Charging_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/charging/animated/Charging_Station_Layer_5_Charging_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-5-charging-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-5-charging-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-charging-layer-5-door-frames",
+      "previewName": "d01-pec-charging-layer-5-door-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings/Charging station/Layers/Charging_Station_Layer_5_door_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/premade/charging/animated/Charging_Station_Layer_5_door_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-5-door-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-5-door-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-casino-layers.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-casino-extra.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-casino-holograms.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-charging-full.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-charging-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-4-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-carwash-door-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-5-charging-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-charging-layer-5-door-frames.tsj"
+    }
+  ]
+}

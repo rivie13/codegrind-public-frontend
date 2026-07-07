@@ -1,0 +1,553 @@
+{
+  "name": "Pixel Edge City - Objects Refined",
+  "description": "Rebuilds PEC construction, tents, and trash art into extracted static atlases plus deliberate frame authoring tilesets.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-construction.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-tents.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash.tsj"
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-objects-construction-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Construction Stuff/Construction_stuff.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/construction/static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-construction-static.tsj",
+      "fileNamePrefix": "construction-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-objects-shipping-containers-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Construction Stuff/Shipping_Containers.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/construction/shipping-containers-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-shipping-containers-static.tsj",
+      "fileNamePrefix": "shipping-container-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-objects-tents-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Tents/Tents_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/tents/static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-tents-static.tsj",
+      "fileNamePrefix": "tent-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "bandCollectionTileset",
+      "name": "d01-pec-objects-trash-loose-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Trash/Trash_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/loose-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash-loose-static.tsj",
+      "fileNamePrefix": "trash-loose-static",
+      "minOpaquePixels": 4,
+      "mergeVerticalGap": 1,
+      "mergeMinXOverlap": 1,
+      "snapGridWidth": 4,
+      "snapGridHeight": 4
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-objects-trash-bins-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Trash Cans and bins/Trashcans_and_Bins_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/bins-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash-bins-static.tsj",
+      "fileNamePrefix": "trash-bins-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "bandCollectionTileset",
+      "name": "d01-pec-objects-trash-water-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Water_Trash_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash-water-static.tsj",
+      "fileNamePrefix": "trash-water-static",
+      "minOpaquePixels": 4
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-green-container-frames",
+      "previewName": "d01-pec-green-container-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Construction Stuff/Animated/Green_Container_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/construction/Animated/Green_Container_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-green-container-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-green-container-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 80
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-red-container-frames",
+      "previewName": "d01-pec-red-container-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Construction Stuff/Animated/Red_Container_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/construction/Animated/Red_Container_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-red-container-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-red-container-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 80
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-white-container-frames",
+      "previewName": "d01-pec-white-container-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Construction Stuff/Animated/White_Container_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/construction/Animated/White_Container_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-container-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-container-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 80
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tent-1-frames",
+      "previewName": "d01-pec-tent-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Tents/Animated/Tent_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/tents/Animated/Tent_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tent-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tent-1-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tent-2-frames",
+      "previewName": "d01-pec-tent-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Tents/Animated/Tent_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/tents/Animated/Tent_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tent-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tent-2-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-trashbin-empty-front-frames",
+      "previewName": "d01-pec-trashbin-empty-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Trash Cans and bins/Animated/Trashbin_Empty_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/Animated/Trashbin_Empty_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-empty-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-empty-front-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-trashbin-full-front-frames",
+      "previewName": "d01-pec-trashbin-full-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Trash Cans and bins/Animated/Trashbin_Full_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/Animated/Trashbin_Full_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-full-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-full-front-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-trashbin-full-side-frames",
+      "previewName": "d01-pec-trashbin-full-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Trash Cans and bins/Animated/Trashbin_Full_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/Animated/Trashbin_Full_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-full-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-full-side-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-barrels-frames",
+      "previewName": "d01-pec-water-barrels-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Barrels_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Barrels_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-barrels-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-barrels-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-bottle-1-frames",
+      "previewName": "d01-pec-water-bottle-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Bottle_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Bottle_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-bottle-2-frames",
+      "previewName": "d01-pec-water-bottle-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Bottle_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Bottle_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-can-frames",
+      "previewName": "d01-pec-water-can-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Can_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Can_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-can-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-can-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-car-frames",
+      "previewName": "d01-pec-water-car-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Car_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Car_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-car-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-car-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-deadfish-1-frames",
+      "previewName": "d01-pec-water-deadfish-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Deadfish_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Deadfish_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-deadfish-2-frames",
+      "previewName": "d01-pec-water-deadfish-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Deadfish_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Deadfish_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-plant-1-frames",
+      "previewName": "d01-pec-water-plant-1-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Plant_1_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Plant_1_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-1-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-1-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-plant-2-frames",
+      "previewName": "d01-pec-water-plant-2-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Plant_2_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Plant_2_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-2-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-2-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-plant-3-frames",
+      "previewName": "d01-pec-water-plant-3-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Plant_3_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Plant_3_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-3-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-3-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-plant-4-frames",
+      "previewName": "d01-pec-water-plant-4-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Plant_4_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Plant_4_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-4-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-4-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-sign-frames",
+      "previewName": "d01-pec-water-sign-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Sign_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Sign_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-sign-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-sign-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-spilt-barrel-frames",
+      "previewName": "d01-pec-water-spilt-barrel-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Spilt_Barrel_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Spilt_Barrel_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-spilt-barrel-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-spilt-barrel-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-tire-frames",
+      "previewName": "d01-pec-water-tire-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Tire_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Tire_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tire-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tire-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-water-tower-frames",
+      "previewName": "d01-pec-water-tower-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Trash/Water Trash/Animated/Water_Tower_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/trash/water-animated/Water_Tower_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tower-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tower-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 48
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-construction-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-shipping-containers-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-tents-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash-loose-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash-bins-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-trash-water-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-green-container-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-red-container-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-white-container-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tent-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tent-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-empty-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-full-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-trashbin-full-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-barrels-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-barrels-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-1-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-bottle-2-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-can-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-can-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-car-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-car-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-1-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-deadfish-2-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-1-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-1-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-2-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-2-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-3-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-3-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-4-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-plant-4-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-sign-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-sign-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-spilt-barrel-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-spilt-barrel-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tire-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tire-preview.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tower-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-tower-preview.tsj"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+    "name":  "Pixel Edge City - Collection Tilesets (Objects, Decorations, Pre-made Buildings)",
+    "description":  "Prepares collection tilesets for individual PNG objects and decorations from Pixel Edge City PREMIUM pack",
+    "version":  "1.0",
+    "operations":  [
+                       {
+                           "type":  "collectionTileset",
+                           "name":  "d01-pec-objects-decorations",
+                           "sourceDir":  "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations",
+                           "destDir":  "public/city-v2/tiled/raw/district-01",
+                           "output":  "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-decorations.tsj",
+                           "match":  ".*\\.png$"
+                       },
+                       {
+                           "type":  "collectionTileset",
+                           "name":  "d01-pec-premade-buildings",
+                           "sourceDir":  "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Pre-made Buildings",
+                           "destDir":  "public/city-v2/tiled/raw/district-01",
+                           "output":  "public/city-v2/tiled/tilesets/district-01/d01-pec-premade-buildings.tsj",
+                           "match":  ".*\\.png$"
+                       }
+                   ]
+}

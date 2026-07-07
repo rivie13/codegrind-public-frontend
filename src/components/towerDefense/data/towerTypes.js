@@ -1,0 +1,511 @@
+// Tower types with their properties
+export const TOWER_TYPES = {
+  FOR_LOOP: {
+    type: 'ForLoop',
+    displayName: 'For Loop',
+    cost: 55,
+    damage: 14,
+    range: 2.5,
+    attackSpeed: 0.8,
+    description: 'Attacks multiple enemies in sequence',
+    color: '#00FF00',
+    conceptKey: 'FOR_LOOP',
+    upgradeCosts: [35, 50], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'for i in range(10): ...',
+      javascript: 'for (let i = 0; i < 10; i++) { ... }',
+      java: 'for (int i = 0; i < 10; i++) { ... }',
+      cpp: 'for (int i = 0; i < 10; i++) { ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Extra Iteration',
+        cost: 100,
+        effect: 'Sweeps 1 extra target (sequential burst, slight falloff)',
+      },
+      {
+        name: 'Nested Loop',
+        cost: 155,
+        effect: 'Sweeps 2 extra targets (sequential burst, heavier falloff)',
+      },
+    ],
+    specialUpgradeCosts: [100, 155],
+    specialEffects: [
+      {
+        multiTarget: {
+          mode: 'sequence',
+          extraTargets: 1,
+          secondaryDamageMultiplier: 0.85,
+          delayMs: 120,
+        },
+      },
+      {
+        multiTarget: {
+          mode: 'sequence',
+          extraTargets: 2,
+          secondaryDamageMultiplier: 0.75,
+          delayMs: 120,
+        },
+      },
+    ],
+  },
+  WHILE_LOOP: {
+    type: 'WhileLoop',
+    displayName: 'While Loop',
+    cost: 80,
+    damage: 10,
+    range: 1.7,
+    attackSpeed: 1.5,
+    description: 'Continuous attack on a single path',
+    color: '#00FFCC',
+    conceptKey: 'WHILE_LOOP',
+    upgradeCosts: [40, 60], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'while condition: ...',
+      javascript: 'while (condition) { ... }',
+      java: 'while (condition) { ... }',
+      cpp: 'while (condition) { ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Focused Pierce',
+        cost: 90,
+        effect:
+          'Laser extends to hit 1 extra enemy (80% secondary damage) — 8% reduced per-shot damage',
+      },
+      {
+        name: 'Arc Discharge',
+        cost: 140,
+        effect:
+          'Beam arcs to 2 more nearby enemies after primary hit (72% chain damage) — additional 6% damage reduction',
+      },
+    ],
+    specialUpgradeCosts: [90, 140],
+    specialEffects: [
+      {
+        multiTarget: { mode: 'chain', extraTargets: 1, secondaryDamageMultiplier: 0.8, delayMs: 0 },
+        damageMultiplier: -0.08,
+      },
+      {
+        multiTarget: {
+          mode: 'chain',
+          extraTargets: 2,
+          primaryDamageMultiplier: 1.05,
+          secondaryDamageMultiplier: 0.72,
+          delayMs: 0,
+        },
+        damageMultiplier: -0.06,
+      },
+    ],
+  },
+  IF_CONDITION: {
+    type: 'IfCondition',
+    displayName: 'If Condition',
+    cost: 45,
+    damage: 14,
+    range: 1.7,
+    attackSpeed: 0.65,
+    description: 'Attacks based on enemy type',
+    color: '#FF9900',
+    conceptKey: 'IF_CONDITION',
+    upgradeCosts: [30, 45], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'if condition: ...',
+      javascript: 'if (condition) { ... }',
+      java: 'if (condition) { ... }',
+      cpp: 'if (condition) { ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Additional Branch',
+        cost: 85,
+        effect: 'Forks a second shot to the weakest target',
+      },
+      {
+        name: 'elif Statement',
+        cost: 125,
+        effect: 'Deals +35% damage to edge/time-limit enemies',
+      },
+    ],
+    specialUpgradeCosts: [85, 125],
+    specialEffects: [
+      {
+        multiTarget: {
+          mode: 'fork',
+          extraTargets: 1,
+          secondaryDamageMultiplier: 0.6,
+        },
+      },
+      { typeDamageBonus: { edge: 0.35, timeLimit: 0.35 } },
+    ],
+  },
+  VARIABLE: {
+    type: 'Variable',
+    displayName: 'Variable',
+    cost: 30,
+    damage: 9,
+    range: 3,
+    attackSpeed: 0.5,
+    description: 'Stores enemy information, enhances nearby towers',
+    color: '#9966FF',
+    conceptKey: 'VARIABLE',
+    upgradeCosts: [20, 40], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'x = value',
+      javascript: 'let x = value',
+      java: 'int x = value',
+      cpp: 'int x = value',
+    },
+    specialUpgrades: [
+      {
+        name: 'Type Specialization',
+        cost: 75,
+        effect: 'Deals +40% damage to complex/space-complex enemies',
+      },
+      {
+        name: 'Constant Declaration',
+        cost: 135,
+        effect: 'Aura: nearby towers gain +10% damage and attack speed',
+      },
+    ],
+    specialUpgradeCosts: [75, 135],
+    specialEffects: [
+      { typeDamageBonus: { complex: 0.4, spaceComplex: 0.4 } },
+      { aura: { radius: 1.75, damageMultiplier: 0.1, speedMultiplier: 0.1 } },
+    ],
+  },
+  AI_ASSIST: {
+    type: 'AIAssist',
+    displayName: 'AI Assist',
+    cost: 90,
+    damage: 12,
+    range: 2.6,
+    attackSpeed: 0.7,
+    description: 'Generates the next-best line and reconfigures based on the result',
+    color: '#66FFE8',
+    conceptKey: 'AI_ASSIST',
+    upgradeCosts: [30, 55],
+    languageExamples: {
+      python: 'AI assist: next line',
+      javascript: 'AI assist: next line',
+      java: 'AI assist: next line',
+      cpp: 'AI assist: next line',
+    },
+    specialUpgrades: [
+      {
+        name: 'Adaptive Calibration',
+        cost: 105,
+        effect: 'Boosts attack speed by 20%',
+      },
+      {
+        name: 'Synthesis Overdrive',
+        cost: 155,
+        effect: 'Boosts damage by 30%',
+      },
+    ],
+    specialUpgradeCosts: [105, 155],
+    specialEffects: [{ speedMultiplier: 0.2 }, { damageMultiplier: 0.3 }],
+  },
+  FUNCTION: {
+    type: 'Function',
+    displayName: 'Boilerplate Core',
+    cost: 110,
+    damage: 42,
+    range: 2.4,
+    attackSpeed: 0.42,
+    description: 'Reusable attack pattern with high damage',
+    color: '#3399FF',
+    conceptKey: 'FUNCTION',
+    upgradeCosts: [45, 70], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'def function(): ...',
+      javascript: 'function name() { ... }',
+      java: 'void function() { ... }',
+      cpp: 'void function() { ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Parameter Expansion',
+        cost: 110,
+        effect: 'Increases range by 1 and damage by 20%',
+      },
+      {
+        name: 'Recursive Function',
+        cost: 170,
+        effect: 'Chain recursion: bounces to 1 extra target with falloff',
+      },
+    ],
+    specialUpgradeCosts: [110, 170],
+    specialEffects: [
+      { rangeBonus: 1, damageMultiplier: 0.2 },
+      {
+        multiTarget: {
+          mode: 'chain',
+          extraTargets: 1,
+          secondaryDamageMultiplier: 0.7,
+          delayMs: 120,
+        },
+      },
+    ],
+  },
+  ARRAY: {
+    type: 'Array',
+    displayName: 'Array',
+    cost: 85,
+    damage: 13,
+    range: 3.2,
+    attackSpeed: 0.65,
+    description: 'Fires multiple shots in array pattern',
+    color: '#FF5555',
+    conceptKey: 'ARRAY',
+    upgradeCosts: [40, 60], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'array = [1, 2, 3]',
+      javascript: 'const array = [1, 2, 3]',
+      java: 'int[] array = {1, 2, 3}',
+      cpp: 'int array[] = {1, 2, 3}',
+    },
+    specialUpgrades: [
+      {
+        name: 'Sorting Attack',
+        cost: 105,
+        effect: 'Prioritizes highest health enemies',
+      },
+      {
+        name: 'Mapping Attack',
+        cost: 145,
+        effect: 'Maps splash damage (50%) to nearby enemies',
+      },
+    ],
+    specialUpgradeCosts: [105, 145],
+    specialEffects: [
+      { targeting: 'highest-health' },
+      { splash: { radius: 1.2, damageMultiplier: 0.5 } },
+    ],
+  },
+  OBJECT: {
+    type: 'Object',
+    displayName: 'Boilerplate Instance',
+    cost: 120,
+    damage: 30,
+    range: 2.4,
+    attackSpeed: 0.38,
+    description: 'Creates damage fields that persist',
+    color: '#FFDD00',
+    conceptKey: 'OBJECT',
+    upgradeCosts: [45, 70], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'obj = {"key": value}',
+      javascript: 'const obj = {key: value}',
+      java: 'class Object { ... }',
+      cpp: 'class Object { ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Inheritance Boost',
+        cost: 120,
+        effect: 'Drops a lingering damage field on impact',
+      },
+      {
+        name: 'Polymorphic Attack',
+        cost: 160,
+        effect: 'Applies a brief slow on hit',
+      },
+    ],
+    specialUpgradeCosts: [120, 160],
+    specialEffects: [
+      { field: { radius: 1.3, duration: 2500, damageMultiplier: 0.25, tickMs: 500 } },
+      { slow: { factor: 0.55, duration: 1800 } },
+    ],
+  },
+  RETURN: {
+    type: 'Return',
+    displayName: 'Return',
+    cost: 130,
+    damage: 38,
+    range: 1.6,
+    attackSpeed: 0.32,
+    description: 'High damage with knockback effect',
+    color: '#FF33CC',
+    conceptKey: 'RETURN_STATEMENT',
+    upgradeCosts: [50, 75], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'return value',
+      javascript: 'return value',
+      java: 'return value',
+      cpp: 'return value',
+    },
+    specialUpgrades: [
+      {
+        name: 'Early Return',
+        cost: 125,
+        effect: '35% chance to execute enemies below 25% health',
+      },
+      {
+        name: 'Multiple Returns',
+        cost: 175,
+        effect: 'Pierces through 1 extra target (reduced damage)',
+      },
+    ],
+    specialUpgradeCosts: [125, 175],
+    specialEffects: [
+      { execute: { threshold: 0.25, chance: 0.35 } },
+      {
+        multiTarget: {
+          mode: 'chain',
+          extraTargets: 1,
+          secondaryDamageMultiplier: 0.8,
+          delayMs: 100,
+        },
+      },
+    ],
+  },
+  TRY_CATCH: {
+    type: 'TryCatch',
+    displayName: 'Try Catch',
+    cost: 70,
+    damage: 12,
+    range: 2.4,
+    attackSpeed: 0.7,
+    description: 'Traps enemies and deals damage over time',
+    color: '#33CCCC',
+    conceptKey: 'TRY_CATCH',
+    upgradeCosts: [35, 55], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'try: ... except: ...',
+      javascript: 'try { ... } catch(e) { ... }',
+      java: 'try { ... } catch(Exception e) { ... }',
+      cpp: 'try { ... } catch(exception& e) { ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Error Handling',
+        cost: 100,
+        effect: 'Applies a slow effect to targets',
+      },
+      {
+        name: 'Finally Block',
+        cost: 145,
+        effect: 'Delayed burst damage after impact',
+      },
+    ],
+    specialUpgradeCosts: [100, 145],
+    specialEffects: [
+      { slow: { factor: 0.6, duration: 1200 } },
+      { delayedDamage: { delayMs: 650, damageMultiplier: 0.5 } },
+    ],
+  },
+  SWITCH: {
+    type: 'Switch',
+    displayName: 'Switch',
+    cost: 65,
+    damage: 18,
+    range: 2.4,
+    attackSpeed: 0.6,
+    description: 'Switches attack pattern based on enemies',
+    color: '#FF99CC',
+    conceptKey: 'SWITCH',
+    upgradeCosts: [30, 50], // Base upgrade costs for level 1->2 and 2->3
+    languageExamples: {
+      python: 'match case: ...',
+      javascript: 'switch(value) { case x: ... }',
+      java: 'switch(value) { case x: ... }',
+      cpp: 'switch(value) { case x: ... }',
+    },
+    specialUpgrades: [
+      {
+        name: 'Multiple Cases',
+        cost: 90,
+        effect: 'Forks a second shot (reduced damage)',
+      },
+      {
+        name: 'Default Case',
+        cost: 135,
+        effect: 'Deals bonus damage to basic enemies',
+      },
+    ],
+    specialUpgradeCosts: [90, 135],
+    specialEffects: [
+      {
+        multiTarget: {
+          mode: 'fork',
+          extraTargets: 1,
+          secondaryDamageMultiplier: 0.6,
+        },
+      },
+      { typeDamageBonus: { basic: 0.3 } },
+    ],
+  },
+  BURST_TURRET: {
+    type: 'BurstTurret',
+    displayName: 'Burst Utility',
+    cost: 35,
+    damage: 26,
+    range: 2.4,
+    attackSpeed: 0.45,
+    description: 'Basic single-target burst damage',
+    color: '#7CFF6B',
+    conceptKey: 'NON_CODE_BURST',
+    isNonCode: true,
+    burstRounds: 3,
+    burstDelayMs: 110,
+    burstDamageMultiplier: 0.4,
+    upgradeCosts: [25, 45],
+    languageExamples: {
+      python: 'basic tower',
+      javascript: 'basic tower',
+      java: 'basic tower',
+      cpp: 'basic tower',
+    },
+    specialUpgrades: [],
+    specialUpgradeCosts: [],
+    specialEffects: [],
+  },
+  BLAST_TURRET: {
+    type: 'BlastTurret',
+    displayName: 'Blast Utility',
+    cost: 55,
+    damage: 28,
+    range: 3.6,
+    attackSpeed: 0.3,
+    description: 'Long-range heavy blast with a very slow reload',
+    color: '#FFB703',
+    conceptKey: 'NON_CODE_AOE',
+    isNonCode: true,
+    aoeRadius: 1.6,
+    aoeDamageMultiplier: 0.7,
+    upgradeCosts: [35, 55],
+    languageExamples: {
+      python: 'basic tower',
+      javascript: 'basic tower',
+      java: 'basic tower',
+      cpp: 'basic tower',
+    },
+    passiveEffects: [{ splash: { radius: 1.4, damageMultiplier: 0.6 } }],
+    specialUpgrades: [],
+    specialUpgradeCosts: [],
+    specialEffects: [],
+  },
+  LOG: {
+    type: 'Log',
+    displayName: 'Log',
+    cost: 40,
+    damage: 15,
+    range: 2.5,
+    attackSpeed: 1.0,
+    description: 'Prints outputs to deal direct damage',
+    color: '#FFA559',
+    conceptKey: 'LOG',
+    isNonCode: false,
+    upgradeCosts: [25, 40],
+    languageExamples: {
+      python: 'print("hello")',
+      javascript: 'console.log("hello")',
+      java: 'System.out.println("hello")',
+      cpp: 'std::cout << "hello"',
+    },
+    specialUpgrades: [],
+    specialUpgradeCosts: [],
+    specialEffects: [],
+  },
+};

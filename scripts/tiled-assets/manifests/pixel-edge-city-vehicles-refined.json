@@ -1,0 +1,849 @@
+{
+  "name": "Pixel Edge City - Vehicles Refined",
+  "description": "Rebuilds PEC vehicle and tram art into extracted static atlases plus deliberate frame authoring tilesets, with separate preview variants generated per strip.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-main.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-tram.tsj"
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-vehicles-main-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Vehicles_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-main-static.tsj",
+      "fileNamePrefix": "vehicle-main",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "atlasCollectionTileset",
+      "name": "d01-pec-vehicles-tram-static",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Tram_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram-static",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-tram-static.tsj",
+      "fileNamePrefix": "tram-static",
+      "minOpaquePixels": 20
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-bus-back-frames",
+      "previewName": "d01-pec-bus-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Bus_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Bus_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-back-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 80
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-bus-front-frames",
+      "previewName": "d01-pec-bus-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Bus_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Bus_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-front-preview.tsj",
+      "tileWidth": 32,
+      "tileHeight": 80
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-bus-left-frames",
+      "previewName": "d01-pec-bus-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Bus_Running_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Bus_Running_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-left-preview.tsj",
+      "tileWidth": 80,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-bus-right-frames",
+      "previewName": "d01-pec-bus-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Bus_Running_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Bus_Running_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-right-preview.tsj",
+      "tileWidth": 80,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-1-back-frames",
+      "previewName": "d01-pec-car-1-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_1_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_1_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-1-front-frames",
+      "previewName": "d01-pec-car-1-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_1_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_1_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-1-side-frames",
+      "previewName": "d01-pec-car-1-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_1_Running_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_1_Running_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-1-colour-back-frames",
+      "previewName": "d01-pec-car-1-colour-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_1_colour_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_1_colour_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-1-colour-front-frames",
+      "previewName": "d01-pec-car-1-colour-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_1_colour_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_1_colour_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-1-colour-side-frames",
+      "previewName": "d01-pec-car-1-colour-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_1_colour_Running_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_1_colour_Running_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-2-back-frames",
+      "previewName": "d01-pec-car-2-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_2_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_2_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-2-front-frames",
+      "previewName": "d01-pec-car-2-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_2_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_2_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-2-side-frames",
+      "previewName": "d01-pec-car-2-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_2_Running_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_2_Running_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-2-colour-back-frames",
+      "previewName": "d01-pec-car-2-colour-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_2_colour_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_2_colour_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-2-colour-front-frames",
+      "previewName": "d01-pec-car-2-colour-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_2_colour_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_2_colour_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-car-2-colour-side-frames",
+      "previewName": "d01-pec-car-2-colour-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Car_2_colour_Running_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Car_2_colour_Running_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-back-frames",
+      "previewName": "d01-pec-police-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Police_car_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Police_car_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-front-frames",
+      "previewName": "d01-pec-police-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Police_car_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Police_car_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-left-frames",
+      "previewName": "d01-pec-police-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Police_car_Running_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Police_car_Running_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-right-frames",
+      "previewName": "d01-pec-police-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Police_car_Running_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Police_car_Running_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-back-frames",
+      "previewName": "d01-pec-swat-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Swat_van_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Swat_van_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-front-frames",
+      "previewName": "d01-pec-swat-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Swat_van_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Swat_van_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-left-frames",
+      "previewName": "d01-pec-swat-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Swat_van_Running_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Swat_van_Running_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-right-frames",
+      "previewName": "d01-pec-swat-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Swat_van_Running_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Swat_van_Running_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-idle-sirens-back-frames",
+      "previewName": "d01-pec-police-idle-sirens-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-idle-sirens-front-frames",
+      "previewName": "d01-pec-police-idle-sirens-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-idle-sirens-left-frames",
+      "previewName": "d01-pec-police-idle-sirens-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-idle-sirens-right-frames",
+      "previewName": "d01-pec-police-idle-sirens-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Police_car_Idle_Sirens_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-idle-sirens-back-frames",
+      "previewName": "d01-pec-swat-idle-sirens-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-idle-sirens-front-frames",
+      "previewName": "d01-pec-swat-idle-sirens-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-idle-sirens-left-frames",
+      "previewName": "d01-pec-swat-idle-sirens-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-idle-sirens-right-frames",
+      "previewName": "d01-pec-swat-idle-sirens-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while Idle/Swat_van_Idle_Sirens_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-running-sirens-back-frames",
+      "previewName": "d01-pec-police-running-sirens-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-running-sirens-front-frames",
+      "previewName": "d01-pec-police-running-sirens-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-running-sirens-left-frames",
+      "previewName": "d01-pec-police-running-sirens-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-police-running-sirens-right-frames",
+      "previewName": "d01-pec-police-running-sirens-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Police_car_Running_Sirens_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-running-sirens-back-frames",
+      "previewName": "d01-pec-swat-running-sirens-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-back-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-running-sirens-front-frames",
+      "previewName": "d01-pec-swat-running-sirens-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-front-preview.tsj",
+      "tileWidth": 16,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-running-sirens-left-frames",
+      "previewName": "d01-pec-swat-running-sirens-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_LEFT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_LEFT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-swat-running-sirens-right-frames",
+      "previewName": "d01-pec-swat-running-sirens-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Vehicles/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_RIGHT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/main/Animated/Sirens/Sirens while running/Swat_van_Running_Sirens_RIGHT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 32
+    },
+
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-cart-door-running-side-frames",
+      "previewName": "d01-pec-tram-cart-door-running-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Cart_door_Running_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Cart_door_Running_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-running-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-running-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-cart-running-front-frames",
+      "previewName": "d01-pec-tram-cart-running-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Cart_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Cart_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-running-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-running-front-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 64
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-cart-running-side-frames",
+      "previewName": "d01-pec-tram-cart-running-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Cart_Running_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Cart_Running_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-running-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-running-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-pilot-back-frames",
+      "previewName": "d01-pec-tram-pilot-back-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Pilot_Cart_Running_BACK_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Pilot_Cart_Running_BACK_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-back-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-back-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 64
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-pilot-front-frames",
+      "previewName": "d01-pec-tram-pilot-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Pilot_Cart_Running_FRONT_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Pilot_Cart_Running_FRONT_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-front-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 64
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-pilot-left-frames",
+      "previewName": "d01-pec-tram-pilot-left-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Pilot_Cart_Running_LEFTFacing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Pilot_Cart_Running_LEFTFacing_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-left-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-left-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-pilot-right-frames",
+      "previewName": "d01-pec-tram-pilot-right-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Running/Tram_Pilot_Cart_Running_RightFacing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Running/Tram_Pilot_Cart_Running_RightFacing_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-right-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-right-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-cart-door-front-frames",
+      "previewName": "d01-pec-tram-cart-door-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Door opening N Closing/Tram_Cart_door_Front_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Door opening N Closing/Tram_Cart_door_Front_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-front-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 64
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-cart-door-side-frames",
+      "previewName": "d01-pec-tram-cart-door-side-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Door opening N Closing/Tram_Cart_door_SIDE_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Door opening N Closing/Tram_Cart_door_SIDE_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-side-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-side-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 48
+    },
+    {
+      "type": "animatedStripTilesets",
+      "framesName": "d01-pec-tram-pilot-door-front-frames",
+      "previewName": "d01-pec-tram-pilot-door-front-preview",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Tram/Animated/Door opening N Closing/Tram_Pilot_Cart_door_Front_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/tram/Animated/Door opening N Closing/Tram_Pilot_Cart_door_Front_anim.png",
+      "framesOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-door-front-frames.tsj",
+      "previewOutput": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-door-front-preview.tsj",
+      "tileWidth": 48,
+      "tileHeight": 64
+    },
+
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-main-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-tram-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-bus-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-1-colour-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-car-2-colour-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-idle-sirens-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-idle-sirens-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-police-running-sirens-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-swat-running-sirens-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-running-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-running-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-running-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-back-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-left-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-right-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-front-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-cart-door-side-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-pilot-door-front-frames.tsj"
+    }
+  ]
+}

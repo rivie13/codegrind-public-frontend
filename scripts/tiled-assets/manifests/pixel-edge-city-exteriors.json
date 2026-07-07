@@ -1,0 +1,180 @@
+{
+  "operations": [
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Building Tiles/Brickwall_Tileset.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Brickwall_Tileset.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-brickwall.tsj",
+      "name": "d01-pec-brickwall",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Building Tiles/Building_Balcony_Tiles.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Building_Balcony_Tiles.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-balcony.tsj",
+      "name": "d01-pec-building-balcony",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Building Tiles/Building_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Building_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-building-main.tsj",
+      "name": "d01-pec-building-main",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Building Tiles/Ladder_Tiles.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Ladder_Tiles.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-ladders.tsj",
+      "name": "d01-pec-ladders",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Fences and Stairs/Large_Fences_and_Gate_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Large_Fences_and_Gate_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-fences-large.tsj",
+      "name": "d01-pec-fences-large",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Fences and Stairs/RoadBlockade_Tiles.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/RoadBlockade_Tiles.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-road-blockades.tsj",
+      "name": "d01-pec-road-blockades",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Fences and Stairs/Small_Fences_and_Stairs_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Small_Fences_and_Stairs_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-fences-and-stairs.tsj",
+      "name": "d01-pec-fences-and-stairs",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Ground Tiles/Ground Tiles/Ground_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Ground_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-ground.tsj",
+      "name": "d01-pec-ground",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Ground Tiles/Road Tiles/Parking Tiles/Parking_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Parking_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-parking.tsj",
+      "name": "d01-pec-parking",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Ground Tiles/Road Tiles/Road Tiles/Broken_Road.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Broken_Road.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-broken-road.tsj",
+      "name": "d01-pec-broken-road",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Ground Tiles/Road Tiles/Road Tiles/Road_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Road_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-road.tsj",
+      "name": "d01-pec-road",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Riverbank Tiles/Riverbank_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Riverbank_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-riverbank.tsj",
+      "name": "d01-pec-riverbank",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Riverbank Tiles/SewerPipes_Spritesheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/SewerPipes_Spritesheet.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-sewer-pipes.tsj",
+      "name": "d01-pec-sewer-pipes",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/Riverbank Tiles/Animated/Water_tiles_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Water_tiles_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-water-animated.tsj",
+      "name": "d01-pec-water-animated",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/TramStation Tiles/Ticket_Counter_Sprite.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/Ticket_Counter_Sprite.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-ticket-counter.tsj",
+      "name": "d01-pec-ticket-counter",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Tilesets/TramStation Tiles/TramStation_Tilesets.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/TramStation_Tilesets.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-tram-station.tsj",
+      "name": "d01-pec-tram-station",
+      "margin": 0,
+      "spacing": 0,
+      "tileWidth": 16,
+      "tileHeight": 16
+    }
+  ]
+}

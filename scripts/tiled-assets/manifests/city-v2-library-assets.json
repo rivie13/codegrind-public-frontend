@@ -1,0 +1,128 @@
+{
+  "name": "City V2 asset library",
+  "description": "Prepares currently uncovered city-v2 art packs as collection tilesets and attaches them to the existing apartment/exterior seed maps for browsing in Tiled.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "collectionTileset",
+      "name": "d01-loose-interior-icons",
+      "sourceDir": "public/city-v2/tiled/icons_trash_other_env_decorations_for_interior",
+      "destDir": "public/city-v2/tiled/raw/district-01/props/interior-loose-icons",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-loose-interior-icons.tsj",
+      "exclude": "^(Machines_and_Misc_Spritesheet|Trash_Spritesheet|Cyberpunk icon pack|Icon14_.*|Vending Machine .*|scanert)\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-mi-animated-objects",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/3_Animated_objects",
+      "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/animated-objects",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-mi-ui-elements",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/4_User_Interface_Elements",
+      "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/ui-elements",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-mi-home-designs",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/6_Home_Designs",
+      "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/home-designs",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-device-1bit-icons",
+      "sourceDir": "public/city-v2/tiled/device-shell-art/1-bit_Pixel_Icons",
+      "destDir": "public/city-v2/tiled/raw/district-01/device-shell-art/1-bit-icons",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-device-1bit-icons.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-device-ads",
+      "sourceDir": "public/city-v2/tiled/device-shell-art/ads",
+      "destDir": "public/city-v2/tiled/raw/district-01/device-shell-art/ads",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-device-ads.tsj"
+    },
+    {
+      "type": "gridCollectionTileset",
+      "name": "d01-device-monitors-terminals",
+      "sourceImage": "public/city-v2/tiled/device-shell-art/monitors_terminals/Pixel Art Computers/Computer Monitor Asset Pack Rev 1 (1).png",
+      "destDir": "public/city-v2/tiled/raw/district-01/device-shell-art/monitors-terminals",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-device-monitors-terminals.tsj",
+      "cellWidth": 16,
+      "cellHeight": 16
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-device-monopixel-icons",
+      "sourceDir": "public/city-v2/tiled/device-shell-art/MonoPixel Icon Pack ver. 2",
+      "destDir": "public/city-v2/tiled/raw/district-01/device-shell-art/monopixel-icons",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-device-monopixel-icons.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-backgrounds-loading",
+      "sourceDir": "public/city-v2/tiled/backgrounds_loadingScreens",
+      "destDir": "public/city-v2/tiled/raw/district-01/backgrounds_loadingScreens",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-backgrounds-loading.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-loose-interior-icons.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-device-1bit-icons.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-device-ads.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-device-monitors-terminals.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-device-monopixel-icons.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-device-monitors-terminals.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-device-monopixel-icons.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-backgrounds-loading.tsj"
+    }
+  ]
+}

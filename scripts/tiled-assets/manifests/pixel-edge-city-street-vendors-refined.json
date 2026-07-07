@@ -1,0 +1,232 @@
+{
+  "name": "Pixel Edge City - Street Vendors Refined",
+  "description": "Generates controllable frame tilesets plus separate preview-only looping tilesets for PEC street vendors.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-vehicles-street-vendors.tsj"
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Street_Vendors_Spritesheet.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Street_Vendors_Spritesheet.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-street-vendors-static.tsj",
+      "name": "d01-pec-street-vendors-static",
+      "tileWidth": 80,
+      "tileHeight": 64,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Burger_van_Opening_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Burger_van_Opening_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-burger-van-opening-frames.tsj",
+      "name": "d01-pec-burger-van-opening-frames",
+      "tileWidth": 80,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Burger_van_Opening_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Burger_van_Opening_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-burger-van-opening-preview.tsj",
+      "name": "d01-pec-burger-van-opening-preview",
+      "tileWidth": 80,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0,
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Burger_van_Closing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Burger_van_Closing_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-burger-van-closing-frames.tsj",
+      "name": "d01-pec-burger-van-closing-frames",
+      "tileWidth": 80,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Burger_van_Closing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Burger_van_Closing_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-burger-van-closing-preview.tsj",
+      "name": "d01-pec-burger-van-closing-preview",
+      "tileWidth": 80,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0,
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Hotdog_van_Opening_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Hotdog_van_Opening_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-hotdog-van-opening-frames.tsj",
+      "name": "d01-pec-hotdog-van-opening-frames",
+      "tileWidth": 64,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Hotdog_van_Opening_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Hotdog_van_Opening_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-hotdog-van-opening-preview.tsj",
+      "name": "d01-pec-hotdog-van-opening-preview",
+      "tileWidth": 64,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0,
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Hotdog_van_Closing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Hotdog_van_Closing_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-hotdog-van-closing-frames.tsj",
+      "name": "d01-pec-hotdog-van-closing-frames",
+      "tileWidth": 64,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Hotdog_van_Closing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Hotdog_van_Closing_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-hotdog-van-closing-preview.tsj",
+      "name": "d01-pec-hotdog-van-closing-preview",
+      "tileWidth": 64,
+      "tileHeight": 48,
+      "margin": 0,
+      "spacing": 0,
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Sushi_stall_Opening_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Sushi_stall_Opening_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-sushi-stall-opening-frames.tsj",
+      "name": "d01-pec-sushi-stall-opening-frames",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Sushi_stall_Opening_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Sushi_stall_Opening_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-sushi-stall-opening-preview.tsj",
+      "name": "d01-pec-sushi-stall-opening-preview",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "margin": 0,
+      "spacing": 0,
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Sushi_stall_Closing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Sushi_stall_Closing_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-sushi-stall-closing-frames.tsj",
+      "name": "d01-pec-sushi-stall-closing-frames",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "margin": 0,
+      "spacing": 0
+    },
+    {
+      "type": "sheetTileset",
+      "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Vehicles/Street vendors/Animated/Sushi_stall_Closing_anim.png",
+      "destImage": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/vehicles/street-vendors/Animated/Sushi_stall_Closing_anim.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-sushi-stall-closing-preview.tsj",
+      "name": "d01-pec-sushi-stall-closing-preview",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "margin": 0,
+      "spacing": 0,
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-street-vendors-static.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-burger-van-opening-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-burger-van-closing-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-hotdog-van-opening-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-hotdog-van-closing-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-sushi-stall-opening-frames.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-sushi-stall-closing-frames.tsj"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+.markdown-message-surface .code-block-container {
+  margin: 0.85rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.markdown-message-surface .code-block-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.markdown-message-surface .code-block-language {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border: 1px solid #6f6f6f;
+  border-radius: 0;
+  background: #d4d0c8;
+  color: #1f2128;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.78),
+    inset -1px -1px 0 rgba(104, 104, 104, 0.28);
+  font-family: 'Tahoma', 'MS Sans Serif', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.markdown-message-surface .code-copy-button {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border: 1px solid #6f6f6f;
+  border-radius: 0;
+  background: #d4d0c8;
+  color: #1f2128;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.78),
+    inset -1px -1px 0 rgba(104, 104, 104, 0.28);
+  cursor: pointer;
+  font-family: 'Tahoma', 'MS Sans Serif', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  transition: background-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+.markdown-message-surface .code-copy-button:hover {
+  background: #ece9e1;
+  transform: translateY(1px);
+}
+
+.markdown-message-surface .code-copy-button:focus-visible {
+  outline: 1px dotted #0a3ca6;
+  outline-offset: 2px;
+}
+
+.markdown-message-surface .code-copy-button.copied {
+  background: #dbead7;
+  border-color: #7d9c73;
+  color: #264a1b;
+}
+
+@media (max-width: 480px) {
+  .markdown-message-surface .code-block-toolbar {
+    align-items: stretch;
+  }
+
+  .markdown-message-surface .code-copy-button {
+    width: 100%;
+  }
+}

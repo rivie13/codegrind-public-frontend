@@ -1,0 +1,63 @@
+{
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-machines-and-misc.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-trash-props.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-trash-props-details.tsj"
+    },
+    {
+      "type": "bandCollectionTileset",
+      "sourceImage": "public/city-v2/tiled/icons_trash_other_env_decorations_for_interior/Trash_Spritesheet.png",
+      "destDir": "public/city-v2/tiled/raw/district-01/props/trash-props",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-trash-props.tsj",
+      "name": "d01-trash-props",
+      "fileNamePrefix": "trash-props",
+      "minOpaquePixels": 4,
+      "mergeVerticalGap": 1,
+      "mergeMinXOverlap": 1,
+      "snapGridWidth": 4,
+      "snapGridHeight": 4
+    },
+    {
+      "type": "collectionTileset",
+      "sourceDir": "public/city-v2/tiled/icons_trash_other_env_decorations_for_interior",
+      "destDir": "public/city-v2/tiled/raw/district-01/props/vending-machines",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-vending-machines.tsj",
+      "name": "d01-vending-machines",
+      "match": "^Vending Machine .*\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "sourceDir": "public/city-v2/tiled/icons_trash_other_env_decorations_for_interior",
+      "destDir": "public/city-v2/tiled/raw/district-01/props/cyberpunk-icons",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-cyberpunk-icons.tsj",
+      "name": "d01-cyberpunk-icons",
+      "match": "^Icon14_.*\\.png$"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-trash-props.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-vending-machines.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-cyberpunk-icons.tsj"
+    }
+  ]
+}

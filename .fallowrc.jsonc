@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+
+  // This package is analyzed directly from codegrind-frontend/.
+  // Keep known non-imported entry surfaces explicit instead of suppressing them later.
+  "entry": ["public/service-worker.js", "src/prerender.jsx"],
+
+  // Build and coverage output should not be treated as source input.
+  "ignorePatterns": ["coverage/**", "dist/**"]
+}

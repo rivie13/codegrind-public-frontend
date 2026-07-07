@@ -1,0 +1,24 @@
+{
+  "operations": [
+    {
+      "type": "collectionTileset",
+      "sourceDir": "public/city-v2/tiled/Pixel Art Sign Pack - Animated/Pixel Art Sign Pack - Animated/Sign 1/OPEN",
+      "destDir": "public/city-v2/tiled/raw/district-01/signs/sign-1-open",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-sign-1-open.tsj",
+      "name": "d01-sign-1-open",
+      "match": "^Sign 1 Glow - OPEN_\\d+\\.png$",
+      "animations": [
+        {
+          "targetTileId": 0,
+          "frameTileIds": "all",
+          "duration": 100
+        }
+      ]
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-sign-1-open.tsj"
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+:root {
+  font-family: var(--cg-font-retro-display), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: var(--cg-text, #1f1f1f);
+  background-color: transparent;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: inherit;
+  color: inherit;
+  text-decoration: inherit;
+}
+a:hover {
+  color: inherit;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: transparent;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Panel styles */
+.panel-resize-handle {
+    width: 4px;
+    background-color: #2D3748;
+    transition: background-color 0.2s;
+    border-left: 1px solid #4A5568;
+    border-right: 1px solid #4A5568;
+  touch-action: none;
+  user-select: none;
+}
+
+.panel-resize-handle:hover {
+    background-color: #4A5568;
+}
+
+/* Terminal resize handle */
+.react-resizable-handle {
+    height: 4px;
+    background-color: #2D3748;
+    cursor: row-resize;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+  touch-action: none;
+  user-select: none;
+}
+
+.react-resizable-handle:hover {
+    background-color: #4A5568;
+}
+
+@media (pointer: coarse) {
+  .panel-resize-handle {
+    width: 12px !important;
+  }
+
+  .react-resizable-handle {
+    height: 12px !important;
+    top: -4px;
+  }
+}
+
+/* Monaco Editor overrides */
+.monaco-editor .margin {
+    background-color: #1a1a1a !important;
+}
+
+.monaco-editor .minimap {
+    display: none !important;
+}
+
+/* Matrix effect intensity levels */
+.matrix-intensity-10 {
+  opacity: 1;
+  color: #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+.matrix-intensity-9 {
+  opacity: 0.9;
+  color: #00ff00;
+  text-shadow: 0 0 4px #00ff00;
+}
+
+.matrix-intensity-8 {
+  opacity: 0.8;
+  color: #00ff00;
+  text-shadow: 0 0 4px #00ff00;
+}
+
+.matrix-intensity-7 {
+  opacity: 0.7;
+  color: #00ff00;
+  text-shadow: 0 0 3px #00ff00;
+}
+
+.matrix-intensity-6 {
+  opacity: 0.6;
+  color: #00ff00;
+  text-shadow: 0 0 3px #00ff00;
+}
+
+.matrix-intensity-5 {
+  opacity: 0.5;
+  color: #00ff00;
+  text-shadow: 0 0 2px #00ff00;
+}
+
+.matrix-intensity-4 {
+  opacity: 0.4;
+  color: #00ff00;
+  text-shadow: 0 0 2px #00ff00;
+}
+
+.matrix-intensity-3 {
+  opacity: 0.3;
+  color: #00ff00;
+  text-shadow: 0 0 1px #00ff00;
+}
+
+.matrix-intensity-2 {
+  opacity: 0.2;
+  color: #00ff00;
+  text-shadow: 0 0 1px #00ff00;
+}
+
+.matrix-intensity-1 {
+  opacity: 0.1;
+  color: #00ff00;
+}
+
+/* Matrix overlay specific styling */
+.matrix-overlay {
+  position: absolute;
+  font-family: 'Courier New', monospace;
+  pointer-events: none;
+  white-space: pre;
+}
+
+/* High-res specific optimizations */
+@media (min-width: 1921px), (min-height: 1081px) {
+  .matrix-overlay {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  /* Reduce animation complexity for high-res displays */
+  .scan-line-animation {
+    animation-timing-function: linear !important;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  .grid-animation {
+    animation-timing-function: linear !important;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}
+
+/* Performance class that can be toggled on components */
+.perf-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* =========================================================
+   COSMETIC KEYFRAMES — profile backgrounds, calling cards,
+   badges. Defined globally so they work on any page.
+   ========================================================= */
+
+@keyframes cosmetic-gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes cosmetic-rain-shift {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 0 0, 40px 120px; }
+}
+@keyframes cosmetic-scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes cosmetic-circuit-flow {
+  0%   { background-position: 0% 0%, 0 0, 0 0; }
+  100% { background-position: 100% 100%, 50px 50px, 50px 50px; }
+}
+@keyframes cosmetic-wave-drift {
+  0%, 100% { background-position: 0 0; }
+  50%       { background-position: 0 100px; }
+}
+@keyframes cosmetic-ember-rise {
+  0%   { background-position: 50% 100%; }
+  50%  { background-position: 50% 50%; }
+  100% { background-position: 50% 0%; }
+}
+@keyframes cosmetic-frost-shimmer {
+  0%, 100% { opacity: 0.7; filter: blur(0px); }
+  50%       { opacity: 0.95; filter: blur(1px); }
+}
+@keyframes cosmetic-plasma-pulse {
+  0%, 100% { background-size: 100% 100%, 100% 100%, 100% 100%; }
+  50%       { background-size: 120% 120%, 120% 120%, 100% 100%; }
+}
+@keyframes cosmetic-data-flow {
+  0%   { background-position: 0 0, 0 0, 0 0; }
+  100% { background-position: 0 1000px, 0 1000px, 0 0; }
+}
+@keyframes cosmetic-vortex-spin {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+@keyframes cosmetic-matrix-fall {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 13px, 0 0; }
+}
+@keyframes cosmetic-scan-beam {
+  0%   { background-position: 0 -100%; }
+  100% { background-position: 0 200%; }
+}
+@keyframes cosmetic-plasma-orbit {
+  0%, 100% { background-position: 0% 50%,   100% 50%,  50% 0%,   0 0; }
+  25%       { background-position: 100% 50%, 0% 50%,   50% 100%, 0 0; }
+  50%       { background-position: 50% 0%,   50% 100%, 0% 50%,   0 0; }
+  75%       { background-position: 50% 100%, 50% 0%,   100% 50%, 0 0; }
+}
+
+/* --- Badge animations --- */
+@keyframes cosmetic-badge-pulse {
+  0%, 100% { filter: brightness(1);   box-shadow: var(--badge-glow-sm); }
+  50%       { filter: brightness(1.5); box-shadow: var(--badge-glow-lg); }
+}
+@keyframes cosmetic-badge-hue-spin {
+  0%   { filter: hue-rotate(0deg)   brightness(1);   }
+  50%  { filter: hue-rotate(180deg) brightness(1.3); }
+  100% { filter: hue-rotate(360deg) brightness(1);   }
+}
+@keyframes cosmetic-badge-flicker {
+  0%, 88%, 100%  { opacity: 1;   filter: brightness(1);   }
+  90%            { opacity: 0.5; filter: brightness(0.4);  }
+  92%            { opacity: 1;   filter: brightness(1.6);  }
+  94%            { opacity: 0.3; filter: brightness(0.2);  }
+  96%            { opacity: 1;   filter: brightness(1.3);  }
+}
+@keyframes cosmetic-badge-orbit-glow {
+  0%, 100% { box-shadow: 0 0 8px 2px currentColor,  0 0 0   0 transparent;  }
+  50%       { box-shadow: 0 0 18px 6px currentColor, 0 0 30px 4px currentColor; }
+}
+
+/* --- Calling card animations --- */
+@keyframes cosmetic-card-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes cosmetic-card-glitch {
+  0%, 88%, 100% { transform: translateX(0);  filter: none;              }
+  90%           { transform: translateX(-3px); filter: hue-rotate(90deg); }
+  92%           { transform: translateX(3px);  filter: hue-rotate(-90deg); }
+  94%           { transform: translateX(-1px); filter: brightness(1.8);  }
+  96%           { transform: translateX(0);   filter: none;              }
+}
+@keyframes cosmetic-card-neon-pulse {
+  0%, 100% { box-shadow: var(--card-glow-base); }
+  50%       { box-shadow: var(--card-glow-peak); }
+}
+@keyframes cosmetic-card-static {
+  0%   { opacity: 0;   }
+  5%   { opacity: 0.04; }
+  10%  { opacity: 0;   }
+  15%  { opacity: 0.03; }
+  30%  { opacity: 0;   }
+  55%  { opacity: 0.03; }
+  60%  { opacity: 0;   }
+  80%  { opacity: 0.04; }
+  100% { opacity: 0;   }
+}
+
+@keyframes profile-dp-ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.profile-dp-ticker-track {
+  animation: profile-dp-ticker-scroll 18s linear infinite;
+}

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Disallow: /ad-test
+Disallow: /achievements
+Disallow: /cancel-email-change
+Disallow: /dev
+Disallow: /profile
+Disallow: /ai-problems/create
+Disallow: /ai-problems/browse
+Disallow: /verify-email
+Disallow: /verify-email-change
+
+Sitemap: https://codegrind.online/sitemap.xml

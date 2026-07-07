@@ -1,0 +1,76 @@
+/**
+ * High Performance Mode Optimizations
+ * 
+ * These optimizations help improve performance on high-resolution displays
+ * by reducing animation complexity and optimizing rendering.
+ */
+
+/* Main optimizations */
+.high-performance-mode {
+  /* Reduce shadow blur and complexity */
+  --shadow-intensity: 0.6;
+  --glow-intensity: 0.7;
+  
+  /* Apply hardware acceleration selectively */
+  transform: translateZ(0);
+}
+
+/* Optimize box shadows */
+.high-performance-mode .monaco-editor,
+.high-performance-mode .editor-panel {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce shadow complexity */
+.high-performance-mode .editor-panel,
+.high-performance-mode .chat-panel-container,
+.high-performance-mode .problem-panel {
+  box-shadow: none !important;
+}
+
+/* Optimize scan lines by reducing frequency */
+.high-performance-mode .chat-container::after,
+.high-performance-mode .problem-description::after {
+  background-size: 100% 8px !important; /* Larger size = fewer lines */
+}
+
+/* Disable complex text shadows in high-res mode */
+.high-performance-mode .glowing-text {
+  text-shadow: 0 0 5px rgba(0, 204, 255, 0.5) !important;
+}
+
+/* Optimize Monaco editor */
+.high-performance-mode .monaco-editor {
+  /* Disable smooth scrolling to improve performance */
+  --vscode-editor-scrollbar-scrollByPage: true;
+}
+
+/* Optimize animations in chat */
+.high-performance-mode .message-content,
+.high-performance-mode .chat-message {
+  transition-duration: 0.15s !important;
+}
+
+/* Reduce animation complexity for all Chakra components */
+.high-performance-mode .chakra-modal__content,
+.high-performance-mode .chakra-popover__content,
+.high-performance-mode .chakra-tooltip {
+  transition-duration: 0.15s !important;
+}
+
+/* Reduce animation duration for Monaco editor */
+.high-performance-mode .monaco-editor .cursor,
+.high-performance-mode .monaco-editor .line-numbers {
+  transition-duration: 0.1s !important;
+}
+
+/* Limit animation frame rate for grid animations */
+.high-performance-mode [style*="animation"] {
+  animation-timing-function: steps(10) !important;
+}
+
+/* Simplify or disable complex background patterns */
+.high-performance-mode [style*="linear-gradient"] {
+  background-size: 40px 40px !important; /* Larger grid size */
+} 

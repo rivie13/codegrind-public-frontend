@@ -1,0 +1,156 @@
+.td-canvas-glitch {
+  position: relative;
+  --glitch-intensity: 0;
+  --glitch-opacity: 0;
+  --glitch-jitter: 0px;
+  --glitch-speed: 1s;
+  --glitch-scan-opacity: 0;
+  --glitch-overlay-opacity: 0;
+  --glitch-flicker-opacity: 0;
+  --glitch-flicker-speed: 1.2s;
+  --glitch-flash-opacity: 0;
+  --intrusion-opacity: 0;
+  --intrusion-speed: 2.4s;
+}
+
+.td-canvas-glitch.glitch-active {
+  animation: none;
+}
+
+.td-canvas-glitch.glitch-active::before,
+.td-canvas-glitch.glitch-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.td-canvas-glitch.glitch-active::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.08) 1px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  opacity: var(--glitch-scan-opacity);
+}
+
+.td-canvas-glitch.glitch-active::after {
+  inset: 6px;
+  border: 1px solid rgba(0, 0, 128, 0.28);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.65),
+    inset -1px -1px 0 rgba(70, 70, 70, 0.35);
+  background: rgba(212, 208, 200, calc(var(--glitch-overlay-opacity) * 0.45));
+  opacity: 1;
+}
+
+.td-canvas-glitch.glitch-active .td-canvas-flicker,
+.td-canvas-glitch.glitch-active .td-canvas-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.td-canvas-glitch.glitch-active .td-canvas-flicker {
+  background: rgba(255, 255, 255, 0.08);
+  opacity: var(--glitch-flicker-opacity);
+  animation: td-canvas-flicker var(--glitch-flicker-speed) infinite;
+}
+
+.td-canvas-glitch.glitch-active .td-canvas-flash {
+  background: radial-gradient(circle at center, rgba(255, 243, 196, 0.5), rgba(255, 243, 196, 0));
+  opacity: var(--glitch-flash-opacity);
+  animation: td-canvas-flash calc(var(--glitch-flicker-speed) * 1.6) infinite;
+}
+
+.td-canvas-glitch.glitch-active .td-canvas-intrusion {
+  position: absolute;
+  inset: 0;
+  padding: 18px;
+  border: 2px solid #6b6b6b;
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(228, 225, 216, 0.92), rgba(206, 201, 190, 0.94));
+  color: #1f2128;
+  font-family: 'Tahoma', 'MS Sans Serif', 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: none;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.78),
+    inset -1px -1px 0 rgba(104, 104, 104, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  animation: td-canvas-intrusion var(--intrusion-speed) infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.td-canvas-glitch.glitch-active .td-canvas-intrusion::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 128, 0.04),
+    rgba(0, 0, 128, 0.04) 2px,
+    rgba(0, 0, 0, 0) 5px,
+    rgba(0, 0, 0, 0) 10px
+  );
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+@keyframes td-canvas-flicker {
+  0%, 100% {
+    opacity: calc(var(--glitch-flicker-opacity) * 0.14);
+  }
+  20% {
+    opacity: calc(var(--glitch-flicker-opacity) * 0.24);
+  }
+  40% {
+    opacity: calc(var(--glitch-flicker-opacity) * 0.06);
+  }
+  60% {
+    opacity: calc(var(--glitch-flicker-opacity) * 0.28);
+  }
+  80% {
+    opacity: calc(var(--glitch-flicker-opacity) * 0.16);
+  }
+}
+
+@keyframes td-canvas-flash {
+  0%, 92%, 100% {
+    opacity: 0;
+  }
+  94% {
+    opacity: var(--glitch-flash-opacity);
+  }
+  96% {
+    opacity: calc(var(--glitch-flash-opacity) * 0.4);
+  }
+}
+
+@keyframes td-canvas-intrusion {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--intrusion-opacity);
+  }
+  26% {
+    opacity: var(--intrusion-opacity);
+  }
+  34% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}

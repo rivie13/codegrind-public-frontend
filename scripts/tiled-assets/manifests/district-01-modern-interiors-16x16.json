@@ -1,0 +1,189 @@
+{
+  "name": "District 01 modern interiors 16x16",
+  "description": "Restores the free apartment sheets as lightweight defaults, generates one tileset per paid 16x16 spritesheet, and rebuilds the animated-object preview collection for district-01 authoring maps.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "sheetTileset",
+      "name": "d01-apartment-interiors",
+      "sourceImage": "public/city-v2/tiled/interiors/Interiors_free_16x16.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-apartment-interiors.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "sheetTileset",
+      "name": "d01-room-builder",
+      "sourceImage": "public/city-v2/tiled/interiors/Room_Builder_free_16x16.png",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-room-builder.tsj",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "directorySheetTilesets",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/1_Interiors/16x16/Theme_Sorter",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/moderninteriors-16x16/theme-sorter",
+      "namePrefix": "d01-mi-theme",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "directorySheetTilesets",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/1_Interiors/16x16/Theme_Sorter_Black_Shadow",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/moderninteriors-16x16/theme-sorter-black-shadow",
+      "namePrefix": "d01-mi-theme-black-shadow",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "directorySheetTilesets",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/1_Interiors/16x16/Theme_Sorter_Shadowless",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/moderninteriors-16x16/theme-sorter-shadowless",
+      "namePrefix": "d01-mi-theme-shadowless",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "directorySheetTilesets",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/1_Interiors/16x16/Room_Builder_subfiles",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/moderninteriors-16x16/room-builder-subfiles",
+      "namePrefix": "d01-mi-room-builder",
+      "tileWidth": 16,
+      "tileHeight": 16
+    },
+    {
+      "type": "animatedStripCollectionTileset",
+      "name": "d01-mi-animated-objects",
+      "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/3_Animated_objects/16x16/spritesheets",
+      "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/animated-objects/16x16/frames",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj",
+      "frameDuration": 100,
+      "frameStep": 16
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-apartment-interiors.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-room-builder.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/apartment-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/cluster-map-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-apartment-interiors.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/cluster-map-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-room-builder.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/cluster-map-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/cluster-map-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/cluster-map-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/data-packet-store-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-apartment-interiors.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/data-packet-store-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-room-builder.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/data-packet-store-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/data-packet-store-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/data-packet-store-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/learning-path-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-apartment-interiors.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/learning-path-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-room-builder.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/learning-path-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/learning-path-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/learning-path-building-interior.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-apartment-interiors.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-room-builder.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+    }
+  ]
+}

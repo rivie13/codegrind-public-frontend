@@ -1,0 +1,37 @@
+import { vi } from 'vitest';
+
+export function createMockCanvasContext() {
+  return {
+    save: vi.fn(),
+    restore: vi.fn(),
+    beginPath: vi.fn(),
+    closePath: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    arc: vi.fn(),
+    ellipse: vi.fn(),
+    rect: vi.fn(),
+    clip: vi.fn(),
+    fillRect: vi.fn(),
+    strokeRect: vi.fn(),
+    setLineDash: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    quadraticCurveTo: vi.fn(),
+    createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+    createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+    fillText: vi.fn(),
+    strokeText: vi.fn(),
+    clearRect: vi.fn(),
+    drawImage: vi.fn(),
+    measureText: vi.fn((text = '') => ({ width: String(text).length * 7 })),
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    font: '10px monospace',
+    textAlign: 'left',
+    textBaseline: 'alphabetic',
+  };
+}

@@ -1,0 +1,665 @@
+/* Custom cyberpunk terminal styling */
+.cyberpunk-terminal {
+  background: linear-gradient(rgba(0, 0, 0, 0.95), rgba(0, 10, 20, 0.9));
+  border: 1px solid #0066ff;
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.2), inset 0 0 10px rgba(0, 150, 255, 0.1);
+  font-family: "Courier New", monospace;
+  position: relative;
+  /* Default values for CSS custom properties that control glitch effect intensity */
+  --glitch-intensity: 0.8;
+  --text-shadow-strength: 0.08em;
+  --transform-strength: 0.04em;
+  --animation-speed: 2.5s;
+  --shake-intensity: 4px;
+  --shake-animation-speed: .8s; /* Separate, faster animation speed for shake effect */
+}
+
+.cyberpunk-terminal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #00ccff, transparent);
+  opacity: 0.8;
+}
+
+.cyberpunk-terminal::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #00ccff, transparent);
+  opacity: 0.5;
+}
+
+/* Terminal line animations */
+@keyframes typeWrite {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Basic cursor blinking animation */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Enhanced glitch effect - now with dynamic intensity via CSS variables */
+@keyframes glitch {
+  0% { text-shadow: var(--text-shadow-strength) 0 0 #ff00ff, calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  10% { text-shadow: var(--text-shadow-strength) 0 0 #ff00ff, calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  11% { text-shadow: calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #ff00ff, calc(0.5 * var(--text-shadow-strength)) calc(0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  15% { text-shadow: calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #ff0055, calc(0.5 * var(--text-shadow-strength)) calc(0.5 * var(--text-shadow-strength)) 0 #00ffaa; }
+  30% { text-shadow: calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #ff5500, calc(0.5 * var(--text-shadow-strength)) calc(0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  31% { text-shadow: calc(0.5 * var(--text-shadow-strength)) var(--text-shadow-strength) 0 #ff00ff, var(--text-shadow-strength) 0 0 #00ffff; }
+  45% { text-shadow: calc(0.5 * var(--text-shadow-strength)) var(--text-shadow-strength) 0 #ff00ff, var(--text-shadow-strength) 0 0 #00ffff; }
+  46% { text-shadow: calc(-0.5 * var(--text-shadow-strength)) 0 0 #ff00ff, calc(-0.5 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  60% { text-shadow: calc(-0.5 * var(--text-shadow-strength)) 0 0 #ff5500, calc(-0.5 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  61% { text-shadow: calc(0.5 * var(--text-shadow-strength)) var(--text-shadow-strength) 0 #ff00ff, var(--text-shadow-strength) 0 0 #55ffff; }
+  75% { text-shadow: calc(0.5 * var(--text-shadow-strength)) var(--text-shadow-strength) 0 #ff00ff, var(--text-shadow-strength) 0 0 #00ffff; }
+  76% { text-shadow: calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #ff0055, calc(0.5 * var(--text-shadow-strength)) calc(0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  90% { text-shadow: calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #ff00ff, calc(0.5 * var(--text-shadow-strength)) calc(0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  91% { text-shadow: var(--text-shadow-strength) 0 0 #ff00ff, calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+  100% { text-shadow: var(--text-shadow-strength) 0 0 #ff00ff, calc(-1 * var(--text-shadow-strength)) calc(-0.5 * var(--text-shadow-strength)) 0 #00ffff; }
+}
+
+/* Severe glitch effect for when lives are getting low - now with dynamic intensity */
+@keyframes severe-glitch {
+  0% { 
+    text-shadow: calc(1.2 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(0.2 * var(--transform-strength)), 0); 
+  }
+  10% { 
+    text-shadow: calc(1.2 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(-0.2 * var(--transform-strength)), 0); 
+  }
+  11% { 
+    text-shadow: calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #ff0055, 
+                calc(0.6 * var(--text-shadow-strength)) calc(0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(0.75 * var(--transform-strength)), 0); 
+  }
+  20% { 
+    text-shadow: calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #ff0055, 
+                calc(0.6 * var(--text-shadow-strength)) calc(0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(-0.625 * var(--transform-strength)), 0); 
+  }
+  21% { 
+    text-shadow: calc(var(--text-shadow-strength)) calc(1.4 * var(--text-shadow-strength)) 0 #ff5500, 
+                calc(1.4 * var(--text-shadow-strength)) 0 0 #00ffff; 
+    transform: translate(calc(-0.2 * var(--transform-strength)), calc(0.425 * var(--transform-strength))); 
+  }
+  30% { 
+    text-shadow: calc(var(--text-shadow-strength)) calc(1.4 * var(--text-shadow-strength)) 0 #ff5500, 
+                calc(1.4 * var(--text-shadow-strength)) 0 0 #00ffff; 
+    transform: translate(calc(0.425 * var(--transform-strength)), calc(-0.2 * var(--transform-strength))); 
+  }
+  31% { 
+    text-shadow: calc(-0.6 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-0.6 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #55ffff; 
+    transform: translate(0, calc(-0.2 * var(--transform-strength))); 
+  }
+  45% { 
+    text-shadow: calc(-0.6 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-0.6 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #55ffff; 
+    transform: translate(calc(0.425 * var(--transform-strength)), 0); 
+  }
+  46% { 
+    text-shadow: calc(0.6 * var(--text-shadow-strength)) calc(1.4 * var(--text-shadow-strength)) 0 #ff0055, 
+                calc(1.4 * var(--text-shadow-strength)) 0 0 #00ffff; 
+    transform: translate(0, calc(0.425 * var(--transform-strength))); 
+  }
+  65% { 
+    text-shadow: calc(0.6 * var(--text-shadow-strength)) calc(1.4 * var(--text-shadow-strength)) 0 #ff0055, 
+                calc(1.4 * var(--text-shadow-strength)) 0 0 #00ffff; 
+    transform: translate(calc(-0.425 * var(--transform-strength)), 0); 
+  }
+  66% { 
+    text-shadow: calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #ff5500, 
+                calc(0.6 * var(--text-shadow-strength)) calc(0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(-0.2 * var(--transform-strength)), calc(-0.2 * var(--transform-strength))); 
+  }
+  80% { 
+    text-shadow: calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #ff5500, 
+                calc(0.6 * var(--text-shadow-strength)) calc(0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(0.2 * var(--transform-strength)), calc(0.2 * var(--transform-strength))); 
+  }
+  81% { 
+    text-shadow: calc(1.2 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(calc(0.2 * var(--transform-strength)), calc(-0.425 * var(--transform-strength))); 
+  }
+  100% { 
+    text-shadow: calc(1.2 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.2 * var(--text-shadow-strength)) calc(-0.6 * var(--text-shadow-strength)) 0 #00ffff; 
+    transform: translate(0, 0); 
+  }
+}
+
+/* Critical glitch effect for extreme danger - now with dynamic intensity */
+@keyframes critical-glitch {
+  0% { 
+    text-shadow: calc(1.7 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.7 * var(--text-shadow-strength)) calc(-0.8 * var(--text-shadow-strength)) 0 #00ffff, 
+                calc(0.8 * var(--text-shadow-strength)) calc(0.8 * var(--text-shadow-strength)) 0 #ffff00; 
+    transform: translate(calc(0.425 * var(--transform-strength)), 0) skew(1.7deg); 
+  }
+  7% { 
+    text-shadow: calc(1.7 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.7 * var(--text-shadow-strength)) calc(-0.8 * var(--text-shadow-strength)) 0 #00ffff, 
+                calc(0.8 * var(--text-shadow-strength)) calc(0.8 * var(--text-shadow-strength)) 0 #ffff00; 
+    transform: translate(calc(-0.425 * var(--transform-strength)), 0) skew(-2.5deg); 
+  }
+  8% { 
+    text-shadow: calc(-1.7 * var(--text-shadow-strength)) calc(0.8 * var(--text-shadow-strength)) 0 #ff5500, 
+                calc(1.7 * var(--text-shadow-strength)) 0 0 #22ffff, 
+                calc(-1.4 * var(--text-shadow-strength)) calc(-1.4 * var(--text-shadow-strength)) 0 #ff0000; 
+    transform: translate(calc(0.75 * var(--transform-strength)), calc(0.425 * var(--transform-strength))) skew(4.2deg); 
+  }
+  15% { 
+    text-shadow: calc(-1.7 * var(--text-shadow-strength)) calc(0.8 * var(--text-shadow-strength)) 0 #ff5500, 
+                calc(1.7 * var(--text-shadow-strength)) 0 0 #22ffff, 
+                calc(-1.4 * var(--text-shadow-strength)) calc(-1.4 * var(--text-shadow-strength)) 0 #ff0000; 
+    transform: translate(calc(-0.625 * var(--transform-strength)), calc(-0.425 * var(--transform-strength))) skew(-0.8deg); 
+  }
+  16% { 
+    text-shadow: calc(0.8 * var(--text-shadow-strength)) calc(-0.8 * var(--text-shadow-strength)) 0 #ff0055, 
+                calc(-0.8 * var(--text-shadow-strength)) 0 0 #00ffff, 
+                0 calc(1.7 * var(--text-shadow-strength)) 0 #ffff00; 
+    transform: translate(0, calc(0.625 * var(--transform-strength))) skew(1.7deg) scale(1.025); 
+  }
+  /* Further keyframes with similar modifications for dynamic intensity */
+  /* ... abbreviated for clarity ... */
+  100% { 
+    text-shadow: calc(1.7 * var(--text-shadow-strength)) 0 0 #ff0055, 
+                calc(-1.7 * var(--text-shadow-strength)) calc(0.8 * var(--text-shadow-strength)) 0 #00ffff, 
+                calc(0.8 * var(--text-shadow-strength)) calc(-0.8 * var(--text-shadow-strength)) 0 #ffff00; 
+    transform: translate(0, 0) skew(0); 
+  }
+}
+
+/* Class to disable all glitch effects while preserving terminal styling */
+.terminal-no-glitch,
+.terminal-no-glitch *,
+.terminal-no-glitch .terminal-text-container,
+.terminal-no-glitch .terminal-line,
+.terminal-no-glitch .critical-message,
+.terminal-no-glitch .alert-message,
+.terminal-no-glitch .breach-message,
+.terminal-no-glitch .system-message,
+.terminal-no-glitch .security-message,
+.terminal-no-glitch .success-message,
+.terminal-no-glitch .verify-message,
+.terminal-no-glitch .warning-message,
+.terminal-no-glitch .intel-message {
+  animation: none !important;
+  text-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  filter: none !important;
+}
+
+/* Add this important override at the end to ensure it has highest specificity */
+.cyberpunk-terminal.terminal-no-glitch {
+  animation: none !important;
+}
+
+/* Game over specific styling to make terminal more readable */
+.terminal-no-glitch .critical-message {
+  color: #ff3355;
+  text-shadow: 0 0 5px rgba(255, 51, 85, 0.5) !important;
+}
+
+.terminal-no-glitch .alert-message {
+  color: #ffcc00;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.5) !important;
+}
+
+.terminal-no-glitch .system-message {
+  color: #33ccff;
+  text-shadow: 0 0 5px rgba(51, 204, 255, 0.5) !important;
+}
+
+/* Lives-based glitch classes that apply directly to the terminal text */
+.terminal-glitch-low .terminal-text-container {
+  animation: glitch var(--animation-speed) infinite;
+  will-change: text-shadow;
+}
+
+.terminal-glitch-medium .terminal-text-container {
+  animation: severe-glitch var(--animation-speed) infinite;
+  will-change: text-shadow, transform;
+}
+
+.terminal-glitch-high .terminal-text-container {
+  animation: critical-glitch var(--animation-speed) infinite;
+  will-change: text-shadow, transform;
+}
+
+/* Also apply a subtle effect to specific message types in critical mode */
+.terminal-glitch-high .critical-message {
+  animation: critical-glitch calc(var(--animation-speed) * 0.75) infinite;
+  will-change: text-shadow, transform;
+}
+
+.terminal-glitch-high .alert-message {
+  animation: severe-glitch var(--animation-speed) infinite;
+  will-change: text-shadow, transform;
+}
+
+/* Animated cursor for cyberpunk terminal */
+.terminal-cursor-blink {
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
+
+/* Message type styling */
+.terminal-line {
+  line-height: 1.4;
+  margin-bottom: 3px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  color: #00ff00;
+}
+
+.system-message {
+  color: #00ccff;
+  font-weight: bold;
+}
+
+.kernel-message {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.alert-message {
+  color: #ff3d00;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(255, 61, 0, 0.5);
+}
+
+.breach-message {
+  color: #00ff66;
+}
+
+.success-message {
+  color: #66ff00;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(102, 255, 0, 0.4);
+}
+
+.critical-message {
+  color: #ff0055;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 0, 85, 0.7);
+}
+
+.module-message {
+  color: #00e5ff;
+}
+
+.upgrade-message {
+  color: #aa00ff;
+}
+
+.security-message {
+  color: #ff4081;
+}
+
+.verify-message {
+  color: #ffff00;
+  text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.warning-message {
+  color: #ffab00;
+  font-weight: bold;
+}
+
+.protocol-message {
+  color: #64ffda;
+}
+
+.analytics-message {
+  color: #ffcc00;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, rgba(255, 204, 0, 0.05), transparent);
+  padding-left: 4px;
+  border-left: 2px solid rgba(255, 204, 0, 0.5);
+}
+
+@keyframes intel-pulse {
+  0%   { text-shadow: 0 0 4px rgba(255, 95, 198, 0.3); }
+  50%  { text-shadow: 0 0 14px rgba(255, 95, 198, 0.85), 0 0 24px rgba(0, 212, 255, 0.4); }
+  100% { text-shadow: 0 0 4px rgba(255, 95, 198, 0.3); }
+}
+
+.intel-message {
+  color: #FF8CDD;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  border-left: 2px solid rgba(255, 95, 198, 0.5);
+  padding-left: 6px;
+  background: linear-gradient(90deg, rgba(255, 95, 198, 0.06), transparent);
+  animation: intel-pulse 2s ease-in-out infinite;
+}
+
+.ascii-art {
+  color: #00ff66;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 0 5px rgba(0, 255, 102, 0.5);
+  /* Add responsive styling for ASCII art */
+  max-width: 100%;
+}
+
+/* New classes for ASCII success and fail */
+.ascii-success {
+  color: #00ff66; /* Bright green color */
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.7);
+  max-width: 100%;
+}
+
+.ascii-fail {
+  color: #ff0055; /* Bright red color */
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(255, 0, 85, 0.7);
+  max-width: 100%;
+}
+
+/* Scan line effect */
+.terminal-text-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.1;
+}
+
+/* CRT flicker effect */
+@keyframes flicker {
+  0% { opacity: 0.9; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.9; }
+  15% { opacity: 0.95; }
+  20% { opacity: 1; }
+  80% { opacity: 0.9; }
+  85% { opacity: 0.95; }
+  90% { opacity: 0.9; }
+  95% { opacity: 0.95; }
+  100% { opacity: 1; }
+}
+
+.cyberpunk-terminal {
+  animation: flicker 5s infinite;
+}
+
+/* Resizable terminal styles */
+.terminal-container {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Fixed default height */
+  min-height: 150px;
+  max-height: 80vh;
+  overflow: hidden;
+  margin: 0;  /* Remove any margin */
+  padding: 0; /* Remove any padding */
+  border-top: none; /* Ensure no border causing gaps */
+}
+
+/* Target the ad container to prevent it from creating a gap */
+.terminal-ad-container {
+  margin: 0;  /* Remove any margin */
+  padding: 0; /* Remove any padding */
+}
+
+/* Remove the previous resizable class that wasn't working */
+.resizable-terminal {
+  /* These properties are now handled by JS in the component */
+  min-height: 150px;
+  max-height: 80vh;
+}
+
+/* Custom resize handle styles */
+.custom-handle {
+  width: 100%;
+  height: 10px;
+  background: #111;
+  cursor: row-resize;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #0066ff;
+  user-select: none; /* Prevent text selection during resize */
+}
+
+.handle-bar {
+  width: 40px;
+  height: 4px;
+  background: #0066ff;
+  border-radius: 2px;
+}
+
+.custom-handle:hover {
+  background: #1a1a2e;
+}
+
+.custom-handle:hover .handle-bar {
+  background: #00ccff;
+  box-shadow: 0 0 5px #00ccff;
+}
+
+/* Media queries for responsive ASCII art */
+@media (max-width: 768px) {
+  .ascii-art {
+    font-size: 10px !important;
+    line-height: 0.9;
+  }
+}
+
+@media (max-width: 576px) {
+  .ascii-art {
+    font-size: 8px !important;
+    line-height: 0.8;
+  }
+}
+
+/* Terminal container shake animations for different glitch levels */
+@keyframes terminal-shake-low {
+  0% { transform: translate(0, 0); }
+  5% { transform: translate(calc(-0.7 * var(--shake-intensity)), 0); }
+  10% { transform: translate(calc(0.5 * var(--shake-intensity)), calc(-0.3 * var(--shake-intensity))); }
+  15% { transform: translate(calc(-0.3 * var(--shake-intensity)), calc(0.7 * var(--shake-intensity))); }
+  20% { transform: translate(calc(0.7 * var(--shake-intensity)), 0); }
+  25% { transform: translate(0, calc(-0.5 * var(--shake-intensity))); }
+  30% { transform: translate(calc(-0.5 * var(--shake-intensity)), calc(0.3 * var(--shake-intensity))); }
+  35% { transform: translate(calc(0.3 * var(--shake-intensity)), calc(-0.7 * var(--shake-intensity))); }
+  40% { transform: translate(0, calc(0.5 * var(--shake-intensity))); }
+  45% { transform: translate(calc(-0.7 * var(--shake-intensity)), 0); }
+  50% { transform: translate(calc(0.5 * var(--shake-intensity)), calc(-0.5 * var(--shake-intensity))); }
+  55% { transform: translate(0, calc(0.7 * var(--shake-intensity))); }
+  60% { transform: translate(calc(-0.5 * var(--shake-intensity)), 0); }
+  65% { transform: translate(calc(0.7 * var(--shake-intensity)), calc(-0.3 * var(--shake-intensity))); }
+  70% { transform: translate(0, calc(0.5 * var(--shake-intensity))); }
+  75% { transform: translate(calc(-0.3 * var(--shake-intensity)), calc(-0.7 * var(--shake-intensity))); }
+  80% { transform: translate(calc(0.5 * var(--shake-intensity)), 0); }
+  85% { transform: translate(calc(-0.7 * var(--shake-intensity)), calc(0.3 * var(--shake-intensity))); }
+  90% { transform: translate(calc(0.3 * var(--shake-intensity)), calc(-0.5 * var(--shake-intensity))); }
+  95% { transform: translate(calc(-0.5 * var(--shake-intensity)), 0); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes terminal-shake-medium {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  5% { transform: translate(calc(-1.2 * var(--shake-intensity)), calc(0.7 * var(--shake-intensity))) rotate(-0.3deg); }
+  10% { transform: translate(calc(1.4 * var(--shake-intensity)), calc(-0.5 * var(--shake-intensity))) rotate(0.2deg); }
+  15% { transform: translate(calc(-0.7 * var(--shake-intensity)), calc(1.4 * var(--shake-intensity))) rotate(-0.1deg); }
+  20% { transform: translate(calc(1.2 * var(--shake-intensity)), calc(-0.7 * var(--shake-intensity))) rotate(0.3deg); }
+  25% { transform: translate(calc(-1.4 * var(--shake-intensity)), calc(0.3 * var(--shake-intensity))) rotate(-0.2deg); }
+  30% { transform: translate(calc(0.5 * var(--shake-intensity)), calc(1.2 * var(--shake-intensity))) rotate(0.1deg); }
+  35% { transform: translate(calc(1.2 * var(--shake-intensity)), calc(-1.0 * var(--shake-intensity))) rotate(-0.3deg); }
+  40% { transform: translate(calc(-0.7 * var(--shake-intensity)), calc(0.7 * var(--shake-intensity))) rotate(0.2deg); }
+  45% { transform: translate(calc(0.5 * var(--shake-intensity)), calc(-1.4 * var(--shake-intensity))) rotate(-0.1deg); }
+  50% { transform: translate(calc(-1.2 * var(--shake-intensity)), 0) rotate(0.3deg); }
+  55% { transform: translate(calc(1.4 * var(--shake-intensity)), calc(0.7 * var(--shake-intensity))) rotate(-0.2deg); }
+  60% { transform: translate(calc(-0.7 * var(--shake-intensity)), calc(-1.2 * var(--shake-intensity))) rotate(0.1deg); }
+  65% { transform: translate(calc(1.0 * var(--shake-intensity)), calc(0.5 * var(--shake-intensity))) rotate(-0.3deg); }
+  70% { transform: translate(calc(-1.4 * var(--shake-intensity)), calc(-0.3 * var(--shake-intensity))) rotate(0.2deg); }
+  75% { transform: translate(calc(0.3 * var(--shake-intensity)), calc(1.4 * var(--shake-intensity))) rotate(-0.1deg); }
+  80% { transform: translate(calc(1.2 * var(--shake-intensity)), calc(-0.7 * var(--shake-intensity))) rotate(0.3deg); }
+  85% { transform: translate(calc(-1.0 * var(--shake-intensity)), calc(0.5 * var(--shake-intensity))) rotate(-0.2deg); }
+  90% { transform: translate(calc(0.7 * var(--shake-intensity)), calc(-1.2 * var(--shake-intensity))) rotate(0.1deg); }
+  95% { transform: translate(calc(-1.4 * var(--shake-intensity)), calc(-0.7 * var(--shake-intensity))) rotate(-0.3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes terminal-shake-high {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  4% { transform: translate(calc(-2.0 * var(--shake-intensity)), calc(1.2 * var(--shake-intensity))) rotate(-0.5deg) scale(1.004); }
+  8% { transform: translate(calc(1.8 * var(--shake-intensity)), calc(-1.6 * var(--shake-intensity))) rotate(0.5deg) scale(0.996); }
+  12% { transform: translate(calc(-1.6 * var(--shake-intensity)), calc(2.0 * var(--shake-intensity))) rotate(-0.4deg) scale(1.006); }
+  16% { transform: translate(calc(2.2 * var(--shake-intensity)), calc(-0.8 * var(--shake-intensity))) rotate(0.6deg) scale(0.994); }
+  20% { transform: translate(calc(-1.0 * var(--shake-intensity)), calc(-1.8 * var(--shake-intensity))) rotate(-0.6deg) scale(1.008); }
+  24% { transform: translate(calc(1.4 * var(--shake-intensity)), calc(1.4 * var(--shake-intensity))) rotate(0.4deg) scale(0.992); }
+  28% { transform: translate(calc(-2.2 * var(--shake-intensity)), calc(-1.0 * var(--shake-intensity))) rotate(-0.7deg) scale(1.005); }
+  32% { transform: translate(calc(1.0 * var(--shake-intensity)), calc(1.8 * var(--shake-intensity))) rotate(0.7deg) scale(0.995); }
+  36% { transform: translate(calc(-1.4 * var(--shake-intensity)), calc(-1.4 * var(--shake-intensity))) rotate(-0.4deg) scale(1.007); }
+  40% { transform: translate(calc(2.2 * var(--shake-intensity)), calc(0.6 * var(--shake-intensity))) rotate(0.6deg) scale(0.993); }
+  44% { transform: translate(calc(-1.8 * var(--shake-intensity)), calc(1.6 * var(--shake-intensity))) rotate(-0.6deg) scale(1.006); }
+  48% { transform: translate(calc(1.6 * var(--shake-intensity)), calc(-2.0 * var(--shake-intensity))) rotate(0.5deg) scale(0.994); }
+  52% { transform: translate(calc(-2.0 * var(--shake-intensity)), calc(-0.6 * var(--shake-intensity))) rotate(-0.5deg) scale(1.005); }
+  56% { transform: translate(calc(0.8 * var(--shake-intensity)), calc(2.2 * var(--shake-intensity))) rotate(0.7deg) scale(0.993); }
+  60% { transform: translate(calc(-1.4 * var(--shake-intensity)), calc(-1.8 * var(--shake-intensity))) rotate(-0.7deg) scale(1.007); }
+  64% { transform: translate(calc(2.0 * var(--shake-intensity)), calc(1.0 * var(--shake-intensity))) rotate(0.4deg) scale(0.995); }
+  68% { transform: translate(calc(-0.6 * var(--shake-intensity)), calc(-2.2 * var(--shake-intensity))) rotate(-0.6deg) scale(1.004); }
+  72% { transform: translate(calc(1.8 * var(--shake-intensity)), calc(0.8 * var(--shake-intensity))) rotate(0.6deg) scale(0.996); }
+  76% { transform: translate(calc(-2.2 * var(--shake-intensity)), calc(-1.0 * var(--shake-intensity))) rotate(-0.4deg) scale(1.006); }
+  80% { transform: translate(calc(1.0 * var(--shake-intensity)), calc(2.0 * var(--shake-intensity))) rotate(0.5deg) scale(0.994); }
+  84% { transform: translate(calc(-1.6 * var(--shake-intensity)), calc(-1.6 * var(--shake-intensity))) rotate(-0.7deg) scale(1.003); }
+  88% { transform: translate(calc(2.2 * var(--shake-intensity)), calc(0.6 * var(--shake-intensity))) rotate(0.7deg) scale(0.997); }
+  92% { transform: translate(calc(-1.0 * var(--shake-intensity)), calc(1.8 * var(--shake-intensity))) rotate(-0.3deg) scale(1.002); }
+  96% { transform: translate(calc(1.4 * var(--shake-intensity)), calc(-2.2 * var(--shake-intensity))) rotate(0.3deg) scale(0.998); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+/* Apply the terminal shaking effect to the terminal container */
+.terminal-glitch-low .terminal-content {
+  animation: terminal-shake-low var(--shake-animation-speed) infinite;
+  will-change: transform;
+}
+
+.terminal-glitch-medium .terminal-content {
+  animation: terminal-shake-medium var(--shake-animation-speed) infinite;
+  will-change: transform;
+}
+
+.terminal-glitch-high .terminal-content {
+  animation: terminal-shake-high calc(var(--shake-animation-speed) * 0.6) infinite;
+  will-change: transform;
+}
+
+/* Keep existing text container animations */
+.terminal-glitch-low .terminal-text-container {
+  animation: glitch var(--animation-speed) infinite;
+  will-change: text-shadow;
+}
+
+.terminal-glitch-medium .terminal-text-container {
+  animation: severe-glitch var(--animation-speed) infinite;
+  will-change: text-shadow, transform;
+}
+
+.terminal-glitch-high .terminal-text-container {
+  animation: critical-glitch var(--animation-speed) infinite;
+  will-change: text-shadow, transform;
+}
+
+/* ... rest of existing code ... */ 
+
+.retro-desktop-terminal {
+  background: #f4efe6;
+  border: 2px solid #575c66;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.76), inset -1px -1px 0 rgba(104, 104, 104, 0.28);
+  color: #1f2430;
+  font-family: "Courier New", monospace;
+  animation: none;
+}
+
+.retro-desktop-terminal::before,
+.retro-desktop-terminal::after,
+.retro-desktop-terminal .terminal-text-container::before {
+  display: none;
+}
+
+.retro-desktop-terminal .terminal-line {
+  color: #1f2430;
+}
+
+.retro-desktop-terminal .system-message,
+.retro-desktop-terminal .module-message,
+.retro-desktop-terminal .protocol-message {
+  color: #000080;
+  text-shadow: none;
+}
+
+.retro-desktop-terminal .success-message,
+.retro-desktop-terminal .ascii-success {
+  color: #2f6d2f;
+  text-shadow: none;
+}
+
+.retro-desktop-terminal .warning-message,
+.retro-desktop-terminal .verify-message,
+.retro-desktop-terminal .analytics-message {
+  color: #8a6500;
+  text-shadow: none;
+  background: none;
+  border-left: none;
+  padding-left: 0;
+}
+
+.retro-desktop-terminal .alert-message,
+.retro-desktop-terminal .critical-message,
+.retro-desktop-terminal .security-message,
+.retro-desktop-terminal .ascii-fail,
+.retro-desktop-terminal .breach-message {
+  color: #8a1d1d;
+  text-shadow: none;
+}
+
+.retro-desktop-terminal .intel-message {
+  color: #4b5563;
+  text-shadow: none;
+  background: none;
+  border-left: none;
+  padding-left: 0;
+  animation: none;
+}
+
+.retro-desktop-terminal .ascii-art,
+.retro-desktop-terminal .kernel-message,
+.retro-desktop-terminal .upgrade-message {
+  color: #000080;
+  text-shadow: none;
+}

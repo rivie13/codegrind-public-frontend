@@ -1,0 +1,13 @@
+{
+  "operations": [
+    {
+      "type": "animatedVariantCollectionTilesets",
+      "sourceDir": "public/city-v2/tiled/Pixel Art Sign Pack - Animated/Pixel Art Sign Pack - Animated",
+      "destDir": "public/city-v2/tiled/raw/district-01/signs",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "namePrefix": "d01-sign",
+      "frameDuration": 100
+    }
+  ]
+}

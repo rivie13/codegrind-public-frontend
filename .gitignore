@@ -1,0 +1,56 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+
+# Environment variables
+.env
+.env.production
+
+#only keep gifs in local by ignoring the folder
+/src/pages/images/*
+
+#only keep wave start sound local by ignoring file
+/public/audio/wave-start.mp3
+
+#only keep sound effects and music local by ignoring folders
+/public/audio/generated_sound_effects/*
+/public/audio/karl-casey/*
+/public/audio/phaser_sound_effects/*
+
+#No coverage files in the git...
+/coverage/*
+
+#do not push city-v2 stuff to prod... 
+# we will use assests that 
+# i will put in the blob storage
+#not allowed to push this content to prod 
+# due to licensing and also just to keep the 
+# repo clean of giant files that are only used for 
+# city mode development
+/public/city-v2/*
+src/utils/assets/assetUrl.test.js
+scripts/rename-cloudinary-assets.mjs
+scripts/upload-missing-assets.mjs

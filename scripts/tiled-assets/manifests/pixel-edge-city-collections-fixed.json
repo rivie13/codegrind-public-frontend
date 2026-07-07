@@ -1,0 +1,170 @@
+{
+  "name": "Pixel Edge City - Collection Tilesets (Objects, Decorations, Pre-made Buildings)",
+  "description": "Prepares collection tilesets for individual PNG objects and decorations from Pixel Edge City PREMIUM pack. Objects are organized by category with each category as a separate collection tileset.",
+  "version": "1.0",
+  "operations": [
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-lamps.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-signs.tsj"
+    },
+    {
+      "type": "detachTilesetFromMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-plants.tsj"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-objects-advertisements",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Advertisments",
+      "destDir": "public/city-v2/tiled/raw/district-01",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-advertisements.tsj",
+      "match": ".*\\.png$",
+      "exclude": "^All_Advertisements\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-objects-benches",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Benches and Tables",
+      "destDir": "public/city-v2/tiled/raw/district-01",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-benches.tsj",
+      "match": ".*\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-objects-broken-cars",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Broken Cars",
+      "destDir": "public/city-v2/tiled/raw/district-01",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-broken-cars.tsj",
+      "match": ".*\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-objects-bus-stop",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Bus Stop",
+      "destDir": "public/city-v2/tiled/raw/district-01",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-bus-stop.tsj",
+      "match": ".*\\.png$"
+    },
+    {
+      "type": "collectionTileset",
+      "name": "d01-pec-objects-graffiti",
+      "sourceDir": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Graffiti",
+      "destDir": "public/city-v2/tiled/raw/district-01",
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-graffiti.tsj",
+      "match": ".*\\.png$"
+    },
+    {
+      "type": "multiSourceSingleTileTilesets",
+      "namePrefix": "d01-pec-object-lamp",
+      "fileNamePrefix": "lamp-static",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/lamps/single",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/lamps",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "sources": [
+        {
+          "type": "atlas",
+          "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Lamps/Street_Lamps_Spritesheet.png",
+          "minOpaquePixels": 4
+        }
+      ]
+    },
+    {
+      "type": "multiSourceSingleTileTilesets",
+      "namePrefix": "d01-pec-object-plant",
+      "fileNamePrefix": "plant-static",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/plants/single",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/plants",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "sources": [
+        {
+          "type": "regions",
+          "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Plants/Bushes_Spritesheet.png",
+          "trim": false,
+          "minOpaquePixels": 4,
+          "regions": [
+            { "x": 16, "y": 16, "width": 48, "height": 48 },
+            { "x": 64, "y": 16, "width": 16, "height": 48 },
+            { "x": 80, "y": 16, "width": 48, "height": 48 },
+            { "x": 16, "y": 64, "width": 48, "height": 16 },
+            { "x": 96, "y": 64, "width": 16, "height": 16 },
+            { "x": 16, "y": 96, "width": 48, "height": 48 },
+            { "x": 64, "y": 96, "width": 16, "height": 48 },
+            { "x": 80, "y": 96, "width": 48, "height": 48 },
+            { "x": 16, "y": 144, "width": 48, "height": 16 },
+            { "x": 96, "y": 144, "width": 16, "height": 16 }
+          ]
+        },
+        {
+          "type": "image",
+          "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Plants/Small_bush_Horizontal.png",
+          "trim": false,
+          "minOpaquePixels": 1
+        },
+        {
+          "type": "image",
+          "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Plants/Small_bush_Vertical.png",
+          "trim": false,
+          "minOpaquePixels": 1
+        },
+        {
+          "type": "regions",
+          "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Plants/Trees_Spritesheet.png",
+          "trim": false,
+          "minOpaquePixels": 4,
+          "regions": [
+            { "x": 16, "y": 16, "width": 32, "height": 64 },
+            { "x": 48, "y": 16, "width": 32, "height": 64 },
+            { "x": 80, "y": 32, "width": 16, "height": 48 }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "multiSourceSingleTileTilesets",
+      "namePrefix": "d01-pec-object-sign",
+      "fileNamePrefix": "sign-static",
+      "destDir": "public/city-v2/tiled/raw/district-01/exteriors/pixel-edge-city/objects/signs/single",
+      "outputDir": "public/city-v2/tiled/tilesets/district-01/generated/signs",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "sources": [
+        {
+          "type": "atlas",
+          "sourceImage": "public/city-v2/tiled/exteriors/PixelEdgeCity - PREMIUM/Assets/Objects and Decorations/Street and Road signs/Signs_Spritesheet.png",
+          "minOpaquePixels": 4
+        }
+      ]
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-advertisements.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-benches.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-broken-cars.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-bus-stop.tsj"
+    },
+    {
+      "type": "attachTilesetToMap",
+      "mapPath": "public/city-v2/tiled/maps/district-01/exterior-seed.tmj",
+      "tilesetPath": "public/city-v2/tiled/tilesets/district-01/d01-pec-objects-graffiti.tsj"
+    }
+
+  ]
+}

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/icon-512.png?v=2026.05.05.1" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2026.05.05.1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#121212" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CodeGrind" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="index,follow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>CodeGrind — Interview Prep, Coding Games, and Learning Paths</title>
+    <meta
+      name="description"
+      content="CodeGrind teaches coding and interview problem solving through original coding challenges, structured learning paths, and a tower defense game powered by real code execution."
+    />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "CodeGrind",
+      "url": "https://codegrind.online",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "description": "An interactive, gamified coding platform and tower defense game designed for data structures, algorithms, and technical interview preparation.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Gamified data structures and algorithms practice",
+        "Interactive code verification game loop",
+        "Web-canvas based browser environment",
+        "Technical interview preparation"
+      ]
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    >
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    </noscript>
+    <!-- Google scripts are injected dynamically after explicit consent — see analyticsService.js -->
+    <style>
+      :root {
+        color-scheme: light;
+        --cg-desktop-top: #1b7b86;
+        --cg-desktop-bottom: #0b4e61;
+        --cg-window: #c6c3bd;
+        --cg-window-face: #d4d0c8;
+        --cg-window-light: #ffffff;
+        --cg-window-dark: #7e7e7e;
+        --cg-window-shadow: #111111;
+        --cg-header-start: #000080;
+        --cg-header-end: #0b55d8;
+        --cg-header-text: #f7f7f7;
+        --cg-panel: #f5f5f5;
+        --cg-text: #141414;
+        --cg-muted: #555555;
+        --cg-led: #0ba40b;
+        --cg-font-retro: "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, sans-serif;
+        --cg-font-terminal: "Lucida Console", Monaco, "Courier New", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--cg-desktop-bottom);
+      }
+
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        color: var(--cg-text);
+      }
+
+      #root {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      .spa-loading-overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        overflow: hidden;
+        z-index: 9999;
+        opacity: 1;
+        visibility: visible;
+        font-family: var(--cg-font-retro);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0 2px, transparent 2px 100%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0 10%, transparent 10% 100%),
+          linear-gradient(180deg, var(--cg-desktop-top), var(--cg-desktop-bottom));
+        transition: opacity 180ms ease, visibility 180ms ease;
+      }
+
+      .spa-loading-overlay::before,
+      .spa-loading-overlay::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .spa-loading-overlay::before {
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+        background-size: 32px 32px;
+        opacity: 0.14;
+      }
+
+      .spa-loading-overlay::after {
+        right: 28px;
+        bottom: 20px;
+        width: min(28vw, 220px);
+        height: 24px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.02)),
+          rgba(0, 0, 0, 0.18);
+        clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%);
+        opacity: 0.2;
+      }
+
+      .spa-loading-overlay.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .spa-loading-panel,
+      .spa-loading-panel * {
+        font-family: var(--cg-font-retro);
+      }
+
+      .spa-loading-panel {
+        position: relative;
+        width: min(94vw, 660px);
+        min-height: 408px;
+        color: var(--cg-text);
+        background: linear-gradient(180deg, #d3cfc8 0%, var(--cg-window) 100%);
+        border: 2px solid var(--cg-window-shadow);
+        box-shadow:
+          inset 2px 2px 0 var(--cg-window-light),
+          inset -2px -2px 0 var(--cg-window-dark),
+          12px 12px 0 rgba(0, 0, 0, 0.28);
+        overflow: hidden;
+        contain: layout paint;
+      }
+
+      .spa-shell-titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 34px;
+        padding: 5px 6px 5px 8px;
+        background: linear-gradient(90deg, var(--cg-header-start) 0%, #0a2f8f 68%, var(--cg-header-end) 100%);
+        border-bottom: 1px solid rgba(17, 17, 17, 0.72);
+        box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .spa-shell-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: var(--cg-header-text);
+        font-size: 0.94rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .spa-shell-logo {
+        display: grid;
+        place-items: center;
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        font-size: 0.7rem;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .spa-shell-controls {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 0 0 auto;
+      }
+
+      .spa-shell-control {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(180deg, #fefefe 0%, var(--cg-window-face) 100%);
+        border: 1px solid var(--cg-window-shadow);
+        box-shadow:
+          inset 1px 1px 0 var(--cg-window-light),
+          inset -1px -1px 0 var(--cg-window-dark);
+        color: #111111;
+        font-size: 0.78rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .spa-shell-body {
+        display: grid;
+        grid-template-rows: auto auto auto auto;
+        gap: 14px;
+        padding: 16px 18px 18px;
+      }
+
+      .spa-shell-intro {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        padding: 12px;
+        min-height: 118px;
+        background: #e8e4dc;
+        border: 2px solid #8d8d8d;
+        box-shadow:
+          inset 1px 1px 0 #ffffff,
+          inset -1px -1px 0 #b1ada6;
+      }
+
+      .spa-shell-intro-logo-frame {
+        display: grid;
+        place-items: center;
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(180deg, #f5f2ec 0%, #dad6ce 100%);
+        border: 2px solid var(--cg-window-shadow);
+        box-shadow:
+          inset 1px 1px 0 var(--cg-window-light),
+          inset -1px -1px 0 var(--cg-window-dark);
+      }
+
+      .spa-shell-intro-logo {
+        width: 48px;
+        height: 48px;
+        display: block;
+        object-fit: contain;
+      }
+
+      .spa-shell-kicker,
+      .spa-shell-copy,
+      .spa-shell-progress-label,
+      .spa-shell-footer {
+        color: var(--cg-muted);
+      }
+
+      .spa-shell-kicker {
+        margin: 0 0 5px;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .spa-shell-title {
+        margin: 0;
+        font-size: clamp(1.62rem, 3vw, 2.25rem);
+        line-height: 1.04;
+        font-weight: 700;
+      }
+
+      .spa-shell-copy {
+        margin: 6px 0 0;
+        min-height: 2.9em;
+        max-width: 50ch;
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+
+      .spa-shell-divider {
+        height: 2px;
+        background: linear-gradient(180deg, #7f7f7f 0 1px, #ffffff 1px 2px);
+      }
+
+      .spa-shell-terminal {
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        min-height: 114px;
+        background: var(--cg-panel);
+        border: 2px solid #000000;
+        box-shadow:
+          inset 1px 1px 0 var(--cg-window-light),
+          inset -1px -1px 0 var(--cg-window-dark);
+      }
+
+      .spa-shell-terminal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--cg-muted);
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .spa-shell-terminal-row {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+        min-height: 22px;
+        color: #1b1b1b;
+        font-size: 0.88rem;
+        line-height: 1.6;
+      }
+
+      .spa-shell-terminal-token,
+      .spa-shell-terminal-text {
+        font-family: var(--cg-font-terminal);
+      }
+
+      .spa-shell-terminal-token {
+        color: #000082;
+        font-size: 0.82rem;
+        line-height: 1.55;
+        text-transform: uppercase;
+      }
+
+      .spa-shell-progress-block {
+        display: grid;
+        gap: 6px;
+        padding: 10px 12px;
+        background: #e8e4dc;
+        border: 2px solid #8d8d8d;
+        box-shadow:
+          inset 1px 1px 0 #ffffff,
+          inset -1px -1px 0 #b1ada6;
+      }
+
+      .spa-shell-progress-label {
+        margin: 0;
+        font-size: 0.86rem;
+        font-weight: 700;
+      }
+
+      .spa-shell-progress {
+        position: relative;
+        height: 28px;
+        overflow: hidden;
+        background: #f8f8f8;
+        border: 2px solid #000000;
+        box-shadow:
+          inset 1px 1px 0 #ffffff,
+          inset -1px -1px 0 #808080;
+      }
+
+      .spa-shell-progress-fill {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        bottom: 3px;
+        width: 38%;
+        background: repeating-linear-gradient(90deg, #0000a8 0 12px, #3c67ff 12px 24px);
+        animation: cgLoaderProgress 1.55s steps(9, end) infinite;
+      }
+
+      .spa-shell-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        min-height: 33px;
+        background: #f1efe9;
+        border: 2px solid #8d8d8d;
+        box-shadow:
+          inset 1px 1px 0 #ffffff,
+          inset -1px -1px 0 #c0bcb5;
+        font-size: 0.82rem;
+      }
+
+      .spa-shell-pulse {
+        width: 11px;
+        height: 11px;
+        flex: 0 0 auto;
+        background: var(--cg-led);
+        border: 1px solid #000000;
+        box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.45);
+        animation: cgLedBlink 1.1s steps(2, end) infinite;
+      }
+
+      @keyframes cgLoaderProgress {
+        0% {
+          transform: translateX(-18%);
+        }
+
+        100% {
+          transform: translateX(168%);
+        }
+      }
+
+      @keyframes cgLedBlink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .spa-loading-panel {
+          width: min(96vw, 560px);
+          min-height: 0;
+        }
+
+        .spa-shell-titlebar {
+          gap: 8px;
+        }
+
+        .spa-shell-body {
+          padding: 14px;
+        }
+
+        .spa-shell-intro {
+          grid-template-columns: 1fr;
+          min-height: 0;
+        }
+
+        .spa-shell-intro-logo-frame {
+          width: 64px;
+          height: 64px;
+        }
+
+        .spa-shell-intro-logo {
+          width: 42px;
+          height: 42px;
+        }
+
+        .spa-shell-title {
+          font-size: clamp(1.46rem, 8vw, 2rem);
+        }
+
+        .spa-shell-copy {
+          min-height: 0;
+        }
+
+        .spa-shell-terminal-row {
+          grid-template-columns: 70px minmax(0, 1fr);
+          gap: 8px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .spa-loading-overlay {
+          transition: none;
+        }
+
+        .spa-shell-progress-fill,
+        .spa-shell-pulse {
+          animation: none;
+        }
+
+        .spa-shell-progress-fill {
+          transform: translateX(54%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="spa-loading-shell" class="spa-loading-overlay">
+      <main class="spa-loading-panel" aria-live="polite" aria-busy="true">
+        <div class="spa-shell-titlebar">
+          <div class="spa-shell-brand">
+            <span class="spa-shell-logo" aria-hidden="true">CG</span>
+            <span>CodeGrind Desktop Runtime</span>
+          </div>
+          <div class="spa-shell-controls" aria-hidden="true">
+            <span class="spa-shell-control">_</span>
+            <span class="spa-shell-control">□</span>
+            <span class="spa-shell-control">X</span>
+          </div>
+        </div>
+        <div class="spa-shell-body">
+          <div class="spa-shell-intro">
+            <div class="spa-shell-intro-logo-frame" aria-hidden="true">
+              <picture>
+                <source srcset="/EnhancedIcon.webp" type="image/webp">
+                <img
+                  class="spa-shell-intro-logo"
+                  src="/EnhancedIcon.png"
+                  alt=""
+                  width="48"
+                  height="48"
+                >
+              </picture>
+            </div>
+            <div>
+              <p class="spa-shell-kicker">Startup shell</p>
+              <h1 class="spa-shell-title">Launching CodeGrind...</h1>
+              <p class="spa-shell-copy">
+                Restoring your session and loading the workspace you were using.
+              </p>
+            </div>
+          </div>
+          <div class="spa-shell-divider" aria-hidden="true"></div>
+          <div class="spa-shell-terminal" aria-hidden="true">
+            <div class="spa-shell-terminal-head">
+              <span>Startup terminal</span>
+              <span>BOOT.EXE</span>
+            </div>
+            <div class="spa-shell-terminal-row">
+              <span class="spa-shell-terminal-token">Boot</span>
+              <span class="spa-shell-terminal-text">Initialize desktop shell</span>
+            </div>
+            <div class="spa-shell-terminal-row">
+              <span class="spa-shell-terminal-token">Restore</span>
+              <span class="spa-shell-terminal-text">Reconnect progress and route context</span>
+            </div>
+            <div class="spa-shell-terminal-row">
+              <span class="spa-shell-terminal-token">Route</span>
+              <span id="spa-route-label" class="spa-shell-terminal-text">
+                Opening your current CodeGrind workspace.
+              </span>
+            </div>
+          </div>
+          <div class="spa-shell-progress-block">
+            <p class="spa-shell-progress-label">Startup progress</p>
+            <div class="spa-shell-progress" aria-hidden="true">
+              <span class="spa-shell-progress-fill"></span>
+            </div>
+          </div>
+          <div class="spa-shell-footer">
+            <span class="spa-shell-pulse" aria-hidden="true"></span>
+            <span>Connecting you to your current screen.</span>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="root"></div>
+    <script>
+      (function () {
+        var routeLabel = document.getElementById('spa-route-label');
+        if (!routeLabel) return;
+
+        var path = window.location.pathname || '/';
+        var routeMessage = 'Opening your current CodeGrind workspace.';
+
+        if (path === '/city' || path === '/city/') {
+          routeMessage = 'Loading Port Meridian and your current district view.';
+        } else if (path.startsWith('/games/')) {
+          routeMessage = 'Loading your game workspace and current challenge state.';
+        } else if (path.startsWith('/problems/')) {
+          routeMessage = 'Loading your problem workspace and editor.';
+        } else if (path.startsWith('/learning/')) {
+          routeMessage = 'Loading your learning path and saved progress.';
+        } else if (path.startsWith('/profile/')) {
+          routeMessage = 'Loading your profile and progress summary.';
+        } else if (path.startsWith('/leaderboards')) {
+          routeMessage = 'Loading current rankings and leaderboard data.';
+        } else if (path.startsWith('/blog/')) {
+          routeMessage = 'Loading the article you opened.';
+        }
+
+        routeLabel.textContent = routeMessage;
+      })();
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
