@@ -3,7 +3,7 @@
 The React frontend for [CodeGrind](https://codegrind.online) — a cyberpunk-themed platform for
 learning algorithms and data structures through interactive tower-defense-style challenges.
 
-This repo is meant to be an open core, a way of letting people see and contribute to the codebase. See `contributing.md` for more information.
+This repo is meant to be an open core, a way of letting people see and contribute to the codebase. See `CONTRIBUTING.md` for more information.
 
 NOTE: Downloading this repo alone is not enough to properly run the full codegrind experience. This repo is intended to allow devs to see, make edits and contribute to the portions of the Frontend    codebase; but requires and does not provide: environment variables, additional assets, private packages and backend code to run (See below for more information).
 
