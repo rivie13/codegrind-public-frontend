@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const PROD_NATIVE_BLOG_BASE_URL =
-  'https://codegrindpublicmedia.blob.core.windows.net/public-media/images/native_blogs';
-
 const loadNativeBlogModule = async ({ assetBaseUrl = '', prod = false } = {}) => {
   vi.resetModules();
   vi.unstubAllEnvs();
@@ -40,10 +37,10 @@ describe('nativeBlogPosts hero images', () => {
     });
 
     expect(getNativeBlogHeroImage('tower-defense-teaches-dsa-patterns.jpg')).toBe(
-      `${PROD_NATIVE_BLOG_BASE_URL}/tower-defense-teaches-dsa-patterns.jpg`
+      '/images/native_blogs/tower-defense-teaches-dsa-patterns.jpg'
     );
     expect(
       getPostBySlug(NATIVE_BLOG_POSTS, 'city-map-walking-between-environments')?.heroImage
-    ).toBe(`${PROD_NATIVE_BLOG_BASE_URL}/Walkable_City_NativeBlog_Image.png`);
+    ).toBe('/images/native_blogs/Walkable_City_NativeBlog_Image.png');
   });
 });

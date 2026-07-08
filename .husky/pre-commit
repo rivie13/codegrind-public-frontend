@@ -1,0 +1,11 @@
+# Always run from the repository root so lint-staged and helper scripts resolve consistently.
+repo_root="$(cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$repo_root" || exit 1
+
+# Prevent Git EOL warnings from polluting lint-staged stash hash parsing.
+GIT_CONFIG_COUNT=1 \
+GIT_CONFIG_KEY_0=core.autocrlf \
+GIT_CONFIG_VALUE_0=false \
+npx lint-staged || exit 1
+
+node scripts/precommit/run-staged-tests.mjs
