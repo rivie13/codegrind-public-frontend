@@ -1,5 +1,5 @@
 import { Box, ChakraProvider } from '@chakra-ui/react';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AutoBugReportHost from './components/feedback/AutoBugReportHost';
@@ -17,7 +17,6 @@ import {
   isGuestLearningTrialProblemUnlocked,
 } from './hooks/guest/useGuestProgress';
 import CityPhaserPreviewBootScreen from './components/city/CityPhaserPreviewBootScreen';
-import MaintenanceScreen from './components/maintenance/MaintenanceScreen';
 import HomePage from './pages/home/Home';
 
 /* ── Lazy page helper ────────────────────────────────────────────── */
@@ -269,7 +268,6 @@ const RequireAuthOrLearningTrialProblem = ({ children, fallback = '/learning/pyt
 
 function App({ router: Router = BrowserRouter, routerProps = {} }) {
   const localOnlyRoutes = getLocalOnlyRoutes();
-  const [showMaintenanceScreen, setShowMaintenanceScreen] = useState(true);
 
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
@@ -547,7 +545,7 @@ function App({ router: Router = BrowserRouter, routerProps = {} }) {
           </Router>
         </ResponsiveProvider>
       </Box>
-      {showMaintenanceScreen && <MaintenanceScreen onClose={() => setShowMaintenanceScreen(false)} />}
+      
     </ChakraProvider>
   );
 }
