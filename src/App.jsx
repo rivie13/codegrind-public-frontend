@@ -18,7 +18,7 @@ import {
 } from './hooks/guest/useGuestProgress';
 import CityPhaserPreviewBootScreen from './components/city/CityPhaserPreviewBootScreen';
 import HomePage from './pages/home/Home';
-
+//test comment
 /* ── Lazy page helper ────────────────────────────────────────────── */
 const lazyPage = (importFn) => {
   const Component = lazy(importFn);
@@ -221,9 +221,7 @@ const RequireAuthOrLearningTrialNode = ({ children, fallback = '/learning/python
     (normalizedPath === 'javascript-path' &&
       typeof nodeId === 'string' &&
       nodeId.startsWith('js-m0-')) ||
-    (normalizedPath === 'java-path' &&
-      typeof nodeId === 'string' &&
-      nodeId.startsWith('java-m0-'));
+    (normalizedPath === 'java-path' && typeof nodeId === 'string' && nodeId.startsWith('java-m0-'));
 
   if (isM0Node) return children;
   return <Navigate to={getLearningFallbackPath(guest, fallback)} replace />;
@@ -545,7 +543,6 @@ function App({ router: Router = BrowserRouter, routerProps = {} }) {
           </Router>
         </ResponsiveProvider>
       </Box>
-      
     </ChakraProvider>
   );
 }
