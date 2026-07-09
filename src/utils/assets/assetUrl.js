@@ -91,7 +91,13 @@ const getAssetUrl = (path) => {
     }
   }
 
-  return `${ASSET_BASE_URL}${normalizedPath}`;
+  let resolvedUrl = `${ASSET_BASE_URL}${normalizedPath}`;
+
+  if (ASSET_BASE_URL.includes('cloudinary.com') && !/\/v\d+/.test(resolvedUrl)) {
+    resolvedUrl = resolvedUrl.replace('/image/upload/', '/image/upload/v1/');
+  }
+
+  return resolvedUrl;
 };
 
 export default getAssetUrl;
