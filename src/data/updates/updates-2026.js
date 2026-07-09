@@ -1,10 +1,53 @@
 export const updates2026 = [
   {
     id: 'current',
+    heading: 'Version 1.9.00 - MAJOR UPDATE',
+    release: 'Released: 07/09/2026',
+    accentColor: '#FF6B35',
+    badge: { text: 'Current', colorScheme: 'green' },
+    sections: [
+      {
+        title: '📢 Announcements',
+        color: '#FFD700',
+        markerColor: '#FFD700',
+        items: [
+          'CodeGrind is now Open Core! The vast majority of the frontend is now open source and available on GitHub at github.com/rivie13/codegrind-public-frontend. We believe in transparency and community-driven development.',
+        ],
+      },
+      {
+        title: '🏗️ Architecture',
+        color: '#FF6B35',
+        markerColor: '#FF6B35',
+        items: [
+          'Refactored the entire platform to a microservice architecture for better scalability, maintainability, and deployment independence.',
+          'Code execution now happens client-side, removing the dependency on remote execution services and enabling faster, more reliable feedback loops.',
+          'Removed C++ from the supported languages due to the client-side code execution refactor — C++ support will be re-evaluated in a future release.',
+          'Removed significant amounts of bloat code across the codebase, resulting in a leaner, faster, and more maintainable platform.',
+        ],
+      },
+      {
+        title: '⚡ Performance',
+        color: '#00FF8C',
+        markerColor: '#00FF8C',
+        items: [
+          'General performance improvements throughout the site thanks to the microservice architecture migration and targeted code optimizations.',
+        ],
+      },
+      {
+        title: '🎨 UI / UX',
+        color: '#00FFFF',
+        markerColor: '#00FFFF',
+        items: [
+          'Ongoing UI improvements to the demo experience to reduce user confusion and make the onboarding flow more intuitive.',
+        ],
+      },
+    ],
+  },
+  {
+    id: '1.8.00',
     heading: 'Version 1.8.00 - MAJOR UPDATE',
     release: 'Released: 06/05/2026',
     accentColor: '#FFD700',
-    badge: { text: 'Current', colorScheme: 'green' },
     sections: [
       {
         title: '🎮 Gameplay',
