@@ -159,6 +159,22 @@ const HomeShowcaseSection = () => {
       direction: 'right',
       mediaRatio: 16 / 9,
     },
+    {
+      title: 'Now Open Core',
+      eyebrow: 'OPEN SOURCE FRONTEND',
+      body: 'CodeGrind is now open core! The majority of the frontend is open source on GitHub. Explore the code, report issues, suggest features, or contribute directly. We believe transparency and community collaboration make the platform better for everyone.',
+      mediaType: 'image',
+      mediaSrc: blogFaqGif,
+      mediaAlt: 'CodeGrind open source GitHub repository preview',
+      cta: {
+        label: 'VIEW ON GITHUB',
+        to: 'https://github.com/rivie13/codegrind-public-frontend',
+        external: true,
+      },
+      accent: 'var(--home-retro-accent-amber)',
+      direction: 'left',
+      mediaRatio: 16 / 9,
+    },
   ];
 
   return (

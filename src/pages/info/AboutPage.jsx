@@ -801,6 +801,30 @@ const AboutPage = () => {
                 </Flex>
               </SectionWindow>
 
+              <SectionWindow title="open_source.txt" accent="var(--cg-accent-amber)" icon={FaCode}>
+                <Text {...bodyTextProps} mb={4}>
+                  CodeGrind is now <b>Open Core</b>! We believe in transparency and community-driven
+                  development. The vast majority of the frontend is open source and available on
+                  GitHub for anyone to explore, contribute to, or learn from.
+                </Text>
+                <Text {...mutedTextProps} mb={4}>
+                  Check out our public repository to see how everything works under the hood, report
+                  issues, suggest features, or submit pull requests. Your contributions help make
+                  CodeGrind better for everyone.
+                </Text>
+                <Flex justify="center" mb={4}>
+                  <Button
+                    as={Link}
+                    href="https://github.com/rivie13/codegrind-public-frontend"
+                    isExternal
+                    leftIcon={<Icon as={FaCode} />}
+                    {...getActionButtonProps('var(--cg-accent-amber)')}
+                  >
+                    View on GitHub
+                  </Button>
+                </Flex>
+              </SectionWindow>
+
               <SectionWindow title="credits_registry.md" accent="var(--cg-link)" icon={FaBrain}>
                 <Text {...bodyTextProps} mb={4}>
                   The Port Meridian city build and apartment terminal overhaul now use a shared
@@ -912,25 +936,39 @@ const AboutPage = () => {
                   Open Source Code Execution Engine Attribution
                 </Heading>
                 <Text {...bodyTextProps} mb={4}>
-                  To enable local, secure, and completely free in-browser code execution for our user base, 
-                  CodeGrind relies on the following incredible open-source projects:
+                  To enable local, secure, and completely free in-browser code execution for our
+                  user base, CodeGrind relies on the following incredible open-source projects:
                 </Text>
                 <UnorderedList {...listProps('var(--cg-accent-green)')} mb={6}>
                   <ListItem>
-                    <b>Pyodide (Python):</b> Powered by WebAssembly (WASM), Pyodide brings a full Python 
-                    scientific stack to the browser. Attributions and deep gratitude go to the Pyodide team 
-                    and contributors for enabling client-side Python execution. Visit the{' '}
-                    <Link href="https://pyodide.org" isExternal color="var(--cg-link)" _hover={{ textDecoration: 'underline' }}>
+                    <b>Pyodide (Python):</b> Powered by WebAssembly (WASM), Pyodide brings a full
+                    Python scientific stack to the browser. Attributions and deep gratitude go to
+                    the Pyodide team and contributors for enabling client-side Python execution.
+                    Visit the{' '}
+                    <Link
+                      href="https://pyodide.org"
+                      isExternal
+                      color="var(--cg-link)"
+                      _hover={{ textDecoration: 'underline' }}
+                    >
                       Pyodide Official Site
-                    </Link>.
+                    </Link>
+                    .
                   </ListItem>
                   <ListItem>
-                    <b>CheerpJ (Java):</b> CheerpJ by Leaning Technologies is an execution engine for Java in the browser, 
-                    allowing us to run the JVM and compile Java code locally using WebAssembly. Attributions and 
-                    credits go to the Leaning Technologies team for their groundbreaking JVM virtualization. Learn more at the{' '}
-                    <Link href="https://leaningtech.com/cheerpj/" isExternal color="var(--cg-link)" _hover={{ textDecoration: 'underline' }}>
+                    <b>CheerpJ (Java):</b> CheerpJ by Leaning Technologies is an execution engine
+                    for Java in the browser, allowing us to run the JVM and compile Java code
+                    locally using WebAssembly. Attributions and credits go to the Leaning
+                    Technologies team for their groundbreaking JVM virtualization. Learn more at the{' '}
+                    <Link
+                      href="https://leaningtech.com/cheerpj/"
+                      isExternal
+                      color="var(--cg-link)"
+                      _hover={{ textDecoration: 'underline' }}
+                    >
                       CheerpJ Website
-                    </Link>.
+                    </Link>
+                    .
                   </ListItem>
                 </UnorderedList>
 
