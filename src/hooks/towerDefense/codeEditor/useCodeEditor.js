@@ -40,6 +40,8 @@ export default function useCodeEditor({
   preserveOnProblemChange = false,
   allowedTowerTypes = null,
   initialLanguage = 'python',
+  isDemo = false,
+  embedded = false,
 }) {
   const toast = useToast();
   const [code, setCode] = useState('');
@@ -52,6 +54,21 @@ export default function useCodeEditor({
   const [initialCodeGenerated, setInitialCodeGenerated] = useState(false);
   const [aiCodeSnippetsEnabled, setAiCodeSnippetsEnabled] = useState(true);
   const lastPrewarmedProblemRef = useRef(null);
+
+  // Derive demo state from explicitly provided configuration props or problem meta
+  const isDemoMode = isDemo || embedded || problem?.isDemo || problem?.embedded || false;
+
+  // Mirror demo mode to the global window/session flag so static API wrappers
+  // (towerDefense.js) that lack React context also bypass backend calls.
+  useEffect(() => {
+    if (!isDemoMode) return;
+    try {
+      window.__tdIsDemoMode = true;
+      sessionStorage.setItem('is_demo_mode', 'true');
+    } catch {
+      // storage may be restricted
+    }
+  }, [isDemoMode]);
 
   // Use a ref to track tower counts by type
   const towerCountsRef = useRef({});
@@ -277,8 +294,6 @@ export default function useCodeEditor({
       suppressTowerSuggestions,
     ]
   );
-
-
 
   // Listen for changes to AI code snippet settings
   useEffect(() => {
@@ -808,6 +823,7 @@ export default function useCodeEditor({
           timerValue,
           addTerminalMessage,
           onExecutionRateLimit,
+          isDemoMode,
         });
 
         if (result.status === 'vm_timeout') {
@@ -850,7 +866,7 @@ export default function useCodeEditor({
         setIsExecuting(false);
       }
     },
-    [code, language, problem, addTerminalMessage, onExecutionRateLimit]
+    [code, language, problem, addTerminalMessage, onExecutionRateLimit, isDemoMode]
   );
 
   /**
@@ -875,6 +891,7 @@ export default function useCodeEditor({
         userId,
         addTerminalMessage,
         onExecutionRateLimit,
+        isDemoMode,
       });
 
       if (result.status === 'vm_timeout') {
@@ -955,7 +972,7 @@ export default function useCodeEditor({
     } finally {
       setIsExecuting(false);
     }
-  }, [code, language, problem, addTerminalMessage, onExecutionRateLimit]);
+  }, [code, language, problem, addTerminalMessage, onExecutionRateLimit, isDemoMode]);
 
   /**
    * Run code to capture raw stdout/stderr without comparing to expected output
@@ -978,6 +995,7 @@ export default function useCodeEditor({
         userId,
         addTerminalMessage,
         onExecutionRateLimit,
+        isDemoMode,
       });
 
       return result;
@@ -990,7 +1008,7 @@ export default function useCodeEditor({
     } finally {
       setIsExecuting(false);
     }
-  }, [code, language, problem, addTerminalMessage, onExecutionRateLimit]);
+  }, [code, language, problem, addTerminalMessage, onExecutionRateLimit, isDemoMode]);
 
   /**
    * Get a code snippet for the current language
@@ -1011,6 +1029,11 @@ export default function useCodeEditor({
 
   // When sending code context to AI
   const sendCodeContext = async (context) => {
+    // Skip backend for demos — no code context to analyze
+    if (isDemoMode) {
+      return { demo: true, context };
+    }
+
     try {
       // Prepare code context for AI prompt
       const preparedContext = {
@@ -1065,4 +1088,3 @@ export default function useCodeEditor({
     sendCodeContext,
   };
 }
-

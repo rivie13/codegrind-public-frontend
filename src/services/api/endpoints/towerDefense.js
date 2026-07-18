@@ -2,6 +2,15 @@ import logger from '../../../utils/core/logger';
 import { fetchWithError } from '../fetcher';
 import { requestAdProofToken } from './adRewards';
 
+// Helper to check for demo/embedded mode dynamically.
+// Static API wrappers have no React context, so we propagate the flag via
+// window.__tdIsDemoMode (set by HomepageTDDemo / useCodeEditor at boot)
+// and sessionStorage (for early-bootstrap persistence across navigation fallbacks).
+const checkDemoMode = () => {
+  if (typeof window === 'undefined') return false;
+  return window.__tdIsDemoMode === true || sessionStorage.getItem('is_demo_mode') === 'true';
+};
+
 const towerDefense = {
   submitScore: async (
     userId,
@@ -13,6 +22,11 @@ const towerDefense = {
     problemType = 'CODEGRIND',
     extra = {}
   ) => {
+    if (checkDemoMode()) {
+      logger.info('[TowerDefense] Demo mode detected, skipping score submission');
+      return { saved: true };
+    }
+
     logger.info('Submitting tower defense score:');
     logger.debug({ userId, problemId, score, time, solutionStatus, gameStatus });
 
@@ -37,11 +51,17 @@ const towerDefense = {
     }
   },
   getScores: async (userId) => {
+    if (checkDemoMode()) {
+      return [];
+    }
     logger.info('Fetching tower defense scores:');
     logger.debug({ userId });
     return fetchWithError(`/api/tower-defense/scores/${userId}`);
   },
   getScoresBulk: async (userId, problemIds = [], problemType = 'CODEGRIND') => {
+    if (checkDemoMode()) {
+      return [];
+    }
     logger.info('Fetching bulk tower defense scores:');
     logger.debug({ userId, count: problemIds.length, problemType });
     return fetchWithError('/api/tower-defense/scores/bulk', {
@@ -53,6 +73,13 @@ const towerDefense = {
 
   // New method for AI-powered code snippet generation
   generateSnippet: async (context, towerType, userInfo = null, model = null) => {
+    if (checkDemoMode()) {
+      logger.info(
+        '[TowerDefense] Demo mode detected, skipping backend AI generation and returning null to trigger standard fallback snippet'
+      );
+      return null;
+    }
+
     logger.info(
       `[TowerDefense] Generating AI code snippet for ${towerType} in ${context.language}`
     );
@@ -183,6 +210,23 @@ const towerDefense = {
 
   // Check rate limit status for AI snippet generation
   checkRateLimit: async (userInfo = null) => {
+    if (checkDemoMode()) {
+      logger.info('[TowerDefense] Demo mode detected, returning mock unlimited rate limit status');
+      return {
+        limit: 15,
+        used: 0,
+        remaining: 15,
+        extraCredits: 0,
+        totalRemaining: 15,
+        unlimited: true,
+        snippetAdCooldownUntil: null,
+        snippetAdCooldownRemaining: 0,
+        reset: Date.now() + 3600000,
+        resetIn: 3600,
+        resetPeriod: 3600000,
+      };
+    }
+
     logger.info('[TowerDefense] Checking AI snippet rate limit');
 
     try {
@@ -298,6 +342,9 @@ const towerDefense = {
     }
   },
   addSnippetCredit: async (userInfo = null, adType = 'short') => {
+    if (checkDemoMode()) {
+      return { ok: true };
+    }
     logger.info('[TowerDefense] Adding AI snippet credit');
 
     try {
@@ -343,6 +390,13 @@ const towerDefense = {
     }
   },
   refineSolution: async (params) => {
+    if (checkDemoMode()) {
+      logger.info(
+        '[TowerDefense] Demo mode detected, returning unmodified code as refinement fallback'
+      );
+      return { refinedCode: params.code };
+    }
+
     try {
       const { code, problem, language, userId, membershipTier, model } = params;
 
@@ -417,6 +471,10 @@ const towerDefense = {
     }
   },
   resetRefinementLimit: async (userId) => {
+    if (checkDemoMode()) {
+      return { ok: true };
+    }
+
     try {
       logger.info(
         '[TowerDefense] Resetting refinement limit via Node.js backend: /api/tower-defense/reset-refinement-limit'

@@ -447,6 +447,7 @@ export default function useTowerDefenseV2GameState({
     preserveOnProblemChange: isMultiProblemTower,
     allowedTowerTypes,
     initialLanguage: preferredLearningLanguage || 'python',
+    isDemo,
   });
   const {
     code,
@@ -1339,4 +1340,3 @@ export default function useTowerDefenseV2GameState({
     handleReturnToMap,
   };
 }
-
