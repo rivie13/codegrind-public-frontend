@@ -17,7 +17,7 @@ export default function useTowerDefenseV2LearningState({
   learningTowerConfig = null,
   learningPathMeta = null,
   learningIsCapstone = false,
-  titleSlug = null
+  titleSlug = null,
 }) {
   const navigate = useNavigate();
   const isLearningMode = Boolean(learningPathTitleSlug || learningPathOnboarding);
@@ -37,16 +37,17 @@ export default function useTowerDefenseV2LearningState({
 
   const [activeProblemIndex, setActiveProblemIndex] = useState(0);
 
-  const resolvedLearningSlug = learningProblemSlugs[activeProblemIndex]
-    || learningTowerConfig?.learningProblemSlug
-    || (Array.isArray(learningTowerConfig?.learningProblemSlugs)
+  const resolvedLearningSlug =
+    learningProblemSlugs[activeProblemIndex] ||
+    learningTowerConfig?.learningProblemSlug ||
+    (Array.isArray(learningTowerConfig?.learningProblemSlugs)
       ? learningTowerConfig.learningProblemSlugs[0]
       : null);
 
-  const activeTitleSlug = (isLearningMode
-    ? (learningProblemSlugs[activeProblemIndex] || resolvedLearningSlug || learningPathTitleSlug)
-    : learningPathTitleSlug)
-    || (isDemo ? demoTitleSlug : (titleSlug || null));
+  const activeTitleSlug =
+    (isLearningMode
+      ? learningProblemSlugs[activeProblemIndex] || resolvedLearningSlug || learningPathTitleSlug
+      : learningPathTitleSlug) || (isDemo ? demoTitleSlug : titleSlug || null);
 
   useEffect(() => {
     if (!learningProblemSlugs.length) return;
@@ -54,16 +55,17 @@ export default function useTowerDefenseV2LearningState({
     setActiveProblemIndex(0);
   }, [activeProblemIndex, learningProblemSlugs.length]);
 
-  const resolvedLearningPathSlug = learningPathSlug
-    || (learningPathMeta?.pathId || null)
-    || null;
+  const resolvedLearningPathSlug = learningPathSlug || learningPathMeta?.pathId || null || null;
 
-  const { pathData: learningPathData } = useLearningPathData(resolvedLearningPathSlug);
+  const { pathData: learningPathData } = useLearningPathData(
+    isDemo ? null : resolvedLearningPathSlug
+  );
   const learningNodeId = learningPathMeta?.nodeId || null;
 
-  const learningNextNode = useMemo(() => (
-    getNextLearningNode(learningPathData, learningNodeId, learningPathMeta?.moduleId)
-  ), [learningPathData, learningNodeId, learningPathMeta?.moduleId]);
+  const learningNextNode = useMemo(
+    () => getNextLearningNode(learningPathData, learningNodeId, learningPathMeta?.moduleId),
+    [learningPathData, learningNodeId, learningPathMeta?.moduleId]
+  );
 
   const learningReturnPath = useMemo(() => {
     if (!resolvedLearningPathSlug) return '/learning/python-path';
@@ -71,21 +73,24 @@ export default function useTowerDefenseV2LearningState({
     return `/learning/${resolvedLearningPathSlug}?module=${encodeURIComponent(learningPathMeta.moduleId)}`;
   }, [learningPathMeta?.moduleId, resolvedLearningPathSlug]);
 
-  const buildLearningRoute = useCallback((node) => {
-    if (!node || !resolvedLearningPathSlug) return null;
-    if (node.type === 'tower') {
-      return `/learning/${resolvedLearningPathSlug}/tower/${node.id}`;
-    }
-    if (node.type === 'learn') {
-      return `/learning/${resolvedLearningPathSlug}/${node.id}`;
-    }
-    if (node.type === 'workspace' || node.type === 'final') {
-      const slug = node.content?.learningProblemSlug || null;
-      if (slug) return `/learning/${resolvedLearningPathSlug}/problems/${slug}`;
-      return `/learning/${resolvedLearningPathSlug}/${node.id}`;
-    }
-    return `/learning/${resolvedLearningPathSlug}`;
-  }, [resolvedLearningPathSlug]);
+  const buildLearningRoute = useCallback(
+    (node) => {
+      if (!node || !resolvedLearningPathSlug) return null;
+      if (node.type === 'tower') {
+        return `/learning/${resolvedLearningPathSlug}/tower/${node.id}`;
+      }
+      if (node.type === 'learn') {
+        return `/learning/${resolvedLearningPathSlug}/${node.id}`;
+      }
+      if (node.type === 'workspace' || node.type === 'final') {
+        const slug = node.content?.learningProblemSlug || null;
+        if (slug) return `/learning/${resolvedLearningPathSlug}/problems/${slug}`;
+        return `/learning/${resolvedLearningPathSlug}/${node.id}`;
+      }
+      return `/learning/${resolvedLearningPathSlug}`;
+    },
+    [resolvedLearningPathSlug]
+  );
 
   const learningNextRoute = useMemo(
     () => buildLearningRoute(learningNextNode),
@@ -101,7 +106,7 @@ export default function useTowerDefenseV2LearningState({
     const nextLearningPath = {
       ...(learningPathMeta || {}),
       nodeId: learningNextNode.id,
-      moduleId: learningNextNode.moduleId || learningPathMeta?.moduleId || null
+      moduleId: learningNextNode.moduleId || learningPathMeta?.moduleId || null,
     };
 
     navigate(learningNextRoute, { state: { learningMode: true, learningPath: nextLearningPath } });
@@ -134,6 +139,6 @@ export default function useTowerDefenseV2LearningState({
     handleContinueLearning,
     handleReturnToMap,
     canEnterEndlessMode,
-    isMultiProblemTower
+    isMultiProblemTower,
   };
 }
