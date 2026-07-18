@@ -271,6 +271,18 @@ const HomepageTDDemo = ({
   const { user } = useAuth();
   const funnel = useGuestFunnel();
 
+  // Set the global window/session flag so the static API wrapper
+  // (towerDefense.js) bypasses real backend calls during demo mode.
+  // This runs early on mount before any sub-component can call the API.
+  useEffect(() => {
+    try {
+      window.__tdIsDemoMode = true;
+      sessionStorage.setItem('is_demo_mode', 'true');
+    } catch {
+      // storage may be restricted
+    }
+  }, []);
+
   useEffect(() => {
     try {
       if (!sessionStorage.getItem('cg_demo_start_time')) {

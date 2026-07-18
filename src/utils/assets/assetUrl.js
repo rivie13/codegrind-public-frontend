@@ -89,6 +89,12 @@ const getAssetUrl = (path) => {
       const rawBaseUrl = ASSET_BASE_URL.replace('/image/upload', '/raw/upload');
       return `${rawBaseUrl}${normalizedPath}`;
     }
+    // Inject version v1 for image assets on Cloudinary
+    let imageBaseUrl = ASSET_BASE_URL;
+    if (!/\/v\d+/.test(imageBaseUrl)) {
+      imageBaseUrl = imageBaseUrl.replace('/image/upload', '/image/upload/v1');
+    }
+    return `${imageBaseUrl}${normalizedPath}`;
   }
 
   let resolvedUrl = `${ASSET_BASE_URL}${normalizedPath}`;

@@ -280,6 +280,10 @@ export default function TowerDefenseV2Test({
       AudioService.playBackgroundMusic('random');
     });
   }, [embedded, learningPathOnboarding, learningPathTitleSlug]);
+  // Treat embedded mode as isDemo — both should skip backend calls like
+  // rate-limit checks and submission sync in the code editor.
+  const effectiveIsDemo = isDemo || embedded;
+
   const {
     layout,
     language,
@@ -331,7 +335,7 @@ export default function TowerDefenseV2Test({
     handleReturnToMap,
     problemError,
   } = useTowerDefenseV2PageState({
-    isDemo,
+    isDemo: effectiveIsDemo,
     demoTitleSlug,
     learningPathTitleSlug,
     learningPathSlug,

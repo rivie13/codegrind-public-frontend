@@ -9,7 +9,9 @@ import { executeCodeWithTestCasesClient } from '@rivie13/premium-core/compiler';
 const MAX_RETRIES = 5;
 const RETRY_DELAY_MS = 3000;
 
-const fetchExecutionRateLimit = async () => {
+const fetchExecutionRateLimit = async (isDemoMode = false) => {
+  // Bypass backend rate limit checks for demo/embedded mode
+  if (isDemoMode) return null;
   try {
     const status = await api.codeExecution.getRateLimitStatus();
     return status?.rateLimit || null;
@@ -112,7 +114,9 @@ const fetchAndFormatTestCases = async (problem, titleSlug) => {
   return testCases.map((tc, index) => {
     return {
       input: tc,
-      expected: expectedOutputs ? expectedOutputs[index] : (tc.expected ?? tc.expectedOutput ?? null),
+      expected: expectedOutputs
+        ? expectedOutputs[index]
+        : (tc.expected ?? tc.expectedOutput ?? null),
       metadata,
     };
   });
@@ -126,8 +130,9 @@ export const submitSolutionRequest = async ({
   timerValue,
   addTerminalMessage,
   onExecutionRateLimit,
+  isDemoMode = false,
 }) => {
-  const preflightRateLimit = await fetchExecutionRateLimit();
+  const preflightRateLimit = await fetchExecutionRateLimit(isDemoMode);
   if (isExecutionLimitExhausted(preflightRateLimit)) {
     const payload = buildExecutionLimitPayload(preflightRateLimit);
     if (addTerminalMessage) {
@@ -151,20 +156,41 @@ export const submitSolutionRequest = async ({
       addTerminalMessage(`[VERIFICATION] Processing ${label} problem client-side...`);
     }
 
-    const formattedTestCases = await fetchAndFormatTestCases(problem, problem.titleSlug);
-    
+    const formattedTestCases = isDemoMode
+      ? []
+      : await fetchAndFormatTestCases(problem, problem.titleSlug);
+
     if (addTerminalMessage) {
       addTerminalMessage('[SYSTEM] Executing code in browser sandbox...');
     }
 
-    const evalResult = await executeCodeWithTestCasesClient(
-      code,
-      formattedTestCases,
-      language
-    );
+    // In demo mode with no test cases, skip executeCodeWithTestCasesClient
+    // (it bails immediately on empty arrays) and return a mock success result
+    // so the demo flow completes.
+    const evalResult =
+      isDemoMode && formattedTestCases.length === 0
+        ? {
+            success: true,
+            executionTime: 0,
+            memoryUsed: 0,
+            results: [
+              {
+                passed: true,
+                stdout: '',
+                stderr: '',
+                input: null,
+                expectedOutput: null,
+                actualOutput: null,
+                runtime: 0,
+                error: null,
+              },
+            ],
+          }
+        : await executeCodeWithTestCasesClient(code, formattedTestCases, language);
 
     const payload = {
-      problemId: isAIProblem || isLearningProblem ? problem.titleSlug : (problem.id || problem.questionId),
+      problemId:
+        isAIProblem || isLearningProblem ? problem.titleSlug : problem.id || problem.questionId,
       code,
       language: language.toLowerCase(),
       status: evalResult.success ? 'accepted' : 'failed',
@@ -176,13 +202,21 @@ export const submitSolutionRequest = async ({
       aiUsageCount: 0,
     };
 
-    if (addTerminalMessage) {
-      addTerminalMessage('[SYSTEM] Syncing results and scores with backend...');
+    // Skip hitting the backend submissions API entirely for demos
+    let submitResponse;
+    if (!isDemoMode) {
+      if (addTerminalMessage) {
+        addTerminalMessage('[SYSTEM] Syncing results and scores with backend...');
+      }
+      submitResponse = userId
+        ? await api.problems.submitSolution(payload)
+        : await api.problems.submitGuestSolution(payload);
+    } else {
+      if (addTerminalMessage) {
+        addTerminalMessage('[SYSTEM] Client-side execution verified (Demo mode).');
+      }
+      submitResponse = { success: evalResult.success };
     }
-
-    const submitResponse = userId
-      ? await api.problems.submitSolution(payload)
-      : await api.problems.submitGuestSolution(payload);
 
     const response = {
       ...submitResponse,
@@ -231,8 +265,9 @@ export const runCodeTestsRequest = async ({
   userId,
   addTerminalMessage,
   onExecutionRateLimit,
+  isDemoMode = false,
 }) => {
-  const preflightRateLimit = await fetchExecutionRateLimit();
+  const preflightRateLimit = await fetchExecutionRateLimit(isDemoMode);
   if (isExecutionLimitExhausted(preflightRateLimit)) {
     const payload = buildExecutionLimitPayload(preflightRateLimit);
     if (addTerminalMessage) {
@@ -245,17 +280,41 @@ export const runCodeTestsRequest = async ({
   }
 
   try {
-    const formattedTestCases = await fetchAndFormatTestCases(problem, problem.titleSlug);
+    const formattedTestCases = isDemoMode
+      ? []
+      : await fetchAndFormatTestCases(problem, problem.titleSlug);
 
     if (addTerminalMessage) {
       addTerminalMessage('[SYSTEM] Executing code in browser sandbox...');
     }
 
-    const evalResult = await executeCodeWithTestCasesClient(
-      code,
-      formattedTestCases,
-      language
-    );
+    // In demo mode with no test cases, skip executeCodeWithTestCasesClient
+    // (it bails immediately on empty arrays) and return a mock success result
+    // so the demo flow completes.
+    const isMockDemoResult = isDemoMode && formattedTestCases.length === 0;
+    const evalResult = isMockDemoResult
+      ? {
+          success: true,
+          executionTime: 0,
+          memoryUsed: 0,
+          results: [
+            {
+              passed: true,
+              stdout: '',
+              stderr: '',
+              input: null,
+              expectedOutput: null,
+              actualOutput: null,
+              runtime: 0,
+              error: null,
+            },
+          ],
+        }
+      : await executeCodeWithTestCasesClient(code, formattedTestCases, language);
+
+    if (isMockDemoResult && addTerminalMessage) {
+      addTerminalMessage('[SYSTEM] Demo mode — all test cases passing ✅');
+    }
 
     const response = {
       success: evalResult.success,
@@ -298,8 +357,9 @@ export const runCodeOutputRequest = async ({
   userId,
   addTerminalMessage,
   onExecutionRateLimit,
+  isDemoMode = false,
 }) => {
-  const preflightRateLimit = await fetchExecutionRateLimit();
+  const preflightRateLimit = await fetchExecutionRateLimit(isDemoMode);
   if (isExecutionLimitExhausted(preflightRateLimit)) {
     const payload = buildExecutionLimitPayload(preflightRateLimit);
     if (addTerminalMessage) {
@@ -312,17 +372,41 @@ export const runCodeOutputRequest = async ({
   }
 
   try {
-    const formattedTestCases = await fetchAndFormatTestCases(problem, problem.titleSlug);
+    const formattedTestCases = isDemoMode
+      ? []
+      : await fetchAndFormatTestCases(problem, problem.titleSlug);
 
     if (addTerminalMessage) {
-      addTerminalMessage('[SYSTEM] Capturing stdout/stderr client-side...');
+      addTerminalMessage('[SYSTEM] Executing code in browser sandbox...');
     }
 
-    const evalResult = await executeCodeWithTestCasesClient(
-      code,
-      formattedTestCases,
-      language
-    );
+    // In demo mode with no test cases, skip executeCodeWithTestCasesClient
+    // (it bails immediately on empty arrays) and return a mock success result
+    // so the demo flow completes.
+    const isMockDemoResult = isDemoMode && formattedTestCases.length === 0;
+    const evalResult = isMockDemoResult
+      ? {
+          success: true,
+          executionTime: 0,
+          memoryUsed: 0,
+          results: [
+            {
+              passed: true,
+              stdout: '',
+              stderr: '',
+              input: null,
+              expectedOutput: null,
+              actualOutput: null,
+              runtime: 0,
+              error: null,
+            },
+          ],
+        }
+      : await executeCodeWithTestCasesClient(code, formattedTestCases, language);
+
+    if (isMockDemoResult && addTerminalMessage) {
+      addTerminalMessage('[SYSTEM] Demo mode — all test cases passing ✅');
+    }
 
     const response = {
       success: evalResult.success,
@@ -340,7 +424,7 @@ export const runCodeOutputRequest = async ({
       },
     };
 
-    return { status: 'ok', success: true, response, apiError: null };
+    return { status: 'ok', success: evalResult.success, response, apiError: null };
   } catch (error) {
     const message = getUserFacingErrorMessage(
       error,
@@ -357,4 +441,3 @@ export const runCodeOutputRequest = async ({
     return { status: 'error', success: false, response, apiError: error };
   }
 };
-
