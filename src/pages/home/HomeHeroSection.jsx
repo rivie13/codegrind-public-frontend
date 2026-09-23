@@ -281,6 +281,7 @@ const HomeHeroSection = ({
   revealPhase = 'prelaunch',
   canBegin = false,
   requiresLandscapeForDemo = false,
+  hasCompletedQuickDemo = false,
   onBeginDemo,
   onSignIn,
   isAuthenticated = false,
@@ -607,9 +608,11 @@ const HomeHeroSection = ({
                               >
                                 {user?.onboardingComplete
                                   ? 'Onboarding complete. Choose safehouse or profile to resume.'
-                                  : requiresLandscapeForDemo
-                                    ? 'Rotate to landscape to unlock the playable demo.'
-                                    : 'Press Begin Demo to boot the game when you are set.'}
+                                  : hasCompletedQuickDemo
+                                    ? 'Demo completed — check back soon.'
+                                    : requiresLandscapeForDemo
+                                      ? 'Rotate to landscape to unlock the playable demo.'
+                                      : 'Press Begin Demo to boot the game when you are set.'}
                               </Text>
                             </Box>
 
@@ -657,13 +660,13 @@ const HomeHeroSection = ({
                                   <RetroButton
                                     size={ctaButtonSize}
                                     onClick={onBeginDemo}
-                                    isDisabled={!canBegin}
+                                    isDisabled={!canBegin || hasCompletedQuickDemo}
                                     px={isCompactLandscapeShellMode ? 7 : 10}
                                     minW={{ base: '100%', md: '230px' }}
                                     bg="var(--home-retro-surface-shell)"
                                     color="var(--home-retro-title-start)"
                                   >
-                                    Begin Demo
+                                    {hasCompletedQuickDemo ? 'Demo Completed' : 'Begin Demo'}
                                   </RetroButton>
                                   {!isAuthenticated && onSignIn ? (
                                     <RetroButton
@@ -692,11 +695,13 @@ const HomeHeroSection = ({
                               lineHeight="1.6"
                               textAlign="center"
                             >
-                              {user?.onboardingComplete
-                                ? 'Onboarding complete. Safehouse and profile ready.'
-                                : requiresLandscapeForDemo
-                                  ? 'Demo launch stays disabled until your phone is in landscape mode.'
-                                  : 'Press begin demo to select your character and load into the world.'}
+                              {hasCompletedQuickDemo
+                                ? 'Demo completed — check back soon for the full experience.'
+                                : user?.onboardingComplete
+                                  ? 'Onboarding complete. Safehouse and profile ready.'
+                                  : requiresLandscapeForDemo
+                                    ? 'Demo launch stays disabled until your phone is in landscape mode.'
+                                    : 'Press begin demo to select your character and load into the world.'}
                             </Text>
                           </VStack>
                         </Box>
