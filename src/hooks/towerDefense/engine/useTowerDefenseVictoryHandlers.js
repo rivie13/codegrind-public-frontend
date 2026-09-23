@@ -96,7 +96,8 @@ export default function useTowerDefenseVictoryHandlers({
       return [...normalizedPrev, ...victoryOutput];
     });
 
-    if (!isDemo) {
+    // Homepage embedded demo — fire callback instead of success modal (even when isDemo)
+    if (onEmbeddedVictory) {
       const stats = {
         score: totalScore,
         finalScore: totalScore,
@@ -111,56 +112,69 @@ export default function useTowerDefenseVictoryHandlers({
 
       setGameStats(stats);
 
-      // Homepage embedded demo — fire callback instead of success modal
-      if (onEmbeddedVictory) {
-        const userIdString =
-          typeof localStorage !== 'undefined' ? localStorage.getItem('user_id') : null;
-        const isAuthenticatedUser = Boolean(userIdString);
+      const userIdString =
+        typeof localStorage !== 'undefined' ? localStorage.getItem('user_id') : null;
+      const isAuthenticatedUser = Boolean(userIdString);
 
-        if (isAuthenticatedUser && codeSubmissionSuccess === true) {
-          submitTowerDefenseWin(totalScore, timerSeconds, {
-            finalLives: livesRef.current,
-            startingLives: initialLives,
-          })
-            .then((response) => {
-              const guestXp = typeof getGuestXpPreview === 'function' ? getGuestXpPreview() : null;
-              const xpPayload = response?.xp || guestXp;
-              const fallbackXpAmount = Array.isArray(xpPayload?.awards)
-                ? xpPayload.awards.reduce((sum, award) => sum + (award?.amount || 0), 0)
-                : 0;
-              const dataPacketsPayload = normalizeDataPacketsPayload(response?.dataPackets, {
-                fallbackXpAmount,
-              });
-
-              if (xpPayload) {
-                setGameStats((prev) => ({
-                  ...(prev || stats),
-                  xp: mergeXpPayloads(prev?.xp || null, xpPayload),
-                  dataPackets: dataPacketsPayload || prev?.dataPackets || null,
-                }));
-              } else if (dataPacketsPayload) {
-                setGameStats((prev) => ({
-                  ...(prev || stats),
-                  dataPackets: dataPacketsPayload,
-                }));
-              }
-
-              const updatedStats = {
-                ...stats,
-                xp: xpPayload ? mergeXpPayloads(stats.xp || null, xpPayload) : null,
-                dataPackets: dataPacketsPayload || stats.dataPackets || null,
-              };
-              onEmbeddedVictory(updatedStats);
-            })
-            .catch((err) => {
-              console.error('[TowerDefenseV2] Failed to submit embedded victory:', err);
-              onEmbeddedVictory(stats);
+      if (isAuthenticatedUser && codeSubmissionSuccess === true) {
+        submitTowerDefenseWin(totalScore, timerSeconds, {
+          finalLives: livesRef.current,
+          startingLives: initialLives,
+        })
+          .then((response) => {
+            const guestXp = typeof getGuestXpPreview === 'function' ? getGuestXpPreview() : null;
+            const xpPayload = response?.xp || guestXp;
+            const fallbackXpAmount = Array.isArray(xpPayload?.awards)
+              ? xpPayload.awards.reduce((sum, award) => sum + (award?.amount || 0), 0)
+              : 0;
+            const dataPacketsPayload = normalizeDataPacketsPayload(response?.dataPackets, {
+              fallbackXpAmount,
             });
-        } else {
-          onEmbeddedVictory(stats);
-        }
-        return;
+
+            if (xpPayload) {
+              setGameStats((prev) => ({
+                ...(prev || stats),
+                xp: mergeXpPayloads(prev?.xp || null, xpPayload),
+                dataPackets: dataPacketsPayload || prev?.dataPackets || null,
+              }));
+            } else if (dataPacketsPayload) {
+              setGameStats((prev) => ({
+                ...(prev || stats),
+                dataPackets: dataPacketsPayload,
+              }));
+            }
+
+            const updatedStats = {
+              ...stats,
+              xp: xpPayload ? mergeXpPayloads(stats.xp || null, xpPayload) : null,
+              dataPackets: dataPacketsPayload || stats.dataPackets || null,
+            };
+            onEmbeddedVictory(updatedStats);
+          })
+          .catch((err) => {
+            console.error('[TowerDefenseV2] Failed to submit embedded victory:', err);
+            onEmbeddedVictory(stats);
+          });
+      } else {
+        onEmbeddedVictory(stats);
       }
+      return;
+    }
+
+    if (!isDemo) {
+      const stats = {
+        score: totalScore,
+        finalScore: totalScore,
+        timeSpent: timerSeconds,
+        formattedTime,
+        finalCredits: creditsRef.current,
+        finalLives: livesRef.current,
+        codeSubmissionSuccess,
+        hasNewHighScore: false,
+        hasNewBestTime: false,
+      };
+
+      setGameStats(stats);
 
       if (successModalTimer) {
         clearTimeout(successModalTimer);
@@ -269,4 +283,3 @@ export default function useTowerDefenseVictoryHandlers({
     handleGameOver,
   };
 }
-
