@@ -101,6 +101,7 @@ const Home = () => {
   const [showPlayerCharacterSelect, setShowPlayerCharacterSelect] = useState(false);
   const [showDemoTypeSelect, setShowDemoTypeSelect] = useState(false);
   const [isQuickDemo, setIsQuickDemo] = useState(false);
+  const [hasCompletedQuickDemo, setHasCompletedQuickDemo] = useState(false);
   const [pathChoiceDemoSummary, setPathChoiceDemoSummary] = useState(null);
   const [hasScrolledPastDemo, setHasScrolledPastDemo] = useState(false);
   const [isDemoBootComplete, setIsDemoBootComplete] = useState(false);
@@ -387,8 +388,19 @@ const Home = () => {
           });
       }
 
-      // Brief delay so the victory terminal output is visible before modal
-      setTimeout(() => setShowPathChoice(true), 2500);
+      // TEMP: cloudinary bypass — return to home instead of PathChoiceModal
+      // TODO: cloudinary revert — restore setShowPathChoice(true)
+      setTimeout(() => {
+        setHasCompletedQuickDemo(true);
+        setIsQuickDemo(false);
+        setIsDemoBootComplete(false);
+        setHomeDemoBootSequenceActive(false);
+        setRevealPhase('prelaunch');
+        if (typeof window !== 'undefined') {
+          window.__codegrindQuickDemoActive = false;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 2500);
     },
     [funnel, guest, isAuthenticated, refreshAuth]
   );
@@ -537,42 +549,54 @@ const Home = () => {
     await handleLaunchCityTarget('/city', pendingPlayerCharacterLaunchSourceRect);
   }, [funnel, handleLaunchCityTarget, pendingPlayerCharacterLaunchSourceRect]);
 
+  // TODO: cloudinary revert — restore character/demo-type modals flow (see handleSelectQuickDemo/handleSelectFullExperience)
   const handleBeginDemo = useCallback(
-    (event) => {
+    async (event) => {
+      if (hasCompletedQuickDemo) {
+        return;
+      }
       if (!canLaunchDemo || requiresLandscapeForDemo) {
         return;
       }
 
-      preloadPhaserBackground().catch((err) => {
-        console.warn('[Home] Background preload error:', err);
-      });
-
-      // Start Phaser scene preboot while user is selecting character + demo type.
-      // This avoids the ~20s scene bootstrap delay when user clicks "Full Experience".
-      prebootPhaserInstance().catch((err) => {
-        console.warn('[Home] Phaser preboot error:', err);
-      });
+      // TEMP bypass: direct to Quick Demo, no character/demo choice modals
+      if (typeof window !== 'undefined') {
+        window.__codegrindQuickDemoActive = true;
+      }
+      try {
+        phaserInstanceManager.pauseGame();
+      } catch (err) {
+        console.warn('[Home] Failed to pause Phaser background instance:', err);
+      }
 
       funnel.beginDemoClicked({ source: 'hero' });
 
-      const triggerRect = event?.currentTarget?.getBoundingClientRect?.();
+      setIsPreloadingForNavigate(true);
+      await preloadPhaserBackground();
+      setIsPreloadingForNavigate(false);
 
-      setPendingPlayerCharacterLaunchSourceRect(
-        triggerRect
-          ? {
-              height: triggerRect.height,
-              left: triggerRect.left,
-              top: triggerRect.top,
-              width: triggerRect.width,
-            }
-          : null
-      );
-      setPendingPlayerCharacterId(
-        guest?.selectedPlayerCharacterId || readStoredSelectedPlayerCharacterId()
-      );
-      setShowPlayerCharacterSelect(true);
+      setIsQuickDemo(true);
+      demoLaunchStartTimeRef.current = performance.now();
+      const timeToDemoClickMs = Date.now() - mountTimeRef.current;
+      funnel.demoLoadingStarted('quick', { timeToDemoClickMs: String(timeToDemoClickMs) });
+      beginDemoLaunch({
+        playTypingAudio: false,
+        shellTheme: demoShellTheme,
+        skipBootSequence: true,
+      });
+
+      prebootPhaserInstance().catch((err) => {
+        console.warn('[Home] Quick demo Phaser preboot error:', err);
+      });
     },
-    [canLaunchDemo, funnel, guest?.selectedPlayerCharacterId, requiresLandscapeForDemo]
+    [
+      beginDemoLaunch,
+      canLaunchDemo,
+      demoShellTheme,
+      funnel,
+      hasCompletedQuickDemo,
+      requiresLandscapeForDemo,
+    ]
   );
 
   const handleEmbeddedChatFocusChange = useCallback((isNonGameFocusActive) => {
@@ -864,8 +888,9 @@ const Home = () => {
               <HomeHeroSection
                 variant="overlay"
                 revealPhase={revealPhase}
-                canBegin={hasHydrated && canLaunchDemo}
+                canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
                 requiresLandscapeForDemo={requiresLandscapeForDemo}
+                hasCompletedQuickDemo={hasCompletedQuickDemo}
                 onBeginDemo={handleBeginDemo}
                 onSignIn={onAuthOpen}
                 isAuthenticated={isAuthenticated}
@@ -1027,8 +1052,9 @@ const Home = () => {
               <HomeHeroSection
                 variant="compact"
                 revealPhase={revealPhase}
-                canBegin={hasHydrated && canLaunchDemo}
+                canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
                 requiresLandscapeForDemo={requiresLandscapeForDemo}
+                hasCompletedQuickDemo={hasCompletedQuickDemo}
                 onBeginDemo={handleBeginDemo}
                 isAuthenticated={isAuthenticated}
                 user={user}
