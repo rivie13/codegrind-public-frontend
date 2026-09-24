@@ -13,10 +13,27 @@ with any reviews/issues.
 
 ## Guidelines
 ### Branching
-- Make a branch off of dev branch, not main
-- Naming convention: feature/<feature-name> or bugfix/<bugfix-name> etc.
-- Keep branches updated with dev branch (rebase on top of dev)
+- Make a branch off of `dev` branch, not `main`
+- Naming convention: `feature/<feature-name>` or `bugfix/<bugfix-name>` etc.
+- Keep branches updated with `dev` branch (rebase on top of `dev`)
 - Once PR is merged, delete your branch
+
+### Merge Strategy (enforced by branch protection)
+- `feature/*` / `fix/*` -> `dev`: **Rebase and merge only**
+  - Before opening a PR or when `dev` moves ahead, update your branch:
+    ```bash
+    git fetch origin
+    git rebase origin/dev
+    # if conflicts: resolve, then git rebase --continue
+    git push --force-with-lease
+    ```
+  - Why rebase: `dev` has **Require linear history** enabled — merge commits are rejected. Rebasing replays your commits on top of the latest `dev`, keeps PRs small, and avoids the "extra commits from previous PRs" problem. Never `git merge origin/dev` into a feature branch.
+  - On GitHub, select **Rebase and merge** (Squash is disabled repo-wide).
+- `dev` -> `main`: **Create a merge commit only**
+  - `main` has **Require linear history disabled** and repo allows merge commits. Use **Create a merge commit** (not Squash, not Rebase).
+  - Why merge commit: `dev` is long-lived; squashing rewrites SHAs and leaves `merge-base` stuck (e.g., `8400eab`), causing perpetual giant PRs and potentially merge conflicts. A merge commit preserves shared ancestry so the next `dev->main` PR shows only new work.
+  - Do not force-push `dev` or `main`.
+
 
 ### Commit Messages
 - Use Conventional Commits format (https://www.conventionalcommits.org/)
