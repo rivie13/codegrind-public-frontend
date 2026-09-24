@@ -29,6 +29,10 @@ import { getGuestXpSummaryFromTotalXp } from '../../hooks/guest/useGuestProgress
 import { normalizeSelectedPlayerCharacterId } from '../../player-character/playerCharacterPresets';
 import useIsMobileDevice from '../../hooks/useIsMobileDevice';
 import useHasHydrated from '../../hooks/useHasHydrated';
+import useQualifierFunnel from '../../hooks/useQualifierFunnel';
+import QualifierFunnel from '../../components/home/QualifierFunnel';
+import FunnelReassurance from '../../components/home/FunnelReassurance';
+import AudioService from '../../utils/audio/AudioService';
 import {
   clearPendingAppLaunch,
   readPendingAppLaunch,
@@ -122,6 +126,9 @@ const Home = () => {
   const { isAuthenticated, refreshAuth, user } = useAuth();
   const guest = useGuestProgressCtx();
   const funnel = useGuestFunnel();
+  const qualifier = useQualifierFunnel();
+  const [funnelStarted, setFunnelStarted] = useState(false);
+  const [liteActivityIndex, setLiteActivityIndex] = useState(0);
   const [revealPhase, setRevealPhase] = useState(() =>
     autoLaunchHomeDemo ? 'launching' : 'prelaunch'
   );
@@ -388,9 +395,24 @@ const Home = () => {
           });
       }
 
-      // TEMP: cloudinary bypass — return to home instead of PathChoiceModal
-      // TODO: cloudinary revert — restore setShowPathChoice(true)
+      // Lite activity: single XP celebration for both waves (one activity), then funnel reassurance
+      try {
+        AudioService.playBeginDemoSequence().catch(() => {});
+      } catch {
+        // ignore SFX failure
+      }
+      // Wave 0+Wave1 are one activity — advance funnel after this single victory, not between waves
+      setLiteActivityIndex((v) => v + 1);
+      qualifier.markActivityComplete();
+
+      // Deferred gate: character/path choice remains gated (owner will place later) — keep returning to home after activities for now
+      // Cut-scene stays present but not invoked for this lite path
       setTimeout(() => {
+        // If funnel still has between questions (time/obstacle), keep demo visible and let funnel overlay drive next reassurance
+        if (qualifier.phase === 'between' || qualifier.pendingReassurance) {
+          // stay in place, let funnel reassurance overlay handle continuation; no reset yet
+          return;
+        }
         setHasCompletedQuickDemo(true);
         setIsQuickDemo(false);
         setIsDemoBootComplete(false);
@@ -400,9 +422,9 @@ const Home = () => {
           window.__codegrindQuickDemoActive = false;
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-      }, 2500);
+      }, 1200);
     },
-    [funnel, guest, isAuthenticated, refreshAuth]
+    [funnel, guest, isAuthenticated, refreshAuth, qualifier]
   );
 
   const handleDemoReady = useCallback(() => {
@@ -549,17 +571,8 @@ const Home = () => {
     await handleLaunchCityTarget('/city', pendingPlayerCharacterLaunchSourceRect);
   }, [funnel, handleLaunchCityTarget, pendingPlayerCharacterLaunchSourceRect]);
 
-  // TODO: cloudinary revert — restore character/demo-type modals flow (see handleSelectQuickDemo/handleSelectFullExperience)
-  const handleBeginDemo = useCallback(
-    async (event) => {
-      if (hasCompletedQuickDemo) {
-        return;
-      }
-      if (!canLaunchDemo || requiresLandscapeForDemo) {
-        return;
-      }
-
-      // TEMP bypass: direct to Quick Demo, no character/demo choice modals
+  const launchLiteActivity = useCallback(
+    async () => {
       if (typeof window !== 'undefined') {
         window.__codegrindQuickDemoActive = true;
       }
@@ -568,13 +581,9 @@ const Home = () => {
       } catch (err) {
         console.warn('[Home] Failed to pause Phaser background instance:', err);
       }
-
-      funnel.beginDemoClicked({ source: 'hero' });
-
       setIsPreloadingForNavigate(true);
       await preloadPhaserBackground();
       setIsPreloadingForNavigate(false);
-
       setIsQuickDemo(true);
       demoLaunchStartTimeRef.current = performance.now();
       const timeToDemoClickMs = Date.now() - mountTimeRef.current;
@@ -584,20 +593,42 @@ const Home = () => {
         shellTheme: demoShellTheme,
         skipBootSequence: true,
       });
-
       prebootPhaserInstance().catch((err) => {
         console.warn('[Home] Quick demo Phaser preboot error:', err);
       });
     },
-    [
-      beginDemoLaunch,
-      canLaunchDemo,
-      demoShellTheme,
-      funnel,
-      hasCompletedQuickDemo,
-      requiresLandscapeForDemo,
-    ]
+    [beginDemoLaunch, demoShellTheme, funnel]
   );
+
+  // TODO: cloudinary revert — restore character/demo-type modals flow (see handleSelectQuickDemo/handleSelectFullExperience)
+  // NOTE: funnel gates activity — Begin Demo starts qualifier, actual game launches after pre-phase reassurance (see effect below)
+  const handleBeginDemo = useCallback(
+    async (event) => {
+      if (hasCompletedQuickDemo) {
+        return;
+      }
+      if (!canLaunchDemo || requiresLandscapeForDemo) {
+        return;
+      }
+      funnel.beginDemoClicked({ source: 'hero' });
+      setFunnelStarted(true);
+      // Preserved-but-not-used: PlayerCharacterSelectModal / PathChoiceModal / DemoTypeSelectModal remain mounted elsewhere, gated off here
+      // Cut-scene (BOOT_INTRO_*) remains in HomepageTDDemo.jsx:42 but not triggered for lite flow
+    },
+    [canLaunchDemo, funnel, hasCompletedQuickDemo, requiresLandscapeForDemo]
+  );
+
+  // Funnel gates: after last pre-phase reassurance (experience+goal), launch the 2-wave lite activity
+  useEffect(() => {
+    if (!funnelStarted) return;
+    if (isQuickDemo) return;
+    if (qualifier.pendingReassurance) return;
+    // pre questions are two: experience + goal. When answers has both and phase moved to between, ready to launch
+    const hasPreAnswers = Boolean(qualifier.answers.experience) && Boolean(qualifier.answers.goal);
+    if (hasPreAnswers && qualifier.phase !== 'pre') {
+      launchLiteActivity();
+    }
+  }, [funnelStarted, qualifier.answers, qualifier.phase, qualifier.pendingReassurance, isQuickDemo, launchLiteActivity]);
 
   const handleEmbeddedChatFocusChange = useCallback((isNonGameFocusActive) => {
     setIsHomeDemoNonGameFocusActive(Boolean(isNonGameFocusActive));
@@ -855,6 +886,30 @@ const Home = () => {
         >
           <HomeBackgroundEffects showBackground={showBackground && !isRetroDesktopTakeover} />
 
+          {/* Qualifier funnel — overlays hero/demo between activities, never between waves */}
+          {funnelStarted && (qualifier.activeQuestion || qualifier.pendingReassurance) ? (
+            <Box px={{ base: 5, md: 8 }} py={{ base: 6, md: 10 }} display="flex" justifyContent="center">
+              {qualifier.pendingReassurance ? (
+                <FunnelReassurance
+                  reassurance={qualifier.pendingReassurance}
+                  onContinue={() => {
+                    qualifier.continueReassurance();
+                    // after last between reassurance, keep lite activity visible; Home's timeout in handleDemoVictory handles home reset
+                  }}
+                />
+              ) : (
+                <QualifierFunnel
+                  question={qualifier.activeQuestion}
+                  onAnswer={(v) => {
+                    funnel.tutorialStepReached?.(qualifier.activeQuestion?.id);
+                    qualifier.answer(v);
+                  }}
+                  progress={qualifier.progress}
+                />
+              )}
+            </Box>
+          ) : null}
+
           {/* Scrollable content container */}
           <Box
             width="100%"
@@ -929,6 +984,7 @@ const Home = () => {
                         onEmbeddedChatFocusChange={handleEmbeddedChatFocusChange}
                         preinitTypingAudio={typingAudioRef}
                         demoLaunchStartTime={demoLaunchStartTimeRef.current}
+                        liteFirstActivity={funnelStarted}
                       />
                     </Suspense>
                   </Box>

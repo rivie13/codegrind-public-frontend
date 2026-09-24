@@ -14,13 +14,20 @@ const TowerDefenseV2Page = lazy(() => import('../games/towerDefenseV2/TowerDefen
  * embedded on the homepage via the `embedded` flag (no PageTemplate / ads).
  */
 
-const ONBOARDING_TOWER_CONFIG = {
+export const ONBOARDING_TOWER_CONFIG = {
   allowedTowers: ['Function', 'Object', 'BurstTurret', 'BlastTurret', 'Log'],
   waves: 2,
   problems: 1,
   multiTab: false,
   learningProblemSlug: 'lp-m0-td-hello-print',
   onboardingId: 'lp-m0-onboarding',
+};
+
+export const LITE_FIRST_ACTIVITY_CONFIG = {
+  ...ONBOARDING_TOWER_CONFIG,
+  onboardingId: 'lp-m0-onboarding-lite',
+  prePlacedTowers: [{ type: 'Function', col: 7, row: 5, level: 1 }],
+  waves: 2,
 };
 
 const LEARNING_PATH_META = {
@@ -221,12 +228,12 @@ const TDGameSection = React.memo(function TDGameSection({
         <TowerDefenseV2Page
           learningPathTitleSlug="lp-m0-td-hello-print"
           learningPathOnboarding={!onboardingComplete}
-          learningTowerConfig={ONBOARDING_TOWER_CONFIG}
+          learningTowerConfig={LITE_FIRST_ACTIVITY_CONFIG}
           learningPathSlug="python-path"
           learningIsCapstone={false}
           learningPathMeta={LEARNING_PATH_META}
           embedded
-          embeddedBootSequenceActive={!bootUiReady}
+          embeddedBootSequenceActive={false}
           embeddedShellTheme={embeddedShellTheme}
           allowEmbeddedHandheldPageScroll={allowEmbeddedHandheldPageScroll}
           onEmbeddedVictory={onVictory}
@@ -234,6 +241,7 @@ const TDGameSection = React.memo(function TDGameSection({
           onEmbeddedReady={onReady}
           onEmbeddedChatFocusChange={onEmbeddedChatFocusChange}
           demoLaunchStartTime={demoLaunchStartTime}
+          liteFirstActivity={true}
         />
       </Suspense>
     </MotionBox>
@@ -267,6 +275,7 @@ const HomepageTDDemo = ({
   onEmbeddedChatFocusChange,
   preinitTypingAudio,
   demoLaunchStartTime = null,
+  liteFirstActivity = false,
 }) => {
   const { user } = useAuth();
   const funnel = useGuestFunnel();
