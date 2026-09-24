@@ -583,9 +583,12 @@ const Home = () => {
       } catch (err) {
         console.warn('[Home] Failed to pause Phaser background instance:', err);
       }
-      setIsPreloadingForNavigate(true);
-      await preloadPhaserBackground();
-      setIsPreloadingForNavigate(false);
+      // Non-blocking: kick Phaser preload in background on first Begin Demo click and while funnel is active,
+      // so it never blocks qualifier interactions. The spinner overlay is NOT used here.
+      preloadPhaserBackground().catch(() => {});
+      prebootPhaserInstance().catch((err) => {
+        console.warn('[Home] Quick demo Phaser preboot error:', err);
+      });
       setIsQuickDemo(true);
       demoLaunchStartTimeRef.current = performance.now();
       const timeToDemoClickMs = Date.now() - mountTimeRef.current;
@@ -595,12 +598,20 @@ const Home = () => {
         shellTheme: demoShellTheme,
         skipBootSequence: true,
       });
-      prebootPhaserInstance().catch((err) => {
-        console.warn('[Home] Quick demo Phaser preboot error:', err);
-      });
     },
     [beginDemoLaunch, demoShellTheme, funnel]
   );
+
+  // Start Phaser preload early — on mount and on Begin Demo — so game is ready before first activity without blocking funnel
+  useEffect(() => {
+    preloadPhaserBackground().catch(() => {});
+    prebootPhaserInstance().catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (!funnelStarted) return;
+    preloadPhaserBackground().catch(() => {});
+    prebootPhaserInstance().catch(() => {});
+  }, [funnelStarted]);
 
   // TODO: cloudinary revert — restore character/demo-type modals flow (see handleSelectQuickDemo/handleSelectFullExperience)
   // NOTE: funnel gates activity — Begin Demo starts qualifier, actual game launches after pre-phase reassurance (see effect below)
@@ -1322,9 +1333,8 @@ const Home = () => {
         </>
       ) : null}
 
-      {/* Preload spinner — shown while awaiting Phaser warmup to finish
-          before navigating to city or starting quick demo. */}
-      {isPreloadingForNavigate && (
+      {/* Preload spinner — only for city navigation, never during qualifier takeover */}
+      {isPreloadingForNavigate && !isFunnelTakeover && (
         <Box
           position="fixed"
           top="0"
