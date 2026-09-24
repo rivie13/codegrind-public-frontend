@@ -1029,3 +1029,50 @@ export function getProTrialOnboardingScript() {
     steps,
   };
 }
+
+export function getHomepageLiteOnboardingScript(language = 'python') {
+  const config = getOnboardingConfig({ onboardingId: 'lp-m0-onboarding', language: 'python' });
+  return {
+    version: 'v7-homepage-lite',
+    config,
+    steps: [
+      {
+        id: 'lite-brief',
+        kind: 'callout',
+        title: 'READ THE BRIEF',
+        message: 'Code is already written. Watch the brief — towers defend what this print does.',
+        targetSelector: "[data-tutorial='problem-panel-header']",
+        placement: 'bottom',
+        panelFocus: { rightPanel: PANEL_TYPES.PROBLEM },
+        requireManualContinue: false,
+        autoAdvanceAfter: 2400,
+      },
+      {
+        id: 'lite-start-wave',
+        kind: 'callout',
+        title: 'START WAVE',
+        message: 'Press Start Wave. The pre-placed tower defends both waves — just watch.',
+        targetSelector: "[data-tutorial='game-start-wave-button']",
+        placement: 'top',
+        highlightKey: 'start-wave',
+        panelFocus: { leftPanel: PANEL_TYPES.GAME },
+        completeWhen: ({ gameState }) => {
+          const s = gameState?.status;
+          return s === 'playing' || s === 'wave-complete' || (gameState?.wave || 0) >= 1;
+        },
+      },
+      {
+        id: 'lite-submit',
+        kind: 'callout',
+        title: 'SUBMIT',
+        message: 'Press Submit when ready. Two waves, one code — button only.',
+        targetSelector: "[data-tutorial='verify-button']",
+        placement: 'top',
+        highlightKey: 'start-wave',
+        panelFocus: { leftPanel: PANEL_TYPES.GAME },
+        showWhen: ({ gameState }) => (gameState?.wave || 0) >= 1,
+        completeWhen: ({ codeSubmitted, verifyAttemptInProgress }) => Boolean(codeSubmitted || verifyAttemptInProgress),
+      },
+    ],
+  };
+}

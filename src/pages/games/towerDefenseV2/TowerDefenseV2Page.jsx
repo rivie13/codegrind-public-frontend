@@ -194,6 +194,7 @@ export default function TowerDefenseV2Test({
   onEmbeddedReady = null,
   onEmbeddedChatFocusChange = null,
   demoLaunchStartTime = null,
+  liteFirstActivity = false,
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -849,7 +850,7 @@ export default function TowerDefenseV2Test({
             selectedTower={selectedTower}
             selectedTowerType={selectedTowerType}
             language={language}
-            surfaceVariant={embedded ? 'homepage' : 'learning'}
+            surfaceVariant={liteFirstActivity && embedded ? 'homepage-lite' : embedded ? 'homepage' : 'learning'}
             leftPanel={leftPanel}
             rightPanel={rightPanel}
             setLeftPanel={setLeftPanel}

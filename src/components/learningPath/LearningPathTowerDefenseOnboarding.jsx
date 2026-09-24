@@ -18,6 +18,7 @@ import {
 } from '../towerDefense/onboarding/onboardingStorageKeys';
 import {
   getHomepageDemoOnboardingScript,
+  getHomepageLiteOnboardingScript,
   getLearningPathOnboardingScript,
   getProTrialOnboardingScript,
 } from '../towerDefense/onboarding/towerDefenseOnboardingScripts';
@@ -442,6 +443,10 @@ const LearningPathTowerDefenseOnboarding = ({
   lastTerminalCommand = '',
 }) => {
   const script = useMemo(() => {
+    if (surfaceVariant === 'homepage-lite') {
+      return getHomepageLiteOnboardingScript(language);
+    }
+
     if (surfaceVariant === 'homepage') {
       return getHomepageDemoOnboardingScript(language);
     }
