@@ -145,7 +145,9 @@ const Home = () => {
     isDemoBootComplete;
   const showOverlayHero =
     !isRetroDesktopTakeover && (revealPhase === 'prelaunch' || revealPhase === 'launching');
+  const isFunnelTakeover = funnelStarted && Boolean(qualifier.activeQuestion || qualifier.pendingReassurance);
   const showBelowFold =
+    !isFunnelTakeover &&
     !isRetroDesktopTakeover &&
     (revealPhase === 'prelaunch' || (revealPhase === 'settled' && isDemoBootComplete));
   const demoSectionRef = useRef(null);
@@ -886,15 +888,25 @@ const Home = () => {
         >
           <HomeBackgroundEffects showBackground={showBackground && !isRetroDesktopTakeover} />
 
-          {/* Qualifier funnel — overlays hero/demo between activities, never between waves */}
-          {funnelStarted && (qualifier.activeQuestion || qualifier.pendingReassurance) ? (
-            <Box px={{ base: 5, md: 8 }} py={{ base: 6, md: 10 }} display="flex" justifyContent="center">
+          {/* Qualifier funnel — EXCLUSIVE takeover: when active, it is the ONLY content on the page (boot.dev style) */}
+          {isFunnelTakeover ? (
+            <Box
+              width="100%"
+              flex="1"
+              minH="calc(100vh - 50px)"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              px={{ base: 5, md: 8 }}
+              py={{ base: 6, md: 10 }}
+              position="relative"
+              zIndex="2"
+            >
               {qualifier.pendingReassurance ? (
                 <FunnelReassurance
                   reassurance={qualifier.pendingReassurance}
                   onContinue={() => {
                     qualifier.continueReassurance();
-                    // after last between reassurance, keep lite activity visible; Home's timeout in handleDemoVictory handles home reset
                   }}
                 />
               ) : (
@@ -910,7 +922,8 @@ const Home = () => {
             </Box>
           ) : null}
 
-          {/* Scrollable content container */}
+          {/* Scrollable content container — hidden during funnel takeover */}
+          {!isFunnelTakeover ? (
           <Box
             width="100%"
             flex="1"
@@ -1137,6 +1150,7 @@ const Home = () => {
               )}
             </AnimatePresence>
           </Box>
+          ) : null}
         </Box>
 
         {pendingCityLaunchTargetPath ? (
