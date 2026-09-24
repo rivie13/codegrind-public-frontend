@@ -1,0 +1,38 @@
+name: enforce-merge-strategy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  check-merge-strategy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify branch workflow
+        run: |
+          BASE="${{ github.base_ref }}"
+          HEAD="${{ github.head_ref }}"
+          echo "Base: $BASE, Head: $HEAD"
+
+          # Rule 1: dev -> main must use merge commit (enforced by review, this just warns)
+          if [ "$BASE" = "main" ] && [ "$HEAD" = "dev" ]; then
+            echo "::notice::dev -> main PR detected. Merge via 'Create a merge commit' only (squash disabled, rebase prohibited by policy)."
+            echo "This PR should be merged with 'Create a merge commit' to preserve ancestry."
+          fi
+
+          # Rule 2: feature/fix -> dev should be rebase (linear history blocks merge commits)
+          if [ "$BASE" = "dev" ]; then
+            echo "::notice::Feature -> dev PR detected. Ensure branch was rebased on origin/dev and will be merged via 'Rebase and merge'."
+            if [[ "$HEAD" == "dev" || "$HEAD" == "main" ]]; then
+              echo "::error::Invalid head branch for dev PR"
+              exit 1
+            fi
+          fi
+
+          # Rule 3: No direct PRs to main except from dev
+          if [ "$BASE" = "main" ] && [ "$HEAD" != "dev" ]; then
+            echo "::error::Only 'dev' may be merged into 'main'. Create a feature branch -> dev first, then dev -> main."
+            exit 1
+          fi
+
+          echo "Merge strategy check passed."
