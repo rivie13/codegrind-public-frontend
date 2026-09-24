@@ -21,25 +21,50 @@ const WINDOW_INSET =
   'inset 1px 1px 0 var(--home-retro-border-dark), inset 2px 2px 0 var(--home-retro-border-mid), inset -1px -1px 0 var(--home-retro-border-light), inset -2px -2px 0 var(--home-retro-border-lighter)';
 const ACTIVE_TITLE_BAR =
   'linear-gradient(90deg, var(--home-retro-title-start) 0%, var(--home-retro-title-end) 100%)';
+const CHROME_INSET = WINDOW_INSET;
+const CHROME_LABEL_BG = 'var(--home-retro-surface-muted)';
 
-const HERO_LEAD = 'CodeGrind: The Tower Defense Code Trainer';
+const HERO_LEAD = 'Write Code. Defend It.';
 const HERO_DESCRIPTION =
-  'Write real code to power your defenses. Stop system breaches by solving real Python, JavaScript and Java problems inside a tactical strategy game.';
+  'Write real Python that powers defenses. Learn by coding — towers defend what you write.';
 
 const HERO_FEATURES = [
   {
-    title: 'Choose Your Track',
-    text: 'Jump straight into the beginner path to learn the fundamentals, or deploy directly into elite interview prep zones. You choose where you start.',
+    title: 'Write Code',
+    text: 'Type real Python and run it instantly.',
   },
   {
-    title: 'Code to Defend',
-    text: 'No passive reading. Deploy function towers and write real, working code to power up and optimize your defensive grid in real time.',
+    title: 'Defend',
+    text: 'Towers defend what your code does.',
   },
   {
-    title: 'Smart AI Assistance',
-    text: 'Use integrated AI to assist with your logic, then verify and refine the output to build true software mastery.',
+    title: 'Level Up',
+    text: 'AI helps, you verify and grow.',
   },
 ];
+
+const ChromeLabel = ({ children, minW = 'auto', ...boxProps }) => (
+  <Box
+    minW={minW}
+    px={3}
+    py={1.5}
+    bg={CHROME_LABEL_BG}
+    boxShadow={CHROME_INSET}
+    opacity={0.9}
+    {...boxProps}
+  >
+    <Text
+      color="var(--home-retro-text-muted)"
+      fontFamily="var(--cg-font-retro-display)"
+      fontSize={{ base: 'xs', md: 'sm' }}
+      fontWeight="400"
+      lineHeight="1"
+      textTransform="uppercase"
+    >
+      {children}
+    </Text>
+  </Box>
+);
 
 const WindowControls = () => (
   <HStack spacing={1}>
@@ -48,17 +73,18 @@ const WindowControls = () => (
         key={label}
         w="18px"
         h="16px"
-        bg="var(--home-retro-surface)"
-        boxShadow={WINDOW_OUTSET}
+        bg={CHROME_LABEL_BG}
+        boxShadow={CHROME_INSET}
+        opacity={0.85}
         display="flex"
         alignItems="center"
         justifyContent="center"
       >
         <Text
-          color="var(--home-retro-text)"
+          color="var(--home-retro-text-muted)"
           fontFamily="var(--cg-font-retro-display)"
           fontSize="10px"
-          fontWeight="700"
+          fontWeight="400"
           lineHeight="1"
         >
           {label}
@@ -140,18 +166,7 @@ const RetroButton = ({ children, ...props }) => (
 );
 
 const TaskbarButton = ({ children, minW = 'auto' }) => (
-  <Box minW={minW} px={3} py={1.5} bg="var(--home-retro-surface)" boxShadow={WINDOW_OUTSET}>
-    <Text
-      color="var(--home-retro-text)"
-      fontFamily="var(--cg-font-retro-display)"
-      fontSize={{ base: 'xs', md: 'sm' }}
-      fontWeight="700"
-      lineHeight="1"
-      textTransform="uppercase"
-    >
-      {children}
-    </Text>
-  </Box>
+  <ChromeLabel minW={minW}>{children}</ChromeLabel>
 );
 
 const RotatePhonePrompt = ({ isCompactLandscapeShellMode, prefersReducedMotion }) => (
@@ -663,20 +678,41 @@ const HomeHeroSection = ({
                                     isDisabled={!canBegin || hasCompletedQuickDemo}
                                     px={isCompactLandscapeShellMode ? 7 : 10}
                                     minW={{ base: '100%', md: '230px' }}
-                                    bg="var(--home-retro-surface-shell)"
-                                    color="var(--home-retro-title-start)"
+                                    bg="#ffd84d"
+                                    color="var(--home-retro-text)"
+                                    border="1px solid #b8962e"
+                                    boxShadow={WINDOW_OUTSET}
                                   >
-                                    {hasCompletedQuickDemo ? 'Demo Completed' : 'Begin Demo'}
+                                    {hasCompletedQuickDemo
+                                      ? 'Demo Completed'
+                                      : 'Begin Demo — 2 min'}
                                   </RetroButton>
                                   {!isAuthenticated && onSignIn ? (
-                                    <RetroButton
+                                    <Button
                                       size={ctaButtonSize}
                                       onClick={onSignIn}
                                       px={isCompactLandscapeShellMode ? 7 : 10}
                                       minW={{ base: '100%', md: '230px' }}
+                                      bg="transparent"
+                                      color="var(--home-retro-text-muted)"
+                                      border="1px solid var(--home-retro-border-mid)"
+                                      borderRadius="0"
+                                      fontFamily="var(--cg-font-retro-display)"
+                                      fontWeight="400"
+                                      letterSpacing="0.04em"
+                                      textTransform="uppercase"
+                                      boxShadow={CHROME_INSET}
+                                      _hover={{
+                                        bg: 'var(--home-retro-surface-shell)',
+                                        color: 'var(--home-retro-text)',
+                                      }}
+                                      _active={{
+                                        boxShadow: CHROME_INSET,
+                                        bg: 'var(--home-retro-surface-muted)',
+                                      }}
                                     >
                                       Sign In
-                                    </RetroButton>
+                                    </Button>
                                   ) : null}
                                 </>
                               )}
