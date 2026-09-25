@@ -1,31 +1,31 @@
 import { useCallback, useMemo, useState } from 'react';
 
 const EXPERIENCE_OPTIONS = [
-  { value: 'never', label: "Never coded", reassurance: "Perfect — we'll start from zero. One print, two clicks, first win." },
-  { value: 'small', label: 'Built small projects', reassurance: "Solid — you'll move fast. We'll keep hand-holding light." },
+  { value: 'never', label: "Never coded", reassurance: "That's ok! No shame in being a beginner, everyone starts somewhere." },
+  { value: 'small', label: 'Built small projects', reassurance: "Awesome, you'll be able to tackle more complex challenges in no time!" },
   { value: 'large', label: 'Built large projects', reassurance: "Pro move — we'll stay Python-focused and keep hints minimal." },
 ];
 
 const GOAL_OPTIONS = [
-  { value: 'career', label: 'To start a new career in tech', reassurance: "Career switchers thrive here — follow lesson by lesson to get job-ready." },
-  { value: 'upskill', label: 'To upskill for my current job', reassurance: "Upskill path is linear — bite-size lessons that stack to confidence." },
-  { value: 'school', label: 'I need it for school', reassurance: "School must-haves made simple — just follow the path, week by week." },
-  { value: 'build', label: 'To build my own projects', reassurance: "Builders love this — code powers towers, projects grow from there." },
-  { value: 'fun', label: 'Just for fun', reassurance: "Fun first, mastery follows — quick wins keep the streak going." },
+  { value: 'career', label: 'To start a new career in tech', reassurance: "That's awesome — a lot of people land jobs starting right where you are." },
+  { value: 'upskill', label: 'To upskill for my current job', reassurance: "Nice — even a little extra code makes you way more valuable at work." },
+  { value: 'school', label: 'I need it for school', reassurance: "Got you — we'll help you get past the tricky parts fast." },
+  { value: 'build', label: 'To build my own projects', reassurance: "Hell yeah — you'll be shipping your own stuff before you know it." },
+  { value: 'fun', label: 'Just for fun', reassurance: "Love it — best projects start just for fun." },
 ];
 
 const TIME_OPTIONS = [
-  { value: '0-3', label: '0–3 hours', reassurance: "Short sessions count — one activity per sitting still levels you up." },
-  { value: '3-7', label: '3–7 hours', reassurance: "Sweet spot — enough to stack wins without burnout." },
-  { value: '8-14', label: '8–14 hours', reassurance: "With that time you'll fly — linear paths turn hours into mastery." },
-  { value: '15+', label: '15+ hours', reassurance: "Power learner — we'll keep the next win queued for you." },
+  { value: '0-3', label: '0–3 hours', reassurance: "All good — even a little each week adds up fast." },
+  { value: '3-7', label: '3–7 hours', reassurance: "Perfect — that's plenty to make steady progress." },
+  { value: '8-14', label: '8–14 hours', reassurance: "Nice — with that time you'll pick it up quick." },
+  { value: '15+', label: '15+ hours', reassurance: "Whoa — you're going all in! You'll move fast." },
 ];
 
 const OBSTACLE_OPTIONS = [
-  { value: 'motivation', label: 'Lack of motivation to keep going', reassurance: "Motivation follows wins — XP fills, SFX pops, next lesson unlocks." },
+  { value: 'motivation', label: 'Lack of motivation to keep going', reassurance: "Totally get it — that's why we made it a game. That first win makes the next one way easier to stick with." },
   { value: 'start', label: 'Not knowing where to start', reassurance: "Many learners feel this — you can't know what you don't know! All paths are linear — just follow lesson by lesson and course by course." },
-  { value: 'projects', label: 'I get the basics, but struggle to build my own projects', reassurance: "Bridge the gap — every activity is a real prompt turned into a tower." },
-  { value: 'time-money', label: 'No time or money to go back to school', reassurance: "No campus needed — learn real Python in minutes per session." },
+  { value: 'projects', label: 'I get the basics, but struggle to build my own projects', reassurance: "You're not alone — we'll turn basics into real, shippable projects one step at a time." },
+  { value: 'time-money', label: 'No time or money to go back to school', reassurance: "No need for school — you can make real progress here whenever you have a few minutes." },
 ];
 
 const QUESTION_SETS = {
