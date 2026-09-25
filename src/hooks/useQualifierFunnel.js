@@ -7,7 +7,7 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 const GOAL_OPTIONS = [
-  { value: 'career', label: 'To start a new career in tech', reassurance: "Career switchers thrive here — follow lesson by lesson to job-ready." },
+  { value: 'career', label: 'To start a new career in tech', reassurance: "Career switchers thrive here — follow lesson by lesson to get job-ready." },
   { value: 'upskill', label: 'To upskill for my current job', reassurance: "Upskill path is linear — bite-size lessons that stack to confidence." },
   { value: 'school', label: 'I need it for school', reassurance: "School must-haves made simple — just follow the path, week by week." },
   { value: 'build', label: 'To build my own projects', reassurance: "Builders love this — code powers towers, projects grow from there." },
@@ -46,7 +46,7 @@ export function getReassurance(questionId, value) {
 }
 
 export default function useQualifierFunnel() {
-  const [phase, setPhase] = useState('pre'); // pre | between | done
+  const [phase, setPhase] = useState('pre'); // pre | first_activity | between | done
   const [preIndex, setPreIndex] = useState(0);
   const [betweenIndex, setBetweenIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -62,7 +62,7 @@ export default function useQualifierFunnel() {
     return null;
   }, [pendingReassurance, phase, currentPre, currentBetween]);
 
-  const isFunnelActive = phase !== 'done' && (!!activeQuestion || !!pendingReassurance);
+  const isFunnelActive = (phase === 'pre' || phase === 'between') && (!!activeQuestion || !!pendingReassurance);
   const experience = answers.experience || null;
   const isProLite = experience === 'large';
 
@@ -84,7 +84,7 @@ export default function useQualifierFunnel() {
       if (nextPre < QUESTION_SETS.preActivity.length) {
         setPreIndex(nextPre);
       } else {
-        setPhase('between');
+        setPhase('first_activity');
       }
     } else if (prevPhase === 'between') {
       const nextBetween = prevBetweenIndex + 1;
@@ -97,9 +97,7 @@ export default function useQualifierFunnel() {
   }, [phase, preIndex, betweenIndex]);
 
   const markActivityComplete = useCallback(() => {
-    // after first activity, if still in pre, advance to between
-    if (phase === 'pre') {
-      // if pre not done, jump to between directly for next funnel segment
+    if (phase === 'first_activity' || phase === 'pre') {
       setPhase('between');
       setPendingReassurance(null);
     }
@@ -107,7 +105,9 @@ export default function useQualifierFunnel() {
 
   const progress = useMemo(() => {
     const total = QUESTION_SETS.preActivity.length + QUESTION_SETS.betweenActivities.length;
-    const done = (phase === 'pre' ? preIndex : QUESTION_SETS.preActivity.length) + (phase === 'between' ? betweenIndex : phase === 'done' ? QUESTION_SETS.betweenActivities.length : 0);
+    const donePre = phase === 'pre' ? preIndex : QUESTION_SETS.preActivity.length;
+    const doneBetween = phase === 'between' ? betweenIndex : phase === 'done' ? QUESTION_SETS.betweenActivities.length : phase === 'first_activity' ? 0 : 0;
+    const done = donePre + doneBetween;
     return { done, total, percent: total ? Math.round((done / total) * 100) : 0 };
   }, [phase, preIndex, betweenIndex]);
 
