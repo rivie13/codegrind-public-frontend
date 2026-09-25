@@ -636,12 +636,10 @@ const Home = () => {
     if (!funnelStarted) return;
     if (isQuickDemo) return;
     if (qualifier.pendingReassurance) return;
-    // pre questions are two: experience + goal. When answers has both and phase moved to between, ready to launch
-    const hasPreAnswers = Boolean(qualifier.answers.experience) && Boolean(qualifier.answers.goal);
-    if (hasPreAnswers && qualifier.phase !== 'pre') {
+    if (qualifier.phase === 'first_activity') {
       launchLiteActivity();
     }
-  }, [funnelStarted, qualifier.answers, qualifier.phase, qualifier.pendingReassurance, isQuickDemo, launchLiteActivity]);
+  }, [funnelStarted, qualifier.phase, qualifier.pendingReassurance, isQuickDemo, launchLiteActivity]);
 
   const handleEmbeddedChatFocusChange = useCallback((isNonGameFocusActive) => {
     setIsHomeDemoNonGameFocusActive(Boolean(isNonGameFocusActive));
