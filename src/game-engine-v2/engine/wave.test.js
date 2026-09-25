@@ -11,7 +11,6 @@ import {
 const buildEngine = () => {
   const engine = {
     GAME_STATUS: {
-      PREHACK: 'prehack',
       READY: 'ready',
       PLAYING: 'playing',
       WAVE_COMPLETE: 'wave-complete',

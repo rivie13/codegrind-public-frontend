@@ -2,7 +2,6 @@ import { getUnlockedEnemyTypesForLevel } from '../enemyProgression.js';
 
 export function startWave(engine, difficulty = 'normal') {
   if (
-    engine.state.status !== engine.GAME_STATUS.PREHACK &&
     engine.state.status !== engine.GAME_STATUS.READY &&
     engine.state.status !== engine.GAME_STATUS.WAVE_COMPLETE
   ) {

@@ -870,13 +870,13 @@ const useStorePageController = () => {
       }
 
       if (tdPreviewKind === TD_PREVIEW_KIND.GAMEPLAY) {
-        if (status === 'ready' || status === 'wave-complete' || status === 'prehack') {
+        if (status === 'ready' || status === 'wave-complete') {
           gameCanvasRef.current.startWave?.('normal');
         }
         return;
       }
 
-      if (status === 'ready' || status === 'wave-complete' || status === 'prehack') {
+      if (status === 'ready' || status === 'wave-complete') {
         previewDifficultyRef.current =
           (previewDifficultyRef.current + 1) % previewDifficulties.length;
         gameCanvasRef.current.startWave?.(previewDifficulties[previewDifficultyRef.current]);

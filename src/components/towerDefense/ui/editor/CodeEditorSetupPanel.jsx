@@ -454,12 +454,12 @@ const CodeEditorSetupPanel = ({
             </Flex>
             <ul style={{ marginLeft: '1.5em', marginBottom: '0.5em' }}>
               <li style={{ marginBottom: '0.5em' }}>
-                <b>Foundation Modules</b>: Click "JACK IN" to activate neural interface. Deploy
-                FUNCTION and OBJECT modules first to establish algorithmic backbone.
+                <b>Foundation Modules</b>: Deploy FUNCTION and OBJECT modules first to establish
+                algorithmic backbone.
               </li>
               <li style={{ marginBottom: '0.5em' }}>
                 <b>Code Matrix</b>: Placing towers injects corresponding code patterns. You can
-                manually edit code after neural interface activation.
+                manually edit code.
               </li>
               <li style={{ marginBottom: '0.5em' }}>
                 <b>ICE Countermeasures</b>: Various tower types represent different programming

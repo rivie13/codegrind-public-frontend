@@ -32,7 +32,6 @@ export default function useTowerDefenseTerminalCommands({
   handleUpgradeSelectedTower,
   handleSpecialUpgradeSelectedTower,
   handleSellSelectedTower,
-  handleJackIn,
   handleStartWave,
   handleShortenPath,
   handleLengthenPath,
@@ -86,10 +85,6 @@ export default function useTowerDefenseTerminalCommands({
       return allowedSet.has(typeKey) || allowedSet.has(conceptKey) || allowedSet.has(rawKey);
     };
 
-    if (gameState.status === GAME_STATUS.PREHACK) {
-      return [];
-    }
-
     if (towerPlacementLocked) {
       return [];
     }
@@ -134,9 +129,6 @@ export default function useTowerDefenseTerminalCommands({
   }, [getAllowedTowerKeys, toCommandId]);
 
   const getTowerAvailabilityMessage = useCallback(() => {
-    if (gameState.status === GAME_STATUS.PREHACK) {
-      return 'Towers locked. Jack in first with /game jack-in.';
-    }
     if (towerPlacementLocked) {
       return TOWER_VERIFICATION_LOCK_MESSAGE;
     }
@@ -157,7 +149,6 @@ export default function useTowerDefenseTerminalCommands({
   }, [
     coreTowerRequirements,
     functionTowerPlaced,
-    gameState.status,
     initialCodeGenerated,
     objectTowerPlaced,
     towerPlacementLocked,
@@ -195,7 +186,6 @@ export default function useTowerDefenseTerminalCommands({
     totalWaves,
     initialCodeGenerated,
     selectedTower,
-    handleJackIn,
     handleStartWave,
     handleShortenPath,
     handleLengthenPath,
@@ -360,11 +350,6 @@ export default function useTowerDefenseTerminalCommands({
           return;
         }
 
-        if (gameState.status === GAME_STATUS.PREHACK) {
-          addTerminalSystemMessage('WARNING', 'Deployables unlock after jack-in.');
-          return;
-        }
-
         const labels = Object.keys(types)
           .map((key) => types[key]?.type || key)
           .join(', ');
@@ -464,11 +449,6 @@ export default function useTowerDefenseTerminalCommands({
           );
           return;
         }
-
-        if (gameState.status === GAME_STATUS.PREHACK) {
-          addTerminalSystemMessage('WARNING', 'Deployables unlock after jack-in.');
-          return;
-        }
         const targetKey = resolveTypeKey(targetToken, types);
         if (!targetKey) {
           addTerminalSystemMessage(
@@ -486,11 +466,6 @@ export default function useTowerDefenseTerminalCommands({
       if (actionToken === 'buy') {
         if (gameState.status === GAME_STATUS.PLAYING) {
           addTerminalSystemMessage('WARNING', 'Commands are locked during active waves.');
-          return;
-        }
-
-        if (gameState.status === GAME_STATUS.PREHACK) {
-          addTerminalSystemMessage('WARNING', 'Jack in before purchasing. Use /game jack-in.');
           return;
         }
 

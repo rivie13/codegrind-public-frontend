@@ -131,7 +131,7 @@ import TowerDefenseV2Page from './TowerDefenseV2Page';
 
 const buildPageState = (overrides = {}) => ({
   layout: <div data-testid="layout" />,
-  gameState: { status: 'prehack', wave: 1 },
+  gameState: { status: 'ready', wave: 1 },
   codeSubmitted: false,
   codeSubmissionSuccess: false,
   playerLevel: 1,

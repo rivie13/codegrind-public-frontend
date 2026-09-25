@@ -7,7 +7,7 @@
  * briefing before the wave starts.
  *
  * Trigger points:
- *   - PREHACK / READY  (wave === 1) → check wave-1 enemies
+ *   - READY  (wave === 1) → check wave-1 enemies
  *   - WAVE_COMPLETE     (wave N)     → check wave-(N+1) enemies
  *
  * Works in all game modes (learning, standalone, demo, endless).
@@ -162,7 +162,7 @@ export default function useEnemyRevealOverlay({ gameState, playerLevel = 1, disa
   const upcomingWave = useMemo(() => {
     if (disabled) return -1;
     const { status, wave } = gameState || {};
-    if (status === 'prehack' || status === 'ready') return wave || 1;
+    if (status === 'ready') return wave || 1;
     if (status === 'wave-complete') return (wave || 0) + 1;
     return -1;
   }, [disabled, gameState?.status, gameState?.wave]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -5,7 +5,6 @@ import { TOWER_VERIFICATION_LOCK_MESSAGE } from '../../../utils/towerDefense/ver
 
 vi.mock('../../../game-engine-v2', () => ({
   GAME_STATUS: {
-    PREHACK: 'prehack',
     READY: 'ready',
     PLAYING: 'playing',
     WAVE_COMPLETE: 'wave-complete',
@@ -80,7 +79,6 @@ function buildProps(overrides = {}) {
     handleUpgradeSelectedTower: vi.fn(),
     handleSpecialUpgradeSelectedTower: vi.fn(),
     handleSellSelectedTower: vi.fn(),
-    handleJackIn: vi.fn(),
     handleStartWave: vi.fn(),
     handleShortenPath: vi.fn(),
     handleLengthenPath: vi.fn(),

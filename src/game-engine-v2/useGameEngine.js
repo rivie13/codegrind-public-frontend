@@ -1,6 +1,6 @@
 /**
  * Tower Defense Game Engine V2 - React Hook
- * 
+ *
  * React hook for integrating the GameEngine with React components
  */
 
@@ -11,7 +11,7 @@ import { GAME_STATUS } from './constants.js';
 
 /**
  * Hook for using the game engine in React
- * 
+ *
  * @param {React.RefObject<HTMLCanvasElement>} canvasRef - Ref to canvas element
  * @param {Object} options - Options
  * @param {Array} options.pathNodes - Path nodes for the map
@@ -20,7 +20,7 @@ import { GAME_STATUS } from './constants.js';
  * @param {number} options.cellSize - Cell size in pixels
  * @param {number} options.initialCredits - Starting credits
  * @param {Object} options.visualSettings - Visual settings for renderer
- * 
+ *
  * @returns {Object} Engine interface
  */
 export function useGameEngine(canvasRef, options = {}) {
@@ -28,10 +28,10 @@ export function useGameEngine(canvasRef, options = {}) {
   const engineRef = useRef(null);
   const rendererRef = useRef(null);
   const animationRef = useRef(null);
-  
+
   // Game state (triggers re-renders)
   const [gameState, setGameState] = useState({
-    status: GAME_STATUS.PREHACK,
+    status: GAME_STATUS.READY,
     credits: options.initialCredits || 350,
     lives: 10,
     wave: 1,
@@ -41,9 +41,9 @@ export function useGameEngine(canvasRef, options = {}) {
     score: 0,
     towers: [],
     enemies: [],
-    projectiles: []
+    projectiles: [],
   });
-  
+
   // UI state
   const [selectedTowerId, setSelectedTowerId] = useState(null);
   const [placementMode, setPlacementMode] = useState(false);
@@ -57,59 +57,62 @@ export function useGameEngine(canvasRef, options = {}) {
   /**
    * Initialize the engine and renderer
    */
-  const initialize = useCallback((config) => {
-    const {
-      pathNodes = [],
-      gridCols = 10,
-      gridRows = 10,
-      cellSize = 50,
-      initialCredits = 350,
-      visualSettings = {}
-    } = config;
+  const initialize = useCallback(
+    (config) => {
+      const {
+        pathNodes = [],
+        gridCols = 10,
+        gridRows = 10,
+        cellSize = 50,
+        initialCredits = 350,
+        visualSettings = {},
+      } = config;
 
-    // Create engine if needed
-    if (!engineRef.current) {
-      engineRef.current = new GameEngine({ initialCredits });
-    }
+      // Create engine if needed
+      if (!engineRef.current) {
+        engineRef.current = new GameEngine({ initialCredits });
+      }
 
-    // Initialize engine with path data
-    engineRef.current.initialize({
-      pathNodes,
-      gridCols,
-      gridRows,
-      cellSize
-    });
-
-    // Create renderer if we have a canvas
-    if (canvasRef.current && !rendererRef.current) {
-      rendererRef.current = new Renderer(canvasRef.current, {
-        cellSize,
-        gridCols,
-        gridRows,
-        settings: visualSettings
-      });
-    }
-
-    // Configure renderer
-    if (rendererRef.current) {
-      rendererRef.current.configure({
+      // Initialize engine with path data
+      engineRef.current.initialize({
         pathNodes,
         gridCols,
         gridRows,
-        cellSize
+        cellSize,
       });
-    }
 
-    // Set up event listeners
-    setupEventListeners();
+      // Create renderer if we have a canvas
+      if (canvasRef.current && !rendererRef.current) {
+        rendererRef.current = new Renderer(canvasRef.current, {
+          cellSize,
+          gridCols,
+          gridRows,
+          settings: visualSettings,
+        });
+      }
 
-    // Initial state update
-    setGameState(engineRef.current.getState());
-    setIsInitialized(true);
+      // Configure renderer
+      if (rendererRef.current) {
+        rendererRef.current.configure({
+          pathNodes,
+          gridCols,
+          gridRows,
+          cellSize,
+        });
+      }
 
-    // Start render loop
-    startRenderLoop();
-  }, [canvasRef, placementMode, placementTowerType]);
+      // Set up event listeners
+      setupEventListeners();
+
+      // Initial state update
+      setGameState(engineRef.current.getState());
+      setIsInitialized(true);
+
+      // Start render loop
+      startRenderLoop();
+    },
+    [canvasRef, placementMode, placementTowerType]
+  );
 
   /**
    * Set up engine event listeners
@@ -237,19 +240,22 @@ export function useGameEngine(canvasRef, options = {}) {
    * Sell a tower
    * @param {string} towerId - Tower ID
    */
-  const sellTower = useCallback((towerId) => {
-    if (engineRef.current) {
-      const success = engineRef.current.sellTower(towerId);
-      if (success && towerId === selectedTowerId) {
-        setSelectedTowerId(null);
-        if (rendererRef.current) {
-          rendererRef.current.setSelectedTower(null);
+  const sellTower = useCallback(
+    (towerId) => {
+      if (engineRef.current) {
+        const success = engineRef.current.sellTower(towerId);
+        if (success && towerId === selectedTowerId) {
+          setSelectedTowerId(null);
+          if (rendererRef.current) {
+            rendererRef.current.setSelectedTower(null);
+          }
         }
+        return success;
       }
-      return success;
-    }
-    return false;
-  }, [selectedTowerId]);
+      return false;
+    },
+    [selectedTowerId]
+  );
 
   /**
    * Reset the game
@@ -289,7 +295,7 @@ export function useGameEngine(canvasRef, options = {}) {
     setPlacementMode(true);
     setPlacementTowerType(towerType);
     setSelectedTowerId(null);
-    
+
     if (rendererRef.current) {
       rendererRef.current.setPlacementMode(true, towerType, 'tower');
       rendererRef.current.setSelectedTower(null);
@@ -302,7 +308,7 @@ export function useGameEngine(canvasRef, options = {}) {
   const exitPlacementMode = useCallback(() => {
     setPlacementMode(false);
     setPlacementTowerType(null);
-    
+
     if (rendererRef.current) {
       rendererRef.current.setPlacementMode(false, null, 'tower');
     }
@@ -316,7 +322,7 @@ export function useGameEngine(canvasRef, options = {}) {
     setSelectedTowerId(towerId);
     setPlacementMode(false);
     setPlacementTowerType(null);
-    
+
     if (rendererRef.current) {
       rendererRef.current.setSelectedTower(towerId);
       rendererRef.current.setPlacementMode(false, null, 'tower');
@@ -327,44 +333,50 @@ export function useGameEngine(canvasRef, options = {}) {
    * Handle canvas click
    * @param {MouseEvent} event - Click event
    */
-  const handleCanvasClick = useCallback((event) => {
-    if (!canvasRef.current || !rendererRef.current) return;
-    
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    
-    const cell = rendererRef.current.getCellAtPosition(x, y);
-    if (!cell) return;
-    
-    if (placementMode && placementTowerType) {
-      // Place tower
-      placeTower(placementTowerType, cell);
-    } else {
-      // Check for tower selection
-      const tower = rendererRef.current.getTowerAtCell(gameState.towers, cell);
-      if (tower) {
-        selectTower(tower.id);
+  const handleCanvasClick = useCallback(
+    (event) => {
+      if (!canvasRef.current || !rendererRef.current) return;
+
+      const rect = canvasRef.current.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const cell = rendererRef.current.getCellAtPosition(x, y);
+      if (!cell) return;
+
+      if (placementMode && placementTowerType) {
+        // Place tower
+        placeTower(placementTowerType, cell);
       } else {
-        selectTower(null);
+        // Check for tower selection
+        const tower = rendererRef.current.getTowerAtCell(gameState.towers, cell);
+        if (tower) {
+          selectTower(tower.id);
+        } else {
+          selectTower(null);
+        }
       }
-    }
-  }, [canvasRef, placementMode, placementTowerType, gameState.towers, placeTower, selectTower]);
+    },
+    [canvasRef, placementMode, placementTowerType, gameState.towers, placeTower, selectTower]
+  );
 
   /**
    * Handle canvas mouse move
    * @param {MouseEvent} event - Mouse event
    */
-  const handleCanvasMouseMove = useCallback((event) => {
-    if (!canvasRef.current || !rendererRef.current) return;
-    if (!placementMode || !placementTowerType) return;
-    
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    
-    rendererRef.current.setHoveredCell(x, y);
-  }, [canvasRef, placementMode, placementTowerType]);
+  const handleCanvasMouseMove = useCallback(
+    (event) => {
+      if (!canvasRef.current || !rendererRef.current) return;
+      if (!placementMode || !placementTowerType) return;
+
+      const rect = canvasRef.current.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      rendererRef.current.setHoveredCell(x, y);
+    },
+    [canvasRef, placementMode, placementTowerType]
+  );
 
   /**
    * Handle canvas mouse leave
@@ -409,7 +421,7 @@ export function useGameEngine(canvasRef, options = {}) {
     selectedTowerId,
     placementMode,
     placementTowerType,
-    
+
     // Game actions
     startWave,
     placeTower,
@@ -418,23 +430,23 @@ export function useGameEngine(canvasRef, options = {}) {
     sellTower,
     resetGame,
     setStatus,
-    
+
     // UI actions
     enterPlacementMode,
     exitPlacementMode,
     selectTower,
-    
+
     // Event handlers
     handleCanvasClick,
     handleCanvasMouseMove,
     handleCanvasMouseLeave,
-    
+
     // Direct engine access (for advanced use)
     engine: engineRef.current,
     renderer: rendererRef.current,
-    
+
     // Manual initialization
-    initialize
+    initialize,
   };
 }
 

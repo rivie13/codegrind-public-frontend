@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
 import TowerDefenseProblemPanel from './TowerDefenseProblemPanel';
 
@@ -55,57 +55,13 @@ describe('TowerDefenseProblemPanel breach progress', () => {
     expect(screen.getByText('Breach Progress: 100%')).toBeInTheDocument();
   });
 
-  it('renders the mission brief callout when the tutorial overlay is active', () => {
+  it('renders the mission brief with no scroll gate', () => {
     renderPanel({
       shellTheme: 'retro-desktop',
-      tutorialOverlay: {
-        isVisible: true,
-        isDismissed: false,
-        isCompactMobileLayout: true,
-      },
     });
 
-    expect(screen.getByText(/Scroll this mission brief before continuing/i)).toBeInTheDocument();
-    expect(screen.getByText('SCROLL')).toBeInTheDocument();
-  });
-
-  it('reports mount and user scroll updates separately for tutorial gating', () => {
-    const onScrollStateChange = vi.fn();
-
-    renderPanel({ onScrollStateChange });
-
-    expect(onScrollStateChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        source: 'mount',
-      })
-    );
-
-    const scrollContainer = document.querySelector(
-      '[data-tutorial="problem-panel-header"]'
-    )?.parentElement;
-
-    expect(scrollContainer).toBeTruthy();
-
-    Object.defineProperty(scrollContainer, 'scrollHeight', {
-      configurable: true,
-      value: 1200,
-    });
-    Object.defineProperty(scrollContainer, 'clientHeight', {
-      configurable: true,
-      value: 400,
-    });
-    Object.defineProperty(scrollContainer, 'scrollTop', {
-      configurable: true,
-      value: 120,
-      writable: true,
-    });
-
-    fireEvent.scroll(scrollContainer);
-
-    expect(onScrollStateChange).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        source: 'scroll',
-      })
-    );
+    expect(screen.getByText('Mission 1: Hello Print')).toBeInTheDocument();
+    expect(screen.queryByText(/Scroll this mission brief before continuing/i)).toBeNull();
+    expect(screen.queryByText('SCROLL')).toBeNull();
   });
 });

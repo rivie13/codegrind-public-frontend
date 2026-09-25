@@ -35,7 +35,6 @@ export default function useTowerDefenseV2DerivedState({
       isReadyForFinalWave &&
       gameState.wave === totalWaves;
 
-    const showJackInButton = gameState.status === GAME_STATUS.PREHACK;
     const showStartWaveButton =
       ((gameState.status === 'ready' && effectiveInitialCodeGenerated) ||
         gameState.status === GAME_STATUS.WAVE_COMPLETE) &&
@@ -49,7 +48,6 @@ export default function useTowerDefenseV2DerivedState({
       isReadyForFinalWave,
       hasValidFinalWave,
       shouldShowVerificationControls,
-      showJackInButton,
       showStartWaveButton,
     };
   }, [

@@ -8,18 +8,17 @@ export default function useTowerDefenseV2SettingsEffects({
   initialCodeGenerated,
   settingsLocked,
   setSettingsLocked,
-  validatedGameSettings
+  validatedGameSettings,
 }) {
   const canEditGameSettings = useMemo(
-    () => !settingsLocked &&
-      (gameStateStatus === GAME_STATUS.PREHACK ||
-        gameStateStatus === GAME_STATUS.READY ||
-        gameStateStatus === GAME_STATUS.WAVE_COMPLETE),
+    () =>
+      !settingsLocked &&
+      (gameStateStatus === GAME_STATUS.READY || gameStateStatus === GAME_STATUS.WAVE_COMPLETE),
     [gameStateStatus, settingsLocked]
   );
 
   useEffect(() => {
-    if (gameStateStatus === GAME_STATUS.PREHACK && !initialCodeGenerated) {
+    if (gameStateStatus === GAME_STATUS.READY && !initialCodeGenerated) {
       setSettingsLocked(false);
     }
   }, [gameStateStatus, initialCodeGenerated, setSettingsLocked]);
@@ -29,7 +28,7 @@ export default function useTowerDefenseV2SettingsEffects({
     if (!applyGameSettings) return;
 
     applyGameSettings(validatedGameSettings, {
-      applyToState: gameStateStatus === GAME_STATUS.PREHACK
+      applyToState: gameStateStatus === GAME_STATUS.READY,
     });
   }, [applyGameSettings, canEditGameSettings, gameStateStatus, validatedGameSettings]);
 

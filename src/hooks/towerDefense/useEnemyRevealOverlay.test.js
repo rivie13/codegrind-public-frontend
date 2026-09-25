@@ -13,7 +13,7 @@ describe('useEnemyRevealOverlay', () => {
   it('marks newly surfaced enemy intel as seen before the overlay is dismissed', async () => {
     const { result } = renderHook(() =>
       useEnemyRevealOverlay({
-        gameState: { status: 'prehack', wave: 1 },
+        gameState: { status: 'ready', wave: 1 },
         playerLevel: 1,
         disabled: false,
       })

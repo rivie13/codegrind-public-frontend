@@ -73,7 +73,7 @@ const GameCanvasV2 = forwardRef(
 
     // Local state
     const [gameState, setGameState] = useState({
-      status: GAME_STATUS.PREHACK,
+      status: GAME_STATUS.READY,
       credits: initialCredits,
       lives: initialLives,
       wave: 1,

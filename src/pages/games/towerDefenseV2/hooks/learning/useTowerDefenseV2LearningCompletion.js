@@ -159,7 +159,7 @@ export default function useTowerDefenseV2LearningCompletion({
 
   useEffect(() => {
     if (!isLearningMode) return;
-    if (gameStatus === 'prehack') {
+    if (gameStatus === 'ready') {
       learningCompletionRecordedRef.current = false;
     }
   }, [gameStatus, isLearningMode]);

@@ -18,9 +18,15 @@ import TopBannerAd from '../../../components/ads/TopBannerAd';
 import adSlots from '../../../config/adSlots';
 import useCompactLandscapeShellMode from '../../../hooks/useCompactLandscapeShellMode';
 
-import LearningPathTowerDefenseOnboarding from '../../../components/learningPath/LearningPathTowerDefenseOnboarding';
 import LearningWaveOverlay from '../../../components/learningPath/LearningWaveOverlay';
 import TowerDefenseOnboardingOverlay from '../../../components/towerDefense/onboarding/TowerDefenseOnboardingOverlay';
+import useTowerDefenseOnboardingController from '../../../components/towerDefense/onboarding/useTowerDefenseOnboardingController';
+import { getHomepageLiteOnboardingScript } from '../../../components/towerDefense/onboarding/towerDefenseOnboardingScripts';
+import {
+  resolveInlineOnboardingSurface,
+  TD_ONBOARDING_REQUEST_STEP_COMPLETE_EVENT,
+  TD_ONBOARDING_STEP_CHANGE_EVENT,
+} from '../../../components/towerDefense/onboarding/inlineOnboardingEvents';
 import EnemyRevealOverlay from '../../../components/towerDefense/ui/overlays/EnemyRevealOverlay';
 import InvalidPlacementOverlay from '../../../components/towerDefense/ui/overlays/InvalidPlacementOverlay';
 import useLearningWaveOverlays from '../../../hooks/learning/useLearningWaveOverlays';
@@ -355,12 +361,101 @@ export default function TowerDefenseV2Test({
   const toast = useToast();
   const isLearningMode = Boolean(learningPathTitleSlug || learningPathOnboarding);
   const [isGuestSignupWallOpen, setIsGuestSignupWallOpen] = useState(false);
-  const [proOnboardingDismissed, setProOnboardingDismissed] = useState(false);
   const shouldBlockHomepageOnboarding =
     embedded && learningPathOnboarding && Boolean(embeddedBootSequenceActive);
-  const isGuestProTrack = !isAuthenticated && guestCtx?.progress?.pathChoice === 'pro';
-  const shouldShowProOnboarding = !learningPathOnboarding && !isLearningMode && isGuestProTrack;
-  const proOnboardingActive = shouldShowProOnboarding && !proOnboardingDismissed;
+
+  const liteScript = useMemo(() => getHomepageLiteOnboardingScript(language), [language]);
+  const { activeStep: liteActiveStep, completeStep: completeLiteStep } =
+    useTowerDefenseOnboardingController({
+      isActive: learningPathOnboardingActive && !shouldBlockHomepageOnboarding,
+      steps: liteScript.steps,
+      context: {
+        gameState,
+        codeSubmitted: Boolean(codeSubmitted),
+        verifyAttemptInProgress: Boolean(verifyAttemptInProgress),
+      },
+      version: liteScript.version,
+      onComplete: () => setLearningPathOnboardingActive(false),
+    });
+
+  const [liteTargetRect, setLiteTargetRect] = useState(null);
+
+  useEffect(() => {
+    if (!liteActiveStep?.targetSelector) {
+      setLiteTargetRect(null);
+      return undefined;
+    }
+
+    const updateTargetRect = () => {
+      const targetElement = getVisibleTargetElement(liteActiveStep.targetSelector);
+      setLiteTargetRect(
+        targetElement ? toRectSnapshot(targetElement.getBoundingClientRect()) : null
+      );
+    };
+
+    updateTargetRect();
+    const intervalId = window.setInterval(updateTargetRect, 250);
+    window.addEventListener('resize', updateTargetRect);
+    window.addEventListener('scroll', updateTargetRect, true);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('resize', updateTargetRect);
+      window.removeEventListener('scroll', updateTargetRect, true);
+    };
+  }, [liteActiveStep]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleCompleteRequest = (event) => {
+      const stepId = String(event?.detail?.stepId || '');
+      if (!stepId) return;
+
+      completeLiteStep(stepId);
+    };
+
+    window.addEventListener(TD_ONBOARDING_REQUEST_STEP_COMPLETE_EVENT, handleCompleteRequest);
+
+    return () => {
+      window.removeEventListener(TD_ONBOARDING_REQUEST_STEP_COMPLETE_EVENT, handleCompleteRequest);
+    };
+  }, [completeLiteStep]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const nextStepId = liteActiveStep ? String(liteActiveStep.id || '') : '';
+    const inlineSurface = liteActiveStep
+      ? resolveInlineOnboardingSurface(liteActiveStep, { leftPanel, rightPanel })
+      : null;
+
+    if (typeof document !== 'undefined') {
+      if (nextStepId) {
+        document.body.dataset.tdOnboardingStepId = nextStepId;
+      } else {
+        document.body.removeAttribute('data-td-onboarding-step-id');
+      }
+    }
+
+    window.__tdInlineOnboardingStepDetail = {
+      surface: inlineSurface,
+      step: inlineSurface && liteActiveStep ? { ...liteActiveStep } : null,
+    };
+
+    window.dispatchEvent(
+      new CustomEvent(TD_ONBOARDING_STEP_CHANGE_EVENT, {
+        detail: {
+          isActive: Boolean(liteActiveStep),
+          stepId: nextStepId,
+          surface: inlineSurface,
+          step: inlineSurface && liteActiveStep ? { ...liteActiveStep } : null,
+        },
+      })
+    );
+
+    return undefined;
+  }, [liteActiveStep, leftPanel, rightPanel]);
   const isSinglePanelMobileLayout = !rightPanel;
   const pageShellLayout = useMemo(
     () => resolveTowerDefensePageShellLayout({ isCompactLandscapeShellMode }),
@@ -382,10 +477,6 @@ export default function TowerDefenseV2Test({
       onEmbeddedChatFocusChange(false);
     };
   }, [embedded, onEmbeddedChatFocusChange]);
-
-  useEffect(() => {
-    setProOnboardingDismissed(false);
-  }, [shouldShowProOnboarding, problem?.titleSlug]);
 
   useEffect(() => {
     if (embedded || isDemo || !isAuthenticated) return;
@@ -835,60 +926,16 @@ export default function TowerDefenseV2Test({
       {learningPathOnboarding ? (
         <>
           {layout}
-          <LearningPathTowerDefenseOnboarding
-            isActive={learningPathOnboardingActive && !shouldBlockHomepageOnboarding}
-            onComplete={() => setLearningPathOnboardingActive(false)}
-            gameState={gameState}
-            code={code}
-            gridCols={gridCols}
-            gridRows={gridRows}
-            codeSubmitted={codeSubmitted}
-            verifyAttemptInProgress={verifyAttemptInProgress}
-            initialCodeGenerated={initialCodeGenerated}
-            functionTowerPlaced={functionTowerPlaced}
-            objectTowerPlaced={objectTowerPlaced}
-            selectedTower={selectedTower}
-            selectedTowerType={selectedTowerType}
-            language={language}
-            surfaceVariant={liteFirstActivity && embedded ? 'homepage-lite' : embedded ? 'homepage' : 'learning'}
-            leftPanel={leftPanel}
-            rightPanel={rightPanel}
-            setLeftPanel={setLeftPanel}
-            setRightPanel={setRightPanel}
-            onClearSelectedTower={clearSelectedTower}
-            lastTerminalCommand={lastTerminalCommand}
-            onboardingId={learningTowerConfig?.onboardingId || null}
-            conceptIntro={learningTowerConfig?.conceptIntro || null}
-          />
-        </>
-      ) : shouldShowProOnboarding ? (
-        <>
-          {layout}
-          <LearningPathTowerDefenseOnboarding
-            isActive={proOnboardingActive && !activeEnemyReveal}
-            onComplete={() => setProOnboardingDismissed(true)}
-            gameState={gameState}
-            code={code}
-            gridCols={gridCols}
-            gridRows={gridRows}
-            codeSubmitted={codeSubmitted}
-            verifyAttemptInProgress={verifyAttemptInProgress}
-            initialCodeGenerated={initialCodeGenerated}
-            functionTowerPlaced={functionTowerPlaced}
-            objectTowerPlaced={objectTowerPlaced}
-            selectedTower={selectedTower}
-            selectedTowerType={selectedTowerType}
-            language={language}
-            surfaceVariant="pro"
-            leftPanel={leftPanel}
-            rightPanel={rightPanel}
-            setLeftPanel={setLeftPanel}
-            setRightPanel={setRightPanel}
-            onClearSelectedTower={clearSelectedTower}
-            lastTerminalCommand={lastTerminalCommand}
-            onboardingId={null}
-            conceptIntro={null}
-          />
+          {liteActiveStep && liteActiveStep.id !== 'mission-objective'
+            ? createPortal(
+                <TowerDefenseOnboardingOverlay
+                  step={liteActiveStep}
+                  targetRect={liteTargetRect}
+                  onCompleteStep={completeLiteStep}
+                />,
+                document.body
+              )
+            : null}
         </>
       ) : isLearningMode ? (
         <>

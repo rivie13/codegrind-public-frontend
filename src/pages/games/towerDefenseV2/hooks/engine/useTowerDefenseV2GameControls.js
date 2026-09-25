@@ -11,7 +11,6 @@ import { GAME_STATUS } from '../../../../../game-engine-v2';
 export default function useTowerDefenseV2GameControls({
   addTerminalMessage,
   effectiveInitialCodeGenerated,
-  setStatus,
   startEngineWave,
   currentWave,
   cancelPlacementMode,
@@ -21,10 +20,9 @@ export default function useTowerDefenseV2GameControls({
   totalWaves,
   coreTowerRequirements,
 }) {
-  const { handleJackIn, startWave } = useTowerDefenseV2GameActions({
+  const { startWave } = useTowerDefenseV2GameActions({
     addTerminalMessage,
     initialCodeGenerated: effectiveInitialCodeGenerated,
-    setStatus,
     startEngineWave,
     currentWave,
     cancelPlacementMode,
@@ -45,10 +43,9 @@ export default function useTowerDefenseV2GameControls({
 
   return useMemo(
     () => ({
-      handleJackIn,
       startWave,
       autoStartCountdown,
     }),
-    [autoStartCountdown, handleJackIn, startWave]
+    [autoStartCountdown, startWave]
   );
 }

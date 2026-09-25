@@ -25,8 +25,7 @@ const CHROME_INSET = WINDOW_INSET;
 const CHROME_LABEL_BG = 'var(--home-retro-surface-muted)';
 
 const HERO_LEAD = 'Write Code. Defend It.';
-const HERO_DESCRIPTION =
-  'Write real Python that powers defenses. Learn by coding — towers defend what you write.';
+const HERO_DESCRIPTION = 'Write code that powers defenses. Learn coding by playing a game.';
 
 const HERO_FEATURES = [
   {

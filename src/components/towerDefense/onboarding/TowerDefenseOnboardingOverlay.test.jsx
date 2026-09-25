@@ -11,6 +11,10 @@ vi.mock('framer-motion', () => ({
 }));
 
 import TowerDefenseOnboardingOverlay from './TowerDefenseOnboardingOverlay';
+import { getHomepageLiteOnboardingScript } from './towerDefenseOnboardingScripts';
+
+const liteSteps = getHomepageLiteOnboardingScript().steps;
+const getLiteStep = (id) => ({ ...liteSteps.find((step) => step.id === id) });
 
 const createMatchMediaResult = (query) => ({
   matches: query === '(pointer: coarse)' || query === '(max-width: 960px)',
@@ -47,14 +51,7 @@ describe('TowerDefenseOnboardingOverlay', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'interwave-slot-switch',
-            kind: 'callout',
-            title: 'SLOT SWITCHING',
-            message: 'Swap slots to continue.',
-            targetSelector: "[data-tutorial-role='panel-switcher']",
-            placement: 'bottom',
-          }}
+          step={getLiteStep('lite-start-wave')}
           targetRect={{
             top: 28,
             left: 20,
@@ -71,7 +68,7 @@ describe('TowerDefenseOnboardingOverlay', () => {
     );
 
     const tickerStrip = screen
-      .getByText('SLOT SWITCHING')
+      .getByText('START WAVE')
       .closest("[data-tutorial='onboarding-mobile-ticker-strip']");
 
     expect(tickerStrip).toBeInTheDocument();
@@ -80,18 +77,11 @@ describe('TowerDefenseOnboardingOverlay', () => {
     expect(topOffset).toBeGreaterThan(70);
   });
 
-  it('keeps the slot-switch ticker anchored below slot controls on mobile', () => {
+  it('keeps top ticker placement when the target has room above it on mobile', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'interwave-slot-switch',
-            kind: 'callout',
-            title: 'SLOT SWITCHING',
-            message: 'Swap slots to continue.',
-            targetSelector: "[data-tutorial-role='panel-switcher']",
-            placement: 'bottom',
-          }}
+          step={getLiteStep('lite-submit')}
           targetRect={{
             top: 180,
             left: 24,
@@ -108,27 +98,20 @@ describe('TowerDefenseOnboardingOverlay', () => {
     );
 
     const tickerStrip = screen
-      .getByText('SLOT SWITCHING')
+      .getByText('SUBMIT')
       .closest("[data-tutorial='onboarding-mobile-ticker-strip']");
 
     expect(tickerStrip).toBeInTheDocument();
 
     const topOffset = Number.parseInt(tickerStrip.style.top || '0', 10);
-    expect(topOffset).toBeGreaterThan(220);
+    expect(topOffset).toBe(0);
   });
 
-  it('pins the slot-switch ticker near the bottom when the taskbar rect is not ready yet', () => {
+  it('defaults the ticker to the top when the target rect is not ready yet', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'interwave-slot-switch',
-            kind: 'callout',
-            title: 'SLOT SWITCHING',
-            message: 'Swap slots to continue.',
-            targetSelector: "[data-tutorial='slot-switch-taskbar']",
-            placement: 'bottom',
-          }}
+          step={getLiteStep('lite-submit')}
           targetRect={null}
           onCompleteStep={vi.fn()}
         />
@@ -136,27 +119,20 @@ describe('TowerDefenseOnboardingOverlay', () => {
     );
 
     const tickerStrip = screen
-      .getByText('SLOT SWITCHING')
+      .getByText('SUBMIT')
       .closest("[data-tutorial='onboarding-mobile-ticker-strip']");
 
     expect(tickerStrip).toBeInTheDocument();
 
     const topOffset = Number.parseInt(tickerStrip.style.top || '0', 10);
-    expect(topOffset).toBeGreaterThan(200);
+    expect(topOffset).toBe(0);
   });
 
   it('keeps default top ticker placement for non-slot callouts with room above target', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'verify-solution',
-            kind: 'callout',
-            title: 'VERIFY SOLUTION',
-            message: 'Run tests when ready.',
-            targetSelector: "[data-tutorial='learning-path-action-buttons']",
-            placement: 'bottom',
-          }}
+          step={getLiteStep('lite-submit')}
           targetRect={{
             top: 200,
             left: 24,
@@ -173,7 +149,7 @@ describe('TowerDefenseOnboardingOverlay', () => {
     );
 
     const tickerStrip = screen
-      .getByText('VERIFY SOLUTION')
+      .getByText('SUBMIT')
       .closest("[data-tutorial='onboarding-mobile-ticker-strip']");
 
     expect(tickerStrip).toBeInTheDocument();
@@ -188,17 +164,7 @@ describe('TowerDefenseOnboardingOverlay', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'mission-objective',
-            kind: 'callout',
-            title: 'MISSION OBJECTIVE',
-            message: 'Read the problem first.',
-            targetSelector: "[data-tutorial='problem-panel-header']",
-            panelFocus: { rightPanel: 'problem' },
-            requireManualContinue: true,
-            actionLabel: 'Got It - Continue',
-            preserveFocusReadability: true,
-          }}
+          step={getLiteStep('mission-objective')}
           targetRect={{
             top: 96,
             left: 20,
@@ -215,11 +181,11 @@ describe('TowerDefenseOnboardingOverlay', () => {
     );
 
     const tickerStrip = screen
-      .getByText('MISSION OBJECTIVE')
+      .getByText('READ THE BRIEF')
       .closest("[data-tutorial='onboarding-mobile-ticker-strip']");
     expect(tickerStrip).toBeInTheDocument();
 
-    const continueButton = screen.getByRole('button', { name: 'Got It - Continue' });
+    const continueButton = screen.getByRole('button', { name: 'I READ THE BRIEF' });
     expect(continueButton).toBeInTheDocument();
 
     fireEvent.click(continueButton);
@@ -235,16 +201,7 @@ describe('TowerDefenseOnboardingOverlay', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'mission-objective',
-            kind: 'callout',
-            title: 'MISSION OBJECTIVE',
-            message: 'Read the problem first.',
-            targetSelector: "[data-tutorial='problem-panel-header']",
-            panelFocus: { rightPanel: 'problem' },
-            preserveFocusReadability: true,
-            preferMobileTicker: true,
-          }}
+          step={getLiteStep('mission-objective')}
           targetRect={{
             top: 96,
             left: 20,
@@ -261,13 +218,13 @@ describe('TowerDefenseOnboardingOverlay', () => {
     );
 
     const tickerStrip = screen
-      .getByText('MISSION OBJECTIVE')
+      .getByText('READ THE BRIEF')
       .closest("[data-tutorial='onboarding-mobile-ticker-strip']");
 
     expect(tickerStrip).toBeInTheDocument();
   });
 
-  it('uses positioned callout on desktop when readability preservation is requested', async () => {
+  it('uses positioned callout on desktop', async () => {
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1366 });
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: 768 });
     // Simulate a desktop device: fine pointer, no coarse pointer, no touch
@@ -279,17 +236,7 @@ describe('TowerDefenseOnboardingOverlay', () => {
     render(
       <ChakraProvider>
         <TowerDefenseOnboardingOverlay
-          step={{
-            id: 'mission-objective',
-            kind: 'callout',
-            title: 'MISSION OBJECTIVE',
-            message: 'Read the problem first.',
-            targetSelector: "[data-tutorial='problem-panel-header']",
-            panelFocus: { rightPanel: 'problem' },
-            requireManualContinue: true,
-            actionLabel: 'Got It - Continue',
-            preserveFocusReadability: true,
-          }}
+          step={getLiteStep('mission-objective')}
           targetRect={{
             top: 140,
             left: 760,
@@ -307,6 +254,12 @@ describe('TowerDefenseOnboardingOverlay', () => {
 
     expect(screen.getByText('Callout')).toBeInTheDocument();
     // TypedText renders via setInterval so we must wait for the typewriter to finish
-    expect(await screen.findByText('Read the problem first.')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'THIS IS WHERE YOU READ THE MISSION BRIEF. The problem panel shows the coding problem you are solving.',
+        {},
+        { timeout: 4000 }
+      )
+    ).toBeInTheDocument();
   });
 });

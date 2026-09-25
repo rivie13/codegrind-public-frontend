@@ -120,7 +120,7 @@ export class GameEngine {
 
     // Game state
     this.state = {
-      status: GAME_STATUS.PREHACK,
+      status: GAME_STATUS.READY,
       credits: this.initialCredits,
       lives: this.initialLives,
       wave: 1,
@@ -759,7 +759,7 @@ export class GameEngine {
 
     // Reset state
     this.state = {
-      status: GAME_STATUS.PREHACK,
+      status: GAME_STATUS.READY,
       credits: this.initialCredits,
       lives: this.initialLives,
       wave: 1,
@@ -845,7 +845,7 @@ export class GameEngine {
   /**
    * Apply gameplay settings (only safe outside active wave)
    * @param {Object} settings - Settings overrides
-   * @param {boolean} [options.applyToState=false] - Update credits/lives for prehack
+   * @param {boolean} [options.applyToState=false] - Update credits/lives for ready
    */
   applyGameSettings(settings = {}, options = {}) {
     return applyGameSettings(this, settings, options);
@@ -885,7 +885,7 @@ export class GameEngine {
   }
 
   /**
-   * Set game status manually (for prehack -> ready transition)
+   * Set game status manually
    * @param {string} status - New status
    */
   setStatus(status) {
