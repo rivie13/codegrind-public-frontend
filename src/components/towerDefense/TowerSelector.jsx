@@ -193,14 +193,6 @@ const TowerSelector = ({
       return missingCoreTowerLabels.includes(tower.type);
     };
 
-    // FIRST CHECK: If game is in prehack state, ALWAYS restrict to Function and Object only
-    if (gameStatus === 'prehack') {
-      //console.log('[DEBUG] TowerSelector: Game is in prehack state - restricting to Function and Object towers only');
-      return Object.values(TOWER_TYPES).filter(
-        (tower) => filterCoreTowers(tower) && isTowerAllowed(tower)
-      );
-    }
-
     // If the game is in playing or wave-complete state, allow all towers regardless of initialCodeGenerated
     // This lets users buy other tower types after the first wave has started
     if (gameStatus === 'playing' || gameStatus === 'wave-complete') {

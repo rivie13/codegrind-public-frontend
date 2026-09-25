@@ -13,7 +13,7 @@ export default function useTowerDefenseV2RefSync({
   waveRef,
   scoreSubmittedRef,
   endlessScoreSubmittedRef,
-  victoryOutputAppliedRef
+  victoryOutputAppliedRef,
 }) {
   useEffect(() => {
     livesRef.current = gameState.lives;
@@ -22,7 +22,7 @@ export default function useTowerDefenseV2RefSync({
   }, [creditsRef, gameState.credits, gameState.lives, gameState.wave, livesRef, waveRef]);
 
   useEffect(() => {
-    if (gameState.status === GAME_STATUS.PREHACK) {
+    if (gameState.status === GAME_STATUS.READY) {
       scoreSubmittedRef.current = false;
       endlessScoreSubmittedRef.current = false;
       victoryOutputAppliedRef.current = false;

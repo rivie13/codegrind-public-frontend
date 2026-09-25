@@ -292,7 +292,7 @@ const CodeEditorPanel = ({
   }, []);
 
   useEffect(() => {
-    if (!effectiveCodeGenerated || gameStatus === 'prehack' || playerLost || playerWon) {
+    if (!effectiveCodeGenerated || playerLost || playerWon) {
       unlockCursorSetRef.current = false;
       return;
     }
@@ -340,7 +340,7 @@ const CodeEditorPanel = ({
 
   useEffect(() => {
     if (typeof lives === 'number') {
-      if (gameStatus === 'prehack' || lives > initialLivesRef.current) {
+      if (gameStatus === 'ready' || lives > initialLivesRef.current) {
         initialLivesRef.current = lives;
       }
     }
@@ -717,10 +717,7 @@ const CodeEditorPanel = ({
         ref={containerRef}
         overflow="hidden"
       >
-        {(!effectiveCodeGenerated || gameStatus === 'prehack') &&
-        !playerLost &&
-        !playerWon &&
-        !isHomepageDemo ? (
+        {!effectiveCodeGenerated && !playerLost && !playerWon && !isHomepageDemo ? (
           <CodeEditorSetupPanel
             showTerminal={showTerminal}
             terminalHeight={terminalHeight}
@@ -772,7 +769,7 @@ const CodeEditorPanel = ({
         )}
 
         {/* Resize Handle - only show when both editor and terminal are visible */}
-        {showTerminal && effectiveCodeGenerated && gameStatus !== 'prehack' && (
+        {showTerminal && effectiveCodeGenerated && (
           <Box
             ref={resizeHandleRef}
             height={useMobileTouchResizeHandle ? '20px' : '8px'}
@@ -830,12 +827,8 @@ const CodeEditorPanel = ({
         {showTerminal && (
           <Box
             ref={terminalRef}
-            flex={
-              effectiveCodeGenerated && gameStatus !== 'prehack'
-                ? `${terminalSplitRatio} 1 0px`
-                : undefined
-            }
-            height={effectiveCodeGenerated && gameStatus !== 'prehack' ? undefined : '40%'}
+            flex={effectiveCodeGenerated ? `${terminalSplitRatio} 1 0px` : undefined}
+            height={effectiveCodeGenerated ? undefined : '40%'}
             minHeight="0"
             borderTop="none"
             m="0"

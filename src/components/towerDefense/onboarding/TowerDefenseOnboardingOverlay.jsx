@@ -68,11 +68,11 @@ const getRetroButtonSx = ({ compact = false } = {}) => ({
 });
 
 const getHighContrastButtonSx = ({ compact = false, stepId } = {}) => {
-  const isHighContrast = stepId === 'mission-objective' || stepId === 'life-loss-warning';
+  const isHighContrast = stepId === 'mission-objective';
   if (!isHighContrast) {
     return getRetroButtonSx({ compact });
   }
-  const neonColor = stepId === 'mission-objective' ? '#39FF14' : '#FF007F';
+  const neonColor = '#39FF14';
   return {
     borderRadius: '0',
     border: '3px solid #000000',
@@ -187,14 +187,6 @@ const getManualContinueDelayMs = (step) => {
   return baseDelayMs;
 };
 
-const isCompactWriteCodeStep = (step) => {
-  if (!step || step.id !== 'write-code' || typeof window === 'undefined') {
-    return false;
-  }
-
-  return buildResponsiveProfile().isHandheldSinglePanelLayout;
-};
-
 const shouldUseTickerCallout = (step) => {
   if (!step || step.kind !== 'callout' || typeof window === 'undefined') {
     return false;
@@ -208,21 +200,9 @@ const shouldUseTickerCallout = (step) => {
   }
 
   const responsiveProfile = buildResponsiveProfile();
-  const stepId = String(step.id || '');
-  const targetSelector = String(step.targetSelector || '');
   const hasTargetFocus = Boolean(step.targetSelector);
   const usesPanelFocus = Boolean(step.panelFocus);
   const prefersMobileTicker = Boolean(step.preferMobileTicker);
-  const isPanelSwitcherTarget =
-    stepId === 'interwave-slot-switch' ||
-    targetSelector.includes("[data-tutorial-role='panel-switcher']") ||
-    targetSelector.includes('[data-tutorial-role="panel-switcher"]') ||
-    targetSelector.includes("[data-tutorial='slot-switch-taskbar']") ||
-    targetSelector.includes('[data-tutorial="slot-switch-taskbar"]');
-
-  if (isPanelSwitcherTarget && responsiveProfile.isHandheldLayout) {
-    return true;
-  }
 
   if (prefersMobileTicker && responsiveProfile.isHandheldSinglePanelLayout) {
     return true;
@@ -231,21 +211,6 @@ const shouldUseTickerCallout = (step) => {
   return (
     responsiveProfile.isHandheldSinglePanelLayout &&
     (hasTargetFocus || usesPanelFocus || prefersMobileTicker)
-  );
-};
-
-const isPanelSwitcherStep = (step) => {
-  if (!step) return false;
-
-  const stepId = String(step.id || '');
-  if (stepId === 'interwave-slot-switch') return true;
-
-  const targetSelector = String(step.targetSelector || '');
-  return (
-    targetSelector.includes("[data-tutorial-role='panel-switcher']") ||
-    targetSelector.includes('[data-tutorial-role="panel-switcher"]') ||
-    targetSelector.includes("[data-tutorial='slot-switch-taskbar']") ||
-    targetSelector.includes('[data-tutorial="slot-switch-taskbar"]')
   );
 };
 
@@ -343,8 +308,7 @@ const getBubbleStyle = (
   rect,
   placement = 'bottom',
   bubbleHeight = DEFAULT_CALLOUT_HEIGHT,
-  gapOverride = CALLOUT_GAP,
-  compactWriteCode = false
+  gapOverride = CALLOUT_GAP
 ) => {
   const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1440;
   const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 900;
@@ -365,23 +329,6 @@ const getBubbleStyle = (
       left: leftVal,
       top: topVal,
       width: width,
-    };
-  }
-
-  if (compactWriteCode) {
-    const compactWidth = Math.min(300, viewportWidth - VIEWPORT_PADDING * 2);
-    const leftVal = Math.max(VIEWPORT_PADDING, viewportWidth - compactWidth - VIEWPORT_PADDING);
-    const topVal = safeTop + 8;
-    return {
-      style: {
-        top: `${topVal}px`,
-        left: `${leftVal}px`,
-        width: `${compactWidth}px`,
-      },
-      resolvedPlacement: 'top',
-      left: leftVal,
-      top: topVal,
-      width: compactWidth,
     };
   }
 
@@ -495,24 +442,6 @@ const getBubbleStyle = (
   };
 };
 
-const getTransmissionStyle = (rect) => {
-  if (!rect) {
-    return {
-      top: '0px',
-      left: '0px',
-      width: '100vw',
-      height: '100vh',
-    };
-  }
-
-  return {
-    top: `${rect.top}px`,
-    left: `${rect.left}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-  };
-};
-
 const getBackdropFrameStyle = (rect) => {
   if (!rect) {
     return {
@@ -545,20 +474,12 @@ const getMobileTickerTopOffset = (rect, step) => {
   );
 
   if (!rect) {
-    if (isPanelSwitcherStep(step)) {
-      return maxTop;
-    }
-
     return MOBILE_TICKER_DEFAULT_TOP;
   }
 
   const highlightedTop = rect.top - TARGET_FRAME_PADDING;
   const highlightedBottom = rect.bottom + TARGET_FRAME_PADDING;
   const defaultTickerBottom = MOBILE_TICKER_DEFAULT_TOP + MOBILE_TICKER_ESTIMATED_HEIGHT;
-
-  if (isPanelSwitcherStep(step)) {
-    return clamp(highlightedBottom + MOBILE_TICKER_TARGET_GAP, MOBILE_TICKER_DEFAULT_TOP, maxTop);
-  }
 
   if (highlightedTop >= defaultTickerBottom + MOBILE_TICKER_TARGET_GAP) {
     return MOBILE_TICKER_DEFAULT_TOP;
@@ -614,25 +535,7 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
   const [manualContinueUnlocked, setManualContinueUnlocked] = useState(true);
   const [manualContinueRemainingMs, setManualContinueRemainingMs] = useState(0);
   const normalizedTargetRect = useMemo(() => normalizeTargetRect(targetRect), [targetRect]);
-  const compactWriteCodeStep = isCompactWriteCodeStep(step);
   const tickerCallout = shouldUseTickerCallout(step);
-  const hasInlineAnswerCode =
-    step?.id === 'write-code' &&
-    typeof step?.answerCode === 'string' &&
-    step.answerCode.trim().length > 0;
-  const useCompactWriteCodeLayout = hasInlineAnswerCode;
-  const compactWriteCodeTickerText = useMemo(() => {
-    if (!compactWriteCodeStep) return '';
-
-    const message = typeof step?.message === 'string' ? step.message : '';
-    const subtext = typeof step?.subtext === 'string' ? step.subtext : '';
-    const answerCode =
-      typeof step?.answerCode === 'string' && step.answerCode.trim().length > 0
-        ? step.answerCode.replace(/\s+/g, ' ').trim()
-        : '';
-
-    return [step?.title, message, subtext, answerCode].filter(Boolean).join('   //   ');
-  }, [compactWriteCodeStep, step?.answerCode, step?.message, step?.subtext, step?.title]);
   const tickerText = useMemo(() => {
     if (!tickerCallout) return '';
 
@@ -645,9 +548,7 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
 
     return [message, subtext, answerCode].filter(Boolean).join('   //   ');
   }, [tickerCallout, step?.answerCode, step?.message, step?.subtext]);
-  const requiresManualContinue =
-    Boolean(step?.requireManualContinue) || step?.id === 'life-loss-warning';
-  const preserveFocusReadability = Boolean(step?.preserveFocusReadability);
+  const requiresManualContinue = Boolean(step?.requireManualContinue);
 
   useEffect(() => {
     if (!step || !requiresManualContinue || !manualContinueUnlocked) return undefined;
@@ -722,11 +623,6 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
   const isContinueButtonDisabled = !manualContinueUnlocked || Boolean(step?.actionDisabled);
 
   useEffect(() => {
-    if (!step || step.kind === 'concept-card' || step.kind === 'transmission') {
-      setBubbleHeight(DEFAULT_CALLOUT_HEIGHT);
-      return undefined;
-    }
-
     const element = bubbleRef.current;
     if (!element) return undefined;
 
@@ -766,32 +662,21 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
     top: bubbleTop,
     width: bubbleWidth,
   } = useMemo(
-    () =>
-      getBubbleStyle(
-        normalizedTargetRect,
-        step?.placement,
-        bubbleHeight,
-        step?.calloutGap,
-        useCompactWriteCodeLayout
-      ),
-    [bubbleHeight, normalizedTargetRect, step, useCompactWriteCodeLayout]
-  );
-  const transmissionStyle = useMemo(
-    () => getTransmissionStyle(normalizedTargetRect),
-    [normalizedTargetRect]
+    () => getBubbleStyle(normalizedTargetRect, step?.placement, bubbleHeight, step?.calloutGap),
+    [bubbleHeight, normalizedTargetRect, step]
   );
   const backdropFrameStyle = useMemo(
     () => getBackdropFrameStyle(normalizedTargetRect),
     [normalizedTargetRect]
   );
   const clipPath = useMemo(() => {
-    if (!normalizedTargetRect || preserveFocusReadability) return 'none';
+    if (!normalizedTargetRect) return 'none';
     const sTop = Math.max(0, normalizedTargetRect.top - 12);
     const sLeft = Math.max(0, normalizedTargetRect.left - 12);
     const sBottom = sTop + normalizedTargetRect.height + 24;
     const sRight = sLeft + normalizedTargetRect.width + 24;
     return `polygon(0px 0px, 0px 100%, ${sLeft}px 100%, ${sLeft}px ${sTop}px, ${sRight}px ${sTop}px, ${sRight}px ${sBottom}px, ${sLeft}px ${sBottom}px, ${sLeft}px 100%, 100% 100%, 100% 0px)`;
-  }, [normalizedTargetRect, preserveFocusReadability]);
+  }, [normalizedTargetRect]);
   const mobileTickerTopOffset = useMemo(
     () => getMobileTickerTopOffset(normalizedTargetRect, step),
     [normalizedTargetRect, step]
@@ -905,231 +790,7 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
 
   return (
     <AnimatePresence mode="wait">
-      {step.kind === 'concept-card' ? (
-        <>
-          <motion.div
-            key={`${step.id}-backdrop`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(0, 0, 0, 0.6)',
-              zIndex: 9999,
-            }}
-          />
-          <motion.div
-            key={step.id}
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10000,
-            }}
-          >
-            <Box w="420px" maxW="90vw">
-              <RetroWindowFrame title={step.title} label="Briefing">
-                <VStack spacing={4} align="stretch">
-                  {step.icon ? (
-                    <Text
-                      fontSize="3xl"
-                      mb={1}
-                      textAlign="center"
-                      color={RETRO_ONBOARDING_THEME.accent}
-                    >
-                      {step.icon}
-                    </Text>
-                  ) : null}
-
-                  {step.bullets?.length ? (
-                    <VStack spacing={2} align="stretch" pl={2}>
-                      {step.bullets.map((bullet, index) => (
-                        <Box
-                          key={`${step.id}-bullet-${index}`}
-                          display="flex"
-                          gap={2}
-                          alignItems="flex-start"
-                        >
-                          <Text
-                            color={RETRO_ONBOARDING_THEME.accent}
-                            fontSize="sm"
-                            mt="1px"
-                            flexShrink={0}
-                          >
-                            ■
-                          </Text>
-                          <Text
-                            color={RETRO_ONBOARDING_THEME.text}
-                            fontSize="sm"
-                            fontFamily={UI_FONT}
-                          >
-                            {bullet}
-                          </Text>
-                        </Box>
-                      ))}
-                    </VStack>
-                  ) : null}
-
-                  {step.example ? (
-                    <Box
-                      bg={RETRO_ONBOARDING_THEME.hintSurface}
-                      border="1px solid"
-                      borderColor={RETRO_ONBOARDING_THEME.hintBorder}
-                      p={3}
-                      fontFamily={CODE_FONT}
-                    >
-                      <Text
-                        color={RETRO_ONBOARDING_THEME.accent}
-                        fontSize="xs"
-                        mb={1}
-                        opacity={0.88}
-                        fontFamily={UI_FONT}
-                      >
-                        Example:
-                      </Text>
-                      <Text color={RETRO_ONBOARDING_THEME.text} fontSize="sm" whiteSpace="pre-wrap">
-                        {step.example}
-                      </Text>
-                      {step.exampleOutput ? (
-                        <>
-                          <Text
-                            color={RETRO_ONBOARDING_THEME.accent}
-                            fontSize="xs"
-                            mt={2}
-                            mb={1}
-                            opacity={0.88}
-                            fontFamily={UI_FONT}
-                          >
-                            Output:
-                          </Text>
-                          <Text color="#4b3705" fontSize="sm">
-                            {step.exampleOutput}
-                          </Text>
-                        </>
-                      ) : null}
-                    </Box>
-                  ) : null}
-
-                  {step.answerCode ? (
-                    <Box
-                      bg={RETRO_ONBOARDING_THEME.hintSurface}
-                      border="1px solid"
-                      borderColor={RETRO_ONBOARDING_THEME.hintBorder}
-                      p={3}
-                      fontFamily={CODE_FONT}
-                    >
-                      <Text
-                        color={RETRO_ONBOARDING_THEME.accent}
-                        fontSize="xs"
-                        mb={1}
-                        opacity={0.9}
-                        fontFamily={UI_FONT}
-                      >
-                        {step.answerLabel || 'Type this:'}
-                      </Text>
-                      <Text color={RETRO_ONBOARDING_THEME.text} fontSize="sm" whiteSpace="pre-wrap">
-                        {step.answerCode}
-                      </Text>
-                    </Box>
-                  ) : null}
-
-                  {step.missionReasonBody ? (
-                    <Box
-                      bg={RETRO_ONBOARDING_THEME.warningSurface}
-                      border="1px solid"
-                      borderColor={RETRO_ONBOARDING_THEME.warningBorder}
-                      p={3}
-                    >
-                      <Text
-                        color="#5c4708"
-                        fontSize="xs"
-                        mb={1}
-                        opacity={0.95}
-                        fontFamily={UI_FONT}
-                      >
-                        {step.missionReasonTitle || 'Why this matters'}
-                      </Text>
-                      <Text color={RETRO_ONBOARDING_THEME.text} fontSize="xs" fontFamily={UI_FONT}>
-                        {step.missionReasonBody}
-                      </Text>
-                    </Box>
-                  ) : null}
-
-                  <Button
-                    onClick={() => onCompleteStep(step.id)}
-                    isDisabled={isContinueButtonDisabled}
-                    fontSize="sm"
-                    size="lg"
-                    mt={2}
-                    sx={getHighContrastButtonSx({ stepId: step.id })}
-                  >
-                    {step.actionLabel || 'Continue'}
-                  </Button>
-                </VStack>
-              </RetroWindowFrame>
-            </Box>
-          </motion.div>
-        </>
-      ) : step.kind === 'transmission' ? (
-        <>
-          <motion.div
-            key={`${step.id}-dim`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.28 }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background:
-                step.presentation === 'minimal-transmission'
-                  ? 'rgba(2, 8, 16, 0.12)'
-                  : 'rgba(2, 8, 16, 0.42)',
-              backdropFilter: step.presentation === 'minimal-transmission' ? 'none' : 'blur(1px)',
-              zIndex: 9999,
-              pointerEvents: 'none',
-            }}
-          />
-          <motion.div
-            key={step.id}
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.35 }}
-            style={{
-              position: 'fixed',
-              zIndex: 10001,
-              pointerEvents: 'none',
-              ...transmissionStyle,
-            }}
-          >
-            <Box
-              position="absolute"
-              top={step.presentation === 'minimal-transmission' ? '10%' : '8%'}
-              left="5%"
-              right={step.presentation === 'minimal-transmission' ? '36%' : '28%'}
-            >
-              <RetroWindowFrame
-                title={step.title}
-                label={step.presentation === 'minimal-transmission' ? 'Signal' : 'Transmission'}
-              >
-                <TypedText
-                  text={step.message}
-                  color={RETRO_ONBOARDING_THEME.text}
-                  fontSize={step.presentation === 'minimal-transmission' ? 'sm' : 'md'}
-                />
-              </RetroWindowFrame>
-            </Box>
-          </motion.div>
-        </>
-      ) : (
+      {
         <>
           <motion.div
             key={`${step.id}-dim`}
@@ -1140,15 +801,15 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
             style={{
               position: 'fixed',
               inset: 0,
-              background: preserveFocusReadability ? 'rgba(2, 8, 16, 0.1)' : 'rgba(2, 8, 16, 0.38)',
-              backdropFilter: preserveFocusReadability ? 'none' : 'blur(4px)',
+              background: 'rgba(2, 8, 16, 0.38)',
+              backdropFilter: 'blur(4px)',
               zIndex: 9997,
               pointerEvents: 'none',
               clipPath: clipPath,
             }}
           />
 
-          {normalizedTargetRect && !preserveFocusReadability ? (
+          {normalizedTargetRect ? (
             <motion.div
               key={`${step.id}-spotlight`}
               initial={{ opacity: 0 }}
@@ -1213,7 +874,7 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
                     lineHeight="1.35"
                     fontFamily={UI_FONT}
                   >
-                    {tickerText || compactWriteCodeTickerText}
+                    {tickerText}
                   </Text>
                   {requiresManualContinue ? (
                     <Flex justify="flex-end" mt={2}>
@@ -1245,70 +906,15 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
                 ...bubbleStyle,
               }}
             >
-              <RetroWindowFrame
-                title={step.title}
-                label="Callout"
-                compact={useCompactWriteCodeLayout}
-              >
-                {useCompactWriteCodeLayout ? (
-                  <Text
-                    color={RETRO_ONBOARDING_THEME.text}
-                    fontSize="sm"
-                    lineHeight="1.5"
-                    fontFamily={UI_FONT}
-                  >
-                    {step.message}
-                  </Text>
-                ) : (
-                  <TypedText text={step.message} fontSize="clamp(0.98rem, 1.2vw, 1.18rem)" />
-                )}
+              <RetroWindowFrame title={step.title} label="Callout">
+                <TypedText text={step.message} fontSize="clamp(0.98rem, 1.2vw, 1.18rem)" />
                 {step.subtext ? (
                   <Box mt={3}>
-                    {useCompactWriteCodeLayout ? (
-                      <Text
-                        color={RETRO_ONBOARDING_THEME.secondaryText}
-                        fontSize="xs"
-                        lineHeight="1.5"
-                        fontFamily={UI_FONT}
-                      >
-                        {step.subtext}
-                      </Text>
-                    ) : (
-                      <TypedText
-                        text={step.subtext}
-                        color={RETRO_ONBOARDING_THEME.secondaryText}
-                        fontSize="xs"
-                      />
-                    )}
-                  </Box>
-                ) : null}
-                {step.answerCode ? (
-                  <Box
-                    mt={3}
-                    px={3}
-                    py={2}
-                    bg={RETRO_ONBOARDING_THEME.hintSurface}
-                    border="1px solid"
-                    borderColor={RETRO_ONBOARDING_THEME.hintBorder}
-                  >
-                    <Text
-                      color={RETRO_ONBOARDING_THEME.accent}
-                      fontSize="2xs"
-                      mb={1}
-                      letterSpacing="0.08em"
-                      fontFamily={UI_FONT}
-                    >
-                      {step.answerLabel || 'TYPE THIS ANSWER'}
-                    </Text>
-                    <Text
-                      color={RETRO_ONBOARDING_THEME.text}
-                      fontSize={compactWriteCodeStep ? 'xs' : 'sm'}
-                      lineHeight={compactWriteCodeStep ? '1.35' : '1.45'}
-                      fontFamily={CODE_FONT}
-                      whiteSpace="pre-wrap"
-                    >
-                      {step.answerCode}
-                    </Text>
+                    <TypedText
+                      text={step.subtext}
+                      color={RETRO_ONBOARDING_THEME.secondaryText}
+                      fontSize="xs"
+                    />
                   </Box>
                 ) : null}
                 {requiresManualContinue ? (
@@ -1328,7 +934,7 @@ export default function TowerDefenseOnboardingOverlay({ step, targetRect, onComp
             </motion.div>
           )}
         </>
-      )}
+      }
     </AnimatePresence>
   );
 }

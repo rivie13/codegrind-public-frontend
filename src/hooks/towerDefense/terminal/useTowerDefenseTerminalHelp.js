@@ -175,15 +175,12 @@ export default function useTowerDefenseTerminalHelp({
   );
 
   const handleGameHelp = useCallback(() => {
-    addTerminalSystemMessage('SYSTEM', '/game jack-in | /game start-wave | /game status');
+    addTerminalSystemMessage('SYSTEM', '/game start-wave | /game status');
     addTerminalSystemMessage(
       'SYSTEM',
       '/game shorten-path | /game lengthen-path | /game cancel-placement'
     );
-    addTerminalSystemMessage(
-      'SYSTEM',
-      'Examples: /game jack-in | /game start-wave | /game shorten-path'
-    );
+    addTerminalSystemMessage('SYSTEM', 'Examples: /game start-wave | /game shorten-path');
     addTerminalSystemMessage(
       'SYSTEM',
       'Path controls cost bits and each command gets more expensive every use.'

@@ -849,7 +849,6 @@ export default function useTowerDefenseV2GameState({
     effectiveObjectTowerPlaced,
     totalWaves,
     shouldShowVerificationControls,
-    showJackInButton,
     showStartWaveButton,
   } = useTowerDefenseV2DerivedState({
     gameState,
@@ -902,10 +901,9 @@ export default function useTowerDefenseV2GameState({
     setCurrentTowerType,
   });
 
-  const { handleJackIn, startWave, autoStartCountdown } = useTowerDefenseV2GameControls({
+  const { startWave, autoStartCountdown } = useTowerDefenseV2GameControls({
     addTerminalMessage,
     effectiveInitialCodeGenerated,
-    setStatus,
     startEngineWave,
     currentWave: gameState.wave,
     cancelPlacementMode,
@@ -1125,7 +1123,6 @@ export default function useTowerDefenseV2GameState({
       handleUpgradeSelectedTower,
       handleSpecialUpgradeSelectedTower,
       handleSellSelectedTower,
-      handleJackIn,
       startWave,
       adjustPath: handleAdjustPathCharged,
       handleCancelPlacement,
@@ -1219,9 +1216,7 @@ export default function useTowerDefenseV2GameState({
     handleCanvasClick,
     handleCanvasMouseMove,
     handleCanvasMouseLeave,
-    showJackInButton,
     showStartWaveButton,
-    handleJackIn,
     startWave,
     autoStartCountdown,
     autoStartEnabled,

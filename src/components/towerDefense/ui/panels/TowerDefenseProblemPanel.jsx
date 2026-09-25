@@ -8,7 +8,7 @@
 
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { Box, Flex, Heading, List, ListIcon, ListItem, Progress, Text } from '@chakra-ui/react';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React from 'react';
 import { FaShieldAlt, FaTerminal } from 'react-icons/fa';
 import MarkdownMessage from '../../../chat/MarkdownMessage';
 import {
@@ -166,12 +166,9 @@ const TowerDefenseProblemPanel = ({
   isDemo = false,
   shellTheme = 'default',
   compactMobileLayout = false,
-  onScrollStateChange = null,
-  tutorialOverlay = null,
   children,
 }) => {
   const parseExamplesFunc = parseAIProblemExamples;
-  const scrollContainerRef = useRef(null);
   const hasProblemLoaded = Boolean(problem || problemDescription);
   const isRetroDesktopTheme = shellTheme === 'retro-desktop';
   const uiFontFamily = isRetroDesktopTheme
@@ -214,176 +211,6 @@ const TowerDefenseProblemPanel = ({
       ? buildLearningFallbackExamples(problem)
       : baseExamples;
   const breachProgress = getBreachProgress({ currentWave, totalWaves, isMissionComplete });
-  const tutorialOverlayNode = useMemo(() => {
-    if (!tutorialOverlay?.isVisible) return null;
-
-    const isCompactOverlayLayout = Boolean(tutorialOverlay?.isCompactMobileLayout);
-
-    return (
-      <Box
-        position={isCompactOverlayLayout ? 'absolute' : { base: 'relative', md: 'sticky' }}
-        top={isCompactOverlayLayout ? '48px' : { base: 'auto', md: '74px' }}
-        left={isCompactOverlayLayout ? 0 : undefined}
-        right={isCompactOverlayLayout ? 0 : undefined}
-        zIndex={3}
-        px={{ base: 2, md: 4 }}
-        pt={isCompactOverlayLayout ? 2 : { base: 2, md: 4 }}
-        pb={isCompactOverlayLayout ? 0 : { base: 1, md: 2 }}
-        pointerEvents="none"
-      >
-        <Box
-          borderRadius={isRetroDesktopTheme ? '0' : 'xl'}
-          border={isRetroDesktopTheme ? '2px solid #232730' : '1px solid rgba(0, 255, 255, 0.42)'}
-          bg={
-            isRetroDesktopTheme
-              ? '#f4efe6'
-              : 'linear-gradient(180deg, rgba(2, 18, 34, 0.9) 0%, rgba(2, 10, 22, 0.78) 100%)'
-          }
-          boxShadow={
-            isRetroDesktopTheme
-              ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.62), inset -1px -1px 0 rgba(66, 72, 82, 0.28)'
-              : '0 0 34px rgba(0, 255, 255, 0.2), inset 0 0 30px rgba(0, 255, 255, 0.08)'
-          }
-          backdropFilter={isRetroDesktopTheme ? undefined : 'blur(8px)'}
-          px={isCompactOverlayLayout ? 2.5 : { base: 3, md: 5 }}
-          py={isCompactOverlayLayout ? 2 : { base: 3, md: 4 }}
-          opacity={tutorialOverlay.isDismissed ? 0 : 1}
-          transform={tutorialOverlay.isDismissed ? 'translateY(-12px)' : 'translateY(0)'}
-          transition="opacity 0.22s ease, transform 0.22s ease"
-          sx={
-            isRetroDesktopTheme
-              ? undefined
-              : {
-                  animation: tutorialOverlay.isDismissed
-                    ? 'none'
-                    : 'tdReadFocusPulse 1.7s ease-in-out infinite',
-                  '@keyframes tdReadFocusPulse': {
-                    '0%, 100%': {
-                      boxShadow:
-                        '0 0 26px rgba(0, 255, 255, 0.16), inset 0 0 22px rgba(0, 255, 255, 0.05)',
-                      borderColor: 'rgba(0, 255, 255, 0.42)',
-                    },
-                    '50%': {
-                      boxShadow:
-                        '0 0 46px rgba(0, 255, 255, 0.28), inset 0 0 32px rgba(0, 255, 255, 0.1)',
-                      borderColor: 'rgba(120, 255, 220, 0.78)',
-                    },
-                  },
-                }
-          }
-        >
-          <Flex
-            align={{ base: 'flex-start', md: 'center' }}
-            justify="space-between"
-            gap={isCompactOverlayLayout ? 2 : { base: 3, md: 4 }}
-          >
-            <Box>
-              <Text
-                color={isRetroDesktopTheme ? '#0b2ba8' : '#00f5c4'}
-                fontSize="xs"
-                fontFamily={uiFontFamily}
-                letterSpacing="0.14em"
-                textTransform="uppercase"
-                mb={1}
-              >
-                Read Me
-              </Text>
-              <Text
-                color={isRetroDesktopTheme ? '#1f2128' : '#f3fbff'}
-                fontSize={isCompactOverlayLayout ? '11px' : { base: 'xs', md: 'md' }}
-                fontWeight="bold"
-                fontFamily={uiFontFamily}
-                letterSpacing="0.03em"
-                textTransform="uppercase"
-              >
-                Scroll this mission brief before continuing.
-              </Text>
-              <Text
-                mt={1.5}
-                color={isRetroDesktopTheme ? '#434855' : 'rgba(214, 248, 255, 0.82)'}
-                fontSize={{ base: '2xs', md: 'xs' }}
-                maxW="560px"
-                lineHeight={{ base: '1.45', md: '1.6' }}
-                display={isCompactOverlayLayout ? 'none' : undefined}
-              >
-                Read the task, example, and requirements in this panel. The continue button stays
-                locked until you scroll through the brief.
-              </Text>
-            </Box>
-
-            <Flex
-              direction="column"
-              align="center"
-              color={isRetroDesktopTheme ? '#0b2ba8' : '#00e5ff'}
-              minW={isCompactOverlayLayout ? '36px' : { base: '40px', md: '52px' }}
-              sx={{
-                animation: tutorialOverlay.isDismissed
-                  ? 'none'
-                  : 'tdBriefBounce 1.4s ease-in-out infinite',
-                '@keyframes tdBriefBounce': {
-                  '0%, 100%': { transform: 'translateY(0)' },
-                  '50%': { transform: 'translateY(8px)' },
-                },
-              }}
-            >
-              <ChevronDownIcon boxSize={isCompactOverlayLayout ? 5 : { base: 6, md: 9 }} />
-              <Text
-                fontSize={isCompactOverlayLayout ? '9px' : '2xs'}
-                fontFamily={uiFontFamily}
-                letterSpacing="0.12em"
-              >
-                SCROLL
-              </Text>
-            </Flex>
-          </Flex>
-        </Box>
-      </Box>
-    );
-  }, [isRetroDesktopTheme, tutorialOverlay, uiFontFamily]);
-
-  const handlePanelScroll = (event) => {
-    if (typeof onScrollStateChange !== 'function') return;
-
-    const currentTarget = event.currentTarget;
-    const maxScroll = Math.max(
-      0,
-      (currentTarget.scrollHeight || 0) - (currentTarget.clientHeight || 0)
-    );
-    const currentScroll = Math.max(0, currentTarget.scrollTop || 0);
-    const progress = maxScroll > 0 ? currentScroll / maxScroll : 1;
-
-    onScrollStateChange({
-      progress,
-      hasScrollableOverflow: maxScroll > 32,
-      hasScrolled: currentScroll > 24,
-      currentScrollPx: currentScroll,
-      reachedBottom: maxScroll <= 32 || currentScroll >= maxScroll - 24,
-      source: 'scroll',
-    });
-  };
-
-  useEffect(() => {
-    if (typeof onScrollStateChange !== 'function') return;
-
-    const currentTarget = scrollContainerRef.current;
-    if (!currentTarget) return;
-
-    const maxScroll = Math.max(
-      0,
-      (currentTarget.scrollHeight || 0) - (currentTarget.clientHeight || 0)
-    );
-    const currentScroll = Math.max(0, currentTarget.scrollTop || 0);
-    const progress = maxScroll > 0 ? currentScroll / maxScroll : 1;
-
-    onScrollStateChange({
-      progress,
-      hasScrollableOverflow: maxScroll > 32,
-      hasScrolled: currentScroll > 24,
-      currentScrollPx: currentScroll,
-      reachedBottom: maxScroll <= 32 || currentScroll >= maxScroll - 24,
-      source: 'mount',
-    });
-  }, [onScrollStateChange, problem, problemDescription, tutorialOverlay?.isVisible]);
 
   if (!hasProblemLoaded) {
     return (
@@ -425,7 +252,6 @@ const TowerDefenseProblemPanel = ({
 
   return (
     <Box
-      ref={scrollContainerRef}
       flex="1"
       minH="0"
       overflowY="auto"
@@ -433,7 +259,6 @@ const TowerDefenseProblemPanel = ({
       bgImage={isRetroDesktopTheme ? `url(${RETRO_WINDOW_BASE_ASSET})` : undefined}
       bgRepeat={isRetroDesktopTheme ? 'repeat' : undefined}
       position="relative"
-      onScroll={handlePanelScroll}
       sx={{
         scrollbarWidth: 'thin',
         scrollbarColor: isRetroDesktopTheme ? '#8e8e8e #c9c4ba' : '#00ccff #0a0a1a',
@@ -544,8 +369,6 @@ const TowerDefenseProblemPanel = ({
         )}
       </Box>
 
-      {tutorialOverlayNode}
-
       {/* Content */}
       <Box p={contentPadding}>
         {/* Hacking Context */}
@@ -651,17 +474,15 @@ const TowerDefenseProblemPanel = ({
                         }
                   }
                 >
-                  <p>Welcome to CodeGrind! Your first mission is simple.</p>
+                  <p>Welcome to CodeGrind!</p>
                   <p>
-                    Write a function that returns the exact string: <code>"Hello, CodeGrind!"</code>
-                  </p>
-                  <p>In the code editor, you will write this solution under the TODO comment:</p>
-                  <p>
-                    <code>print("Hello, CodeGrind!")</code>
+                    In order to help you get started, we will walk you through the game mechanics
+                    and how to solve your first problem.
                   </p>
                   <p>
-                    Once your code is ready, you will build <strong>defense modules</strong> to
-                    protect the system.
+                    This is where you normally would read the problem you are asked to solve but we
+                    already solved this problem for you, so you can focus on learning the game
+                    mechanics.
                   </p>
                 </Box>
               ) : problem.source === 'LEETCODE' || problem.source === 'CODEGRIND' ? (

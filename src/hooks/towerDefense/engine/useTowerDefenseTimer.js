@@ -6,16 +6,10 @@ export default function useTowerDefenseTimer(gameStatus) {
   const timerStartRef = useRef(null);
 
   useEffect(() => {
-    const isActive =
-      gameStatus !== GAME_STATUS.PREHACK &&
-      gameStatus !== GAME_STATUS.GAME_OVER &&
-      gameStatus !== GAME_STATUS.LEVEL_COMPLETE;
+    const isRunning =
+      gameStatus !== GAME_STATUS.GAME_OVER && gameStatus !== GAME_STATUS.LEVEL_COMPLETE;
 
-    if (!isActive) {
-      if (gameStatus === GAME_STATUS.PREHACK) {
-        timerStartRef.current = null;
-        setTimerSeconds(0);
-      }
+    if (!isRunning) {
       return;
     }
 

@@ -140,12 +140,13 @@ const hashNoise = (seed) => {
 const hexToRgb = (hex) => {
   if (!hex || typeof hex !== 'string') return { r: 255, g: 255, b: 255 };
   const normalized = hex.replace('#', '');
-  const value = normalized.length === 3
-    ? normalized
-        .split('')
-        .map((ch) => ch + ch)
-        .join('')
-    : normalized;
+  const value =
+    normalized.length === 3
+      ? normalized
+          .split('')
+          .map((ch) => ch + ch)
+          .join('')
+      : normalized;
   const int = Number.parseInt(value, 16);
   if (Number.isNaN(int)) return { r: 255, g: 255, b: 255 };
   return {
@@ -383,14 +384,26 @@ const drawPathGradient = (ctx, mode, pathPoints, elapsed, tdMapPack, baseWidth) 
   let gradient;
   if (mode === 'plasma-ribbon') {
     const shift = (Math.sin(elapsed * 0.9) + 1) * 0.5;
-    gradient = ctx.createLinearGradient(pathPoints[0].x, pathPoints[0].y, pathPoints[pathPoints.length - 1].x, pathPoints[pathPoints.length - 1].y);
+    gradient = ctx.createLinearGradient(
+      pathPoints[0].x,
+      pathPoints[0].y,
+      pathPoints[pathPoints.length - 1].x,
+      pathPoints[pathPoints.length - 1].y
+    );
     gradient.addColorStop(0, tdMapPack.pathInnerColor);
     gradient.addColorStop(Math.max(0.2, Math.min(0.8, shift)), 'rgba(255, 255, 255, 0.2)');
     gradient.addColorStop(1, tdMapPack.pathColor);
   } else if (mode === 'neon-vein') {
     const pulse = (Math.sin(elapsed * 2.1) + 1) * 0.5;
     const mid = pathPoints[Math.floor(pathPoints.length / 2)];
-    gradient = ctx.createRadialGradient(mid.x, mid.y, baseWidth * 0.25, mid.x, mid.y, baseWidth * 5);
+    gradient = ctx.createRadialGradient(
+      mid.x,
+      mid.y,
+      baseWidth * 0.25,
+      mid.x,
+      mid.y,
+      baseWidth * 5
+    );
     gradient.addColorStop(0, `rgba(255, 255, 255, ${0.16 + pulse * 0.2})`);
     gradient.addColorStop(0.35, tdMapPack.pathInnerColor);
     gradient.addColorStop(1, tdMapPack.pathColor);
@@ -441,8 +454,14 @@ const drawCamoOverlay = (ctx, centerX, centerY, size, palette, elapsed, towerInd
     const color = getPaletteBlend(palette, phase + i * 0.13);
     const drift = elapsed * 0.4 + towerIndex * 0.8;
     const radius = size * (0.1 + hashNoise(towerIndex * 17 + i * 0.5) * 0.2);
-    const x = centerX + Math.sin(drift + i * 0.7) * size * 0.18 + (hashNoise(towerIndex * 11 + i) - 0.5) * size * 0.22;
-    const y = centerY + Math.cos(drift * 0.8 + i * 0.9) * size * 0.16 + (hashNoise(towerIndex * 7 + i * 2.1) - 0.5) * size * 0.2;
+    const x =
+      centerX +
+      Math.sin(drift + i * 0.7) * size * 0.18 +
+      (hashNoise(towerIndex * 11 + i) - 0.5) * size * 0.22;
+    const y =
+      centerY +
+      Math.cos(drift * 0.8 + i * 0.9) * size * 0.16 +
+      (hashNoise(towerIndex * 7 + i * 2.1) - 0.5) * size * 0.2;
     ctx.globalAlpha = 0.24;
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -508,7 +527,13 @@ const drawAttackFx = (ctx, fxId, towers, elapsed, color) => {
         ctx.fillStyle = color;
         ctx.globalAlpha = 0.24;
         ctx.beginPath();
-        ctx.arc(tower.x + Math.cos(angle) * radius, tower.y + Math.sin(angle) * radius, 2.2, 0, Math.PI * 2);
+        ctx.arc(
+          tower.x + Math.cos(angle) * radius,
+          tower.y + Math.sin(angle) * radius,
+          2.2,
+          0,
+          Math.PI * 2
+        );
         ctx.fill();
       }
     });
@@ -599,7 +624,8 @@ function CosmeticsLabPage() {
     [enemyPackId]
   );
   const damageTextPack = useMemo(
-    () => (damageTextPackId === 'default' ? null : getPackById(TD_DAMAGE_TEXT_PACKS, damageTextPackId)),
+    () =>
+      damageTextPackId === 'default' ? null : getPackById(TD_DAMAGE_TEXT_PACKS, damageTextPackId),
     [damageTextPackId]
   );
   const deathFxPack = useMemo(
@@ -793,10 +819,18 @@ function CosmeticsLabPage() {
       ctx.fillText(`TD PACK: ${towerPack.name.toUpperCase()}`, 20, 24);
       ctx.fillText(`MAP PACK: ${tdMapPack.name.toUpperCase()}`, 20, 42);
       ctx.fillText(`BACKGROUND PACK: ${tdBackgroundPack.name.toUpperCase()}`, 20, 60);
-      ctx.fillText(`LIGHTNING FX: ${LIGHTNING_INTERNAL_MODES.find((m) => m.id === lightningInternalMode)?.name?.toUpperCase() || 'EDGE SWEEP'}`, 20, 78);
+      ctx.fillText(
+        `LIGHTNING FX: ${LIGHTNING_INTERNAL_MODES.find((m) => m.id === lightningInternalMode)?.name?.toUpperCase() || 'EDGE SWEEP'}`,
+        20,
+        78
+      );
       ctx.font = '12px monospace';
       ctx.fillStyle = '#94A3B8';
-      ctx.fillText('Map Pack changes the lane and routed path. Background Pack changes the grid, atmosphere, and board FX.', 20, 96);
+      ctx.fillText(
+        'Map Pack changes the lane and routed path. Background Pack changes the grid, atmosphere, and board FX.',
+        20,
+        96
+      );
 
       const renderer = {
         ctx,
@@ -812,13 +846,14 @@ function CosmeticsLabPage() {
         towerAuraMap: new Map(),
       };
 
-      const towerSamples = towerPack.id === 'lightning-core'
-        ? [{ id: 't1', type: 'Function', row: 4, col: 9, specialUpgradeLevel: 2 }]
-        : [
-            { id: 't1', type: 'Function', row: 2, col: 3, specialUpgradeLevel: 1 },
-            { id: 't2', type: 'ForLoop', row: 5, col: 8, specialUpgradeLevel: 0 },
-            { id: 't3', type: 'Variable', row: 2, col: 13, specialUpgradeLevel: 2 },
-          ];
+      const towerSamples =
+        towerPack.id === 'lightning-core'
+          ? [{ id: 't1', type: 'Function', row: 4, col: 9, specialUpgradeLevel: 2 }]
+          : [
+              { id: 't1', type: 'Function', row: 2, col: 3, specialUpgradeLevel: 1 },
+              { id: 't2', type: 'ForLoop', row: 5, col: 8, specialUpgradeLevel: 0 },
+              { id: 't3', type: 'Variable', row: 2, col: 13, specialUpgradeLevel: 2 },
+            ];
 
       const towerCenters = towerSamples.map((sample) => ({
         x: (sample.col + 0.5) * cellSize,
@@ -983,8 +1018,9 @@ function CosmeticsLabPage() {
         return;
       }
 
-      if (status === 'ready' || status === 'wave-complete' || status === 'prehack') {
-        previewDifficultyRef.current = (previewDifficultyRef.current + 1) % previewDifficulties.length;
+      if (status === 'ready' || status === 'wave-complete') {
+        previewDifficultyRef.current =
+          (previewDifficultyRef.current + 1) % previewDifficulties.length;
         gameCanvasRef.current.startWave?.(previewDifficulties[previewDifficultyRef.current]);
       }
     };
@@ -1123,7 +1159,10 @@ function CosmeticsLabPage() {
             </HStack>
             <HStack>
               <Text minW="120px">Background</Text>
-              <Select value={backgroundId} onChange={(event) => setBackgroundId(event.target.value)}>
+              <Select
+                value={backgroundId}
+                onChange={(event) => setBackgroundId(event.target.value)}
+              >
                 {EDITOR_BACKGROUND_PACKS.map((pack) => (
                   <option key={pack.id} value={pack.id}>
                     {pack.name}
@@ -1142,7 +1181,13 @@ function CosmeticsLabPage() {
               </Select>
             </HStack>
           </SimpleGrid>
-          <Box mt={3} fontSize="sm" color="#94A3B8" border="1px solid rgba(148, 163, 184, 0.3)" p={3}>
+          <Box
+            mt={3}
+            fontSize="sm"
+            color="#94A3B8"
+            border="1px solid rgba(148, 163, 184, 0.3)"
+            p={3}
+          >
             <Text>{themePack.description}</Text>
             <Text mt={2}>{fontPack.description}</Text>
             <Text mt={2}>{backgroundPack.description}</Text>
@@ -1184,9 +1229,10 @@ function CosmeticsLabPage() {
               position="absolute"
               inset={0}
               sx={{
-                '.monaco-editor, .monaco-editor .margin, .monaco-editor-background, .monaco-editor .inputarea.ime-input': {
-                  background: 'transparent !important',
-                },
+                '.monaco-editor, .monaco-editor .margin, .monaco-editor-background, .monaco-editor .inputarea.ime-input':
+                  {
+                    background: 'transparent !important',
+                  },
                 '.monaco-editor .cursor': effectPack.cursorGlow
                   ? {
                       boxShadow: `0 0 8px ${effectPack.cursorGlowColor || '#67E8F9'}`,
@@ -1245,7 +1291,10 @@ function CosmeticsLabPage() {
             <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={3}>
               <HStack>
                 <Text minW="120px">TD Map Pack</Text>
-                <Select value={tdMapPackId} onChange={(event) => setTdMapPackId(event.target.value)}>
+                <Select
+                  value={tdMapPackId}
+                  onChange={(event) => setTdMapPackId(event.target.value)}
+                >
                   {TD_MAP_PACKS.map((pack) => (
                     <option key={pack.id} value={pack.id}>
                       {pack.name}
@@ -1268,7 +1317,10 @@ function CosmeticsLabPage() {
               </HStack>
               <HStack>
                 <Text minW="120px">Tower Pack</Text>
-                <Select value={towerPackId} onChange={(event) => setTowerPackId(event.target.value)}>
+                <Select
+                  value={towerPackId}
+                  onChange={(event) => setTowerPackId(event.target.value)}
+                >
                   {TOWER_PACKS.map((pack) => (
                     <option key={pack.id} value={pack.id}>
                       {pack.name}
@@ -1278,7 +1330,10 @@ function CosmeticsLabPage() {
               </HStack>
               <HStack>
                 <Text minW="120px">Enemy Scheme</Text>
-                <Select value={enemyPackId} onChange={(event) => setEnemyPackId(event.target.value)}>
+                <Select
+                  value={enemyPackId}
+                  onChange={(event) => setEnemyPackId(event.target.value)}
+                >
                   {ENEMY_PACKS.map((pack) => (
                     <option key={pack.id} value={pack.id}>
                       {pack.name}
@@ -1288,7 +1343,10 @@ function CosmeticsLabPage() {
               </HStack>
               <HStack>
                 <Text minW="120px">Path Gradient</Text>
-                <Select value={pathGradientMode} onChange={(event) => setPathGradientMode(event.target.value)}>
+                <Select
+                  value={pathGradientMode}
+                  onChange={(event) => setPathGradientMode(event.target.value)}
+                >
                   {PATH_GRADIENT_MODES.map((mode) => (
                     <option key={mode.id} value={mode.id}>
                       {mode.name}
@@ -1298,7 +1356,10 @@ function CosmeticsLabPage() {
               </HStack>
               <HStack>
                 <Text minW="120px">TD Attack FX</Text>
-                <Select value={tdAttackFxMode} onChange={(event) => setTdAttackFxMode(event.target.value)}>
+                <Select
+                  value={tdAttackFxMode}
+                  onChange={(event) => setTdAttackFxMode(event.target.value)}
+                >
                   {TD_ATTACK_FX_MODES.map((mode) => (
                     <option key={mode.id} value={mode.id}>
                       {mode.name}
@@ -1308,20 +1369,28 @@ function CosmeticsLabPage() {
               </HStack>
               <HStack>
                 <Text minW="120px">Damage Text</Text>
-                <Select value={damageTextPackId} onChange={(event) => setDamageTextPackId(event.target.value)}>
+                <Select
+                  value={damageTextPackId}
+                  onChange={(event) => setDamageTextPackId(event.target.value)}
+                >
                   {TD_DAMAGE_TEXT_PACKS.map((pack) => (
                     <option key={pack.id} value={pack.id}>
-                      {pack.name}{pack.free ? ' (Free)' : ` — ${pack.priceDataPackets} DP`}
+                      {pack.name}
+                      {pack.free ? ' (Free)' : ` — ${pack.priceDataPackets} DP`}
                     </option>
                   ))}
                 </Select>
               </HStack>
               <HStack>
                 <Text minW="120px">Death FX</Text>
-                <Select value={deathFxPackId} onChange={(event) => setDeathFxPackId(event.target.value)}>
+                <Select
+                  value={deathFxPackId}
+                  onChange={(event) => setDeathFxPackId(event.target.value)}
+                >
                   {TD_DEATH_FX_PACKS.map((pack) => (
                     <option key={pack.id} value={pack.id}>
-                      {pack.name}{pack.free ? ' (Free)' : ` — ${pack.priceDataPackets} DP`}
+                      {pack.name}
+                      {pack.free ? ' (Free)' : ` — ${pack.priceDataPackets} DP`}
                     </option>
                   ))}
                 </Select>
@@ -1358,12 +1427,19 @@ function CosmeticsLabPage() {
               )}
             </SimpleGrid>
 
-            <Box mt={3} fontSize="sm" color="#94A3B8" border="1px solid rgba(148, 163, 184, 0.3)" p={3}>
+            <Box
+              mt={3}
+              fontSize="sm"
+              color="#94A3B8"
+              border="1px solid rgba(148, 163, 184, 0.3)"
+              p={3}
+            >
               <Text>{tdMapPack.description}</Text>
               <Text mt={2}>{tdBackgroundPack.description}</Text>
               <Text mt={2}>{towerPack.description}</Text>
               <Text mt={2}>
-                Damage Text: {TD_DAMAGE_TEXT_PACKS.find((p) => p.id === damageTextPackId)?.description}
+                Damage Text:{' '}
+                {TD_DAMAGE_TEXT_PACKS.find((p) => p.id === damageTextPackId)?.description}
               </Text>
               <Text mt={2}>
                 Death FX: {TD_DEATH_FX_PACKS.find((p) => p.id === deathFxPackId)?.description}
@@ -1375,10 +1451,11 @@ function CosmeticsLabPage() {
                 WHAT SHOULD CHANGE
               </Text>
               <Text fontSize="xs" color="#AFC4DA">
-                TD Map Pack changes lane/path styling. Background Pack changes the board backdrop, grid,
-                and sellable grid cosmetics. Path Gradient changes lane animation. TD Attack FX changes
-                ambient combat effects. Lightning selectors control in-tower arcs and optional tower-to-enemy
-                beam links. Damage Text changes floating hit numbers. Death FX changes enemy kill explosions.
+                TD Map Pack changes lane/path styling. Background Pack changes the board backdrop,
+                grid, and sellable grid cosmetics. Path Gradient changes lane animation. TD Attack
+                FX changes ambient combat effects. Lightning selectors control in-tower arcs and
+                optional tower-to-enemy beam links. Damage Text changes floating hit numbers. Death
+                FX changes enemy kill explosions.
               </Text>
             </Box>
 
@@ -1458,7 +1535,10 @@ function CosmeticsLabPage() {
 
             <HStack>
               <Text minW="120px">Calling Card</Text>
-              <Select value={profileCardPackId} onChange={(event) => setProfileCardPackId(event.target.value)}>
+              <Select
+                value={profileCardPackId}
+                onChange={(event) => setProfileCardPackId(event.target.value)}
+              >
                 {PROFILE_CALLING_CARD_PACKS.map((pack) => (
                   <option key={pack.id} value={pack.id}>
                     {pack.name} ({pack.rarity})
@@ -1469,7 +1549,10 @@ function CosmeticsLabPage() {
 
             <HStack>
               <Text minW="120px">Badge</Text>
-              <Select value={profileBadgePackId} onChange={(event) => setProfileBadgePackId(event.target.value)}>
+              <Select
+                value={profileBadgePackId}
+                onChange={(event) => setProfileBadgePackId(event.target.value)}
+              >
                 {PROFILE_BADGE_PACKS.map((pack) => (
                   <option key={pack.id} value={pack.id}>
                     {pack.name} ({pack.rarity})
@@ -1479,7 +1562,13 @@ function CosmeticsLabPage() {
             </HStack>
           </SimpleGrid>
 
-          <Box mt={3} fontSize="sm" color="#94A3B8" border="1px solid rgba(148, 163, 184, 0.3)" p={3}>
+          <Box
+            mt={3}
+            fontSize="sm"
+            color="#94A3B8"
+            border="1px solid rgba(148, 163, 184, 0.3)"
+            p={3}
+          >
             <Text>{profileBackgroundPack.description}</Text>
             <Text mt={2}>{profileCallingCardPack.description}</Text>
             <Text mt={2}>{profileBadgePack.description}</Text>
@@ -1517,7 +1606,12 @@ function CosmeticsLabPage() {
         </Box>
 
         <HStack spacing={3}>
-          <Button size="sm" onClick={() => setMountedAt(Date.now())} colorScheme="cyan" variant="outline">
+          <Button
+            size="sm"
+            onClick={() => setMountedAt(Date.now())}
+            colorScheme="cyan"
+            variant="outline"
+          >
             Restart TD Preview Animation
           </Button>
         </HStack>

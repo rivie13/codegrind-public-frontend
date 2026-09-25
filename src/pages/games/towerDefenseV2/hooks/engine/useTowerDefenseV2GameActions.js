@@ -1,7 +1,5 @@
 import { useCallback } from 'react';
 
-import audioManager from '../../../../../utils/audio/AudioManager';
-import { GAME_STATUS } from '../../../../../game-engine-v2';
 import {
   formatCoreTowerList,
   getMissingCoreTowerLabels,
@@ -10,7 +8,6 @@ import {
 export default function useTowerDefenseV2GameActions({
   addTerminalMessage,
   initialCodeGenerated,
-  setStatus,
   startEngineWave,
   currentWave,
   cancelPlacementMode,
@@ -23,16 +20,6 @@ export default function useTowerDefenseV2GameActions({
     })
   );
   const coreTowerModuleWord = coreTowerLabelText.includes(' and ') ? 'modules' : 'module';
-
-  const handleJackIn = useCallback(() => {
-    setStatus(GAME_STATUS.READY);
-    audioManager.playSoundEffect('jack-in');
-    addTerminalMessage('[KERNEL] _/// NEURAL INTERFACE ESTABLISHED ////_');
-    addTerminalMessage('[SYSTEM] Cyberspace intrusion protocols initializing...');
-    addTerminalMessage(
-      `[ALERT] Deploy ${coreTowerLabelText} ${coreTowerModuleWord} to compile core system architecture.`
-    );
-  }, [addTerminalMessage, coreTowerLabelText, coreTowerModuleWord, setStatus]);
 
   const startWave = useCallback(
     (difficulty = 'normal') => {
@@ -64,5 +51,5 @@ export default function useTowerDefenseV2GameActions({
     ]
   );
 
-  return { handleJackIn, startWave };
+  return { startWave };
 }

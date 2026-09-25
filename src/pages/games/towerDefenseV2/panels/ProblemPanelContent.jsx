@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Box, Button, Flex, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
 
 import { TD_ONBOARDING_REQUEST_STEP_COMPLETE_EVENT } from '../../../../components/towerDefense/onboarding/inlineOnboardingEvents';
@@ -8,9 +8,7 @@ import {
   RETRO_WINDOW_BUTTON_ASSET,
   RETRO_WINDOW_BUTTON_PRESSED_ASSET,
 } from '../../../../utils/assets/towerDefenseAssetUrls';
-import { buildResponsiveProfile } from '../../../../utils/web/responsiveProfile';
 import useGuestFunnel from '../../../../hooks/guest/useGuestFunnel';
-const BRIEF_OVERLAY_SCROLL_DISMISS_THRESHOLD_PX = 40;
 
 export default function ProblemPanelContent({
   problem,
@@ -41,10 +39,6 @@ export default function ProblemPanelContent({
   }, [autoSwitchActive, autoSwitchRemaining]);
   const inlineOnboardingStep = useInlineTowerDefenseOnboardingStep('problem');
   const isMissionBriefStep = inlineOnboardingStep?.id === 'mission-objective';
-  const [manualContinueUnlocked, setManualContinueUnlocked] = useState(true);
-  const [manualContinueRemainingMs, setManualContinueRemainingMs] = useState(0);
-  const [scrollGateSatisfied, setScrollGateSatisfied] = useState(false);
-  const [briefOverlayDismissed, setBriefOverlayDismissed] = useState(false);
 
   const funnel = useGuestFunnel();
   const handleProblemClick = () => {
@@ -59,78 +53,7 @@ export default function ProblemPanelContent({
     }
   }, [isHomepageDemo, funnel]);
 
-  useEffect(() => {
-    setScrollGateSatisfied(false);
-    setBriefOverlayDismissed(false);
-  }, [inlineOnboardingStep?.id]);
-
-  useEffect(() => {
-    if (!inlineOnboardingStep?.requireManualContinue) {
-      setManualContinueUnlocked(true);
-      setManualContinueRemainingMs(0);
-      return undefined;
-    }
-
-    const baseDelayMs = Number(inlineOnboardingStep?.manualContinueDelayMs);
-    const mobileDelayMs = Number(inlineOnboardingStep?.manualContinueDelayMobileMs);
-    const isMobileViewport =
-      typeof window !== 'undefined' && buildResponsiveProfile().isHandheldSinglePanelLayout;
-    const delayMs =
-      isMobileViewport && Number.isFinite(mobileDelayMs) && mobileDelayMs > 0
-        ? mobileDelayMs
-        : Number.isFinite(baseDelayMs) && baseDelayMs > 0
-          ? baseDelayMs
-          : 0;
-
-    if (!delayMs) {
-      setManualContinueUnlocked(true);
-      setManualContinueRemainingMs(0);
-      return undefined;
-    }
-
-    setManualContinueUnlocked(false);
-    setManualContinueRemainingMs(delayMs);
-
-    const unlockTimerId = window.setTimeout(() => {
-      setManualContinueUnlocked(true);
-      setManualContinueRemainingMs(0);
-    }, delayMs);
-
-    const countdownTimerId = window.setInterval(() => {
-      setManualContinueRemainingMs((currentValue) => Math.max(0, currentValue - 100));
-    }, 100);
-
-    return () => {
-      window.clearTimeout(unlockTimerId);
-      window.clearInterval(countdownTimerId);
-    };
-  }, [inlineOnboardingStep]);
-
-  const continueButtonLabel = (() => {
-    if (!inlineOnboardingStep?.requireManualContinue) {
-      return '';
-    }
-
-    const requiredScrollProgress = Number(inlineOnboardingStep?.requireScrollProgress || 0);
-    const scrollIsRequired = requiredScrollProgress > 0;
-
-    if (inlineOnboardingStep?.lockedActionLabel) {
-      if (!manualContinueUnlocked) {
-        return inlineOnboardingStep.lockedActionLabel;
-      }
-    }
-
-    if (scrollIsRequired && !scrollGateSatisfied) {
-      return inlineOnboardingStep?.blockedActionLabel || 'Scroll to continue';
-    }
-
-    if (manualContinueUnlocked) {
-      return inlineOnboardingStep?.actionLabel || 'Continue';
-    }
-
-    const remainingSeconds = Math.max(1, Math.ceil(manualContinueRemainingMs / 1000));
-    return `Continue in ${remainingSeconds}s`;
-  })();
+  const continueButtonLabel = inlineOnboardingStep?.actionLabel || 'I READ THE BRIEF';
 
   const requestStepCompletion = () => {
     if (typeof window === 'undefined' || !inlineOnboardingStep?.id) return;
@@ -144,45 +67,7 @@ export default function ProblemPanelContent({
     );
   };
 
-  const handleProblemPanelScrollStateChange = ({
-    progress,
-    hasScrollableOverflow,
-    hasScrolled,
-    currentScrollPx,
-    source,
-  }) => {
-    if (!isMissionBriefStep) return;
-
-    const requiredScrollProgress = Number(inlineOnboardingStep?.requireScrollProgress || 0);
-    const scrollIsRequired = requiredScrollProgress > 0;
-    const normalizedProgress = Number.isFinite(progress) ? progress : 0;
-    const normalizedScrollPx = Number.isFinite(currentScrollPx) ? currentScrollPx : 0;
-    const hasStartedReading =
-      source === 'scroll' &&
-      (normalizedScrollPx >= BRIEF_OVERLAY_SCROLL_DISMISS_THRESHOLD_PX ||
-        (Boolean(hasScrolled) && normalizedProgress >= 0.04));
-
-    if (hasStartedReading) {
-      setBriefOverlayDismissed(true);
-      if (isHomepageDemo) {
-        funnel.briefScrolled();
-      }
-    }
-
-    if (!scrollIsRequired) {
-      setScrollGateSatisfied(true);
-      return;
-    }
-
-    const hasSatisfiedRequirement =
-      !hasScrollableOverflow || normalizedProgress >= requiredScrollProgress;
-
-    setScrollGateSatisfied(hasSatisfiedRequirement);
-  };
-
-  const isContinueEnabled = Boolean(
-    manualContinueUnlocked && (!inlineOnboardingStep?.requireScrollProgress || scrollGateSatisfied)
-  );
+  const isContinueEnabled = true;
   const retroChromeStripProps = isRetroDesktopTheme
     ? {
         bg: '#d4d0c8',
@@ -357,10 +242,6 @@ export default function ProblemPanelContent({
               : undefined
           }
         >
-          <Text color={isRetroDesktopTheme ? '#1e2430' : 'green.200'} fontSize="sm" mb={1}>
-            Unlock the editor by using the jack in button and placing Function/Object towers in the
-            game to set up the problem in the editor.
-          </Text>
           <Text color={isRetroDesktopTheme ? '#404957' : 'green.100'} fontSize="xs">
             Then switch to the Editor slot to solve the problem after unlocking. Use tower defense
             and code to defend against waves of enemies. You can generate code snippets by deploying
@@ -383,20 +264,12 @@ export default function ProblemPanelContent({
           isDemo={isHomepageDemo}
           shellTheme={shellTheme}
           compactMobileLayout={useCompactMobileChrome}
-          onScrollStateChange={handleProblemPanelScrollStateChange}
-          tutorialOverlay={
-            isMissionBriefStep
-              ? {
-                  isVisible: true,
-                  isDismissed: briefOverlayDismissed,
-                  isCompactMobileLayout: useCompactMobileChrome,
-                }
-              : null
-          }
         >
           {isMissionBriefStep && inlineOnboardingStep?.requireManualContinue ? (
             <Flex justify="center" mt={6} pb={4}>
               <Button
+                data-td-onboarding-portal
+                data-tutorial="brief-continue-button"
                 size={useCompactMobileChrome ? 'sm' : 'md'}
                 isDisabled={!isContinueEnabled}
                 onClick={requestStepCompletion}

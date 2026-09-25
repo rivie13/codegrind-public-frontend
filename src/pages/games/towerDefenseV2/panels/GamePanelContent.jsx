@@ -30,7 +30,7 @@ const TD_MOBILE_LOADOUT_OPENED_EVENT = 'td-mobile-loadout-opened';
 const TD_MOBILE_COLLAPSE_UI_EVENT = 'td-mobile-collapse-ui';
 const TD_MOBILE_OPEN_TOWER_DETAILS_EVENT = 'td-mobile-open-tower-details';
 const TD_ONBOARDING_STEP_CHANGE_EVENT = 'td-onboarding-step-change';
-const MOBILE_HUD_FOCUS_STEP_IDS = new Set(['jack-in', 'start-wave', 'verify-solution']);
+const MOBILE_HUD_FOCUS_STEP_IDS = new Set(['start-wave', 'verify-solution']);
 
 const createRetroWindowsButtonSx = (pressed = false) => ({
   backgroundImage: `url(${pressed ? RETRO_WINDOW_BUTTON_PRESSED_ASSET : RETRO_WINDOW_BUTTON_ASSET})`,
@@ -80,9 +80,7 @@ export default function GamePanelContent({
   onCanvasClick,
   onCanvasMouseMove,
   onCanvasMouseLeave,
-  showJackInButton,
   showStartWaveButton,
-  onJackIn,
   onStartWave,
   autoStartCountdown,
   autoStartWaves = false,
@@ -500,7 +498,7 @@ export default function GamePanelContent({
     const allowedSet = Array.isArray(allowedTowerTypes)
       ? new Set(allowedTowerTypes.map(normalize))
       : null;
-    const shouldLimitToCore = gameState.status === 'prehack' || !initialCodeGenerated;
+    const shouldLimitToCore = !initialCodeGenerated;
 
     return Object.entries(TOWER_TYPES)
       .filter(([towerKey, tower]) => {
@@ -579,14 +577,10 @@ export default function GamePanelContent({
     const seconds = autoStartCountdown % 60;
     return `${minutes}:${String(seconds).padStart(2, '0')}`;
   }, [autoStartCountdown]);
-  const showMobileJackInAction =
-    isMobileCanvasMode && showJackInButton && !hardcoreMode && !isGameOver && !isVictory;
   const showMobileStartWaveAction =
     isMobileCanvasMode && showStartWaveButton && !autoStartWaves && !isGameOver && !isVictory;
   const showMobileVerificationControls =
     isMobileCanvasMode && shouldShowVerificationControls && !isGameOver && !isVictory;
-  const jackInLockedByOnboarding =
-    Boolean(activeOnboardingStepId) && activeOnboardingStepId !== 'jack-in';
 
   const mobileTerminalFeedLines = useMemo(() => {
     const toLineText = (entry) => {
@@ -620,7 +614,6 @@ export default function GamePanelContent({
     showMobileSelectorToggle ||
     Boolean(slotSwitcherControl) ||
     Boolean(slotChrome) ||
-    showMobileJackInAction ||
     showMobileStartWaveAction ||
     showMobileVerificationControls ||
     showMobileTerminalFeed;
@@ -652,8 +645,7 @@ export default function GamePanelContent({
     ? showMobileContinuePrompt
       ? 36
       : 12
-    : showJackInButton ||
-        showStartWaveButton ||
+    : showStartWaveButton ||
         (gameState.status === 'ready' && !initialCodeGenerated && !isGameOver && !isVictory)
       ? 96
       : 20;
@@ -1018,20 +1010,6 @@ export default function GamePanelContent({
               LENGTHEN ({lengthenCost})
             </Button>
           </>
-        )}
-        {showMobileJackInAction && (
-          <Button
-            size="xs"
-            colorScheme={isRetroDesktopTheme ? undefined : 'green'}
-            variant={isRetroDesktopTheme ? 'unstyled' : 'solid'}
-            onClick={onJackIn}
-            isDisabled={jackInLockedByOnboarding}
-            fontFamily={hudFontFamily}
-            data-tutorial="jack-in-button"
-            sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
-          >
-            JACK IN
-          </Button>
         )}
         {showMobileStartWaveAction && (
           <Button
@@ -1548,35 +1526,6 @@ export default function GamePanelContent({
                 {renderHudControlsContent()}
               </Box>
             )}
-
-            {/* Jack In Button - shown only in prehack state */}
-            {showJackInButton &&
-              !hardcoreMode &&
-              !isGameOver &&
-              !isVictory &&
-              !isMobileCanvasMode && (
-                <Box
-                  position="absolute"
-                  bottom={isMobileCanvasMode ? '10px' : '20px'}
-                  left={isMobileCanvasMode ? 'auto' : '50%'}
-                  right={isMobileCanvasMode ? '12px' : 'auto'}
-                  transform={isMobileCanvasMode ? 'none' : 'translateX(-50%)'}
-                >
-                  <Button
-                    colorScheme={isRetroDesktopTheme ? undefined : 'green'}
-                    size={isMobileCanvasMode ? 'md' : 'lg'}
-                    onClick={onJackIn}
-                    isDisabled={jackInLockedByOnboarding}
-                    boxShadow={isRetroDesktopTheme ? undefined : '0 0 20px rgba(0, 255, 136, 0.5)'}
-                    fontFamily={hudFontFamily}
-                    data-tutorial="jack-in-button"
-                    variant={isRetroDesktopTheme ? 'unstyled' : 'solid'}
-                    sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
-                  >
-                    JACK IN
-                  </Button>
-                </Box>
-              )}
 
             {/* Start Wave Button - shown after towers placed or between waves */}
             {showStartWaveButton &&

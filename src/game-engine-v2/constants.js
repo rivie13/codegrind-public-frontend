@@ -387,8 +387,7 @@ export const DEPLOYABLE_TYPES = {
 // ============================================================================
 
 export const GAME_STATUS = {
-  PREHACK: 'prehack', // Initial state, waiting to start
-  READY: 'ready', // Ready to start a wave (Function + Object placed)
+  READY: 'ready', // Initial state — ready to start a wave
   PLAYING: 'playing', // Wave in progress (matches V1)
   WAVE_COMPLETE: 'wave-complete', // Wave finished
   LEVEL_COMPLETE: 'level-complete', // All waves finished - victory!
