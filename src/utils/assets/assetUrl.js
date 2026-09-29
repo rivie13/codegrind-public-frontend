@@ -45,6 +45,9 @@ const getAssetUrl = (path) => {
   }
 
   if (normalizedPath.startsWith('/audio/')) {
+    if (!VITE_ENV.PROD && DEV_SOUND_BASE_PATH) {
+      return `${DEV_SOUND_BASE_PATH}${normalizedPath.replace('/audio', '')}`;
+    }
     if (SOUND_BASE_URL) {
       let resolved = `${SOUND_BASE_URL}${normalizedPath.replace('/audio', '/sound')}`;
       if (resolved.includes('cloudinary.com') && !/\/v\d+/.test(resolved)) {
@@ -62,20 +65,12 @@ const getAssetUrl = (path) => {
       }
       return `${ASSET_BASE_URL}${normalizedPath.replace('/audio', '/sound')}`;
     }
-    if (!VITE_ENV.PROD && DEV_SOUND_BASE_PATH) {
-      return `${DEV_SOUND_BASE_PATH}${normalizedPath.replace('/audio', '')}`;
-    }
   }
 
   if (!ASSET_BASE_URL && !VITE_ENV.PROD && normalizedPath.startsWith('/images/')) {
     return `${DEV_IMAGE_BASE_PATH}${normalizedPath.replace('/images', '')}`;
   }
-  if (
-    !ASSET_BASE_URL &&
-    !VITE_ENV.PROD &&
-    DEV_TILED_BASE_PATH &&
-    isCityTiledAliasPath(normalizedPath)
-  ) {
+  if (!VITE_ENV.PROD && DEV_TILED_BASE_PATH && isCityTiledAliasPath(normalizedPath)) {
     return `${DEV_TILED_BASE_PATH}${stripAliasPrefix(normalizedPath, CITY_TILED_ALIAS_PREFIX)}`;
   }
   if (!ASSET_BASE_URL) {
