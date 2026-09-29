@@ -2,8 +2,9 @@ import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
 
-const INPUT_FILE = 'C:/Users/rivie/CursorProjects/CodeGrind_Assets/Art_Assets/tiled/backgrounds_loadingScreens/Dusk_City_Background_UNCROPPED.png';
-const OUTPUT_DIR = 'C:/Users/rivie/CursorProjects/CodeGrind_Assets/Art_Assets/tiled/backgrounds_loadingScreens/baked_backdrop';
+const TILED_PROJECT_ROOT = process.env.TILED_PROJECT_DIR || process.env.CODEGRIND_TILED_PROJECT_DIR || 'D:/CodeGrind_Assets/Art_Assets/tiled';
+const INPUT_FILE = path.join(TILED_PROJECT_ROOT, 'backgrounds_loadingScreens/Dusk_City_Background_UNCROPPED.png');
+const OUTPUT_DIR = path.join(TILED_PROJECT_ROOT, 'backgrounds_loadingScreens/baked_backdrop');
 
 async function bake() {
   console.log('⚡ Starting backdrop slicing/baking...');
