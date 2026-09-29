@@ -9,27 +9,33 @@ const EXTERNAL_TILED_ASSET_ROUTE_PREFIX = '/__external_tiled__';
 const EXTERNAL_SOUND_ASSET_ROUTE_PREFIX = '/__external_sound__';
 
 const resolveExternalTiledProjectDirs = () => {
+  const explicitRoot = process.env.TILED_PROJECT_DIR || process.env.CODEGRIND_TILED_PROJECT_DIR;
   const candidates = [
+    explicitRoot,
+    'D:/CodeGrind_Assets/Art_Assets/tiled',
     'C:/Users/rivie/CursorProjects/CodeGrind_Assets/Art_Assets/tiled',
     'D:/CodeGrind_Media/Art_Asset_Packs',
     'D:/CodeGrind_Media/Art_Collectibles',
     'D:/CodeGrind_Media',
     path.resolve(process.cwd(), '../CodeGrind_Assets/Art_Assets/tiled'),
     path.resolve(process.cwd(), '../../CodeGrind_Assets/Art_Assets/tiled'),
-  ];
+  ].filter(Boolean);
 
   return candidates.filter((candidate) => fs.existsSync(candidate));
 };
 
 const resolveExternalSoundProjectDirs = () => {
+  const explicitRoot = process.env.SOUND_PROJECT_DIR || process.env.CODEGRIND_SOUND_PROJECT_DIR;
   const candidates = [
+    explicitRoot,
+    'D:/CodeGrind_Assets/Sound_Assets',
     'C:/Users/rivie/CursorProjects/CodeGrind_Assets/Sound_Assets',
     'D:/CodeGrind_Media/Sound_Asset_Packs',
     'D:/CodeGrind_Media/soundeffects',
     'D:/CodeGrind_Media',
     path.resolve(process.cwd(), '../CodeGrind_Assets/Sound_Assets'),
     path.resolve(process.cwd(), '../../CodeGrind_Assets/Sound_Assets'),
-  ];
+  ].filter(Boolean);
 
   return candidates.filter((candidate) => fs.existsSync(candidate));
 };

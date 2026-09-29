@@ -25,6 +25,7 @@ function resolveTiledProjectRoot() {
   const explicitRoot = process.env.TILED_PROJECT_DIR || process.env.CODEGRIND_TILED_PROJECT_DIR;
   const candidates = [
     explicitRoot,
+    'D:/CodeGrind_Assets/Art_Assets/tiled',
     path.resolve(process.cwd(), '../../CodeGrind_Assets/Art_Assets/tiled'),
     path.resolve(process.cwd(), '../CodeGrind_Assets/Art_Assets/tiled'),
     path.resolve(MODULE_DIR, '../../../../../CodeGrind_Assets/Art_Assets/tiled'),
