@@ -795,6 +795,27 @@ export default function useTowerDefenseV2Engine({
     return true;
   }, []);
 
+  /**
+   * Programmatically place a tower at a grid position (simple-demo pre-place).
+   * Uses the same engine validation as UI placement and fires onTowerPlaced
+   * so codegen/flags stay in sync. Returns true on success.
+   */
+  const placeTowerAt = useCallback((towerType, position, placementSource = 'simple-demo') => {
+    if (!engineRef.current || !towerType || !position) return false;
+    const result = engineRef.current.placeTower(towerType, {
+      row: position.row,
+      col: position.col,
+    });
+    if (result) {
+      onTowerPlacedRef.current?.({
+        towerType,
+        position: { row: position.row, col: position.col },
+        placementSource,
+      });
+    }
+    return Boolean(result);
+  }, []);
+
   return {
     canvasRefCallback,
     gameState,
@@ -829,5 +850,6 @@ export default function useTowerDefenseV2Engine({
     notifySolutionSuccess,
     canSpendBits,
     spendBits,
+    placeTowerAt,
   };
 }

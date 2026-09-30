@@ -22,7 +22,9 @@ export default function useTowerDefenseV2PageState({
   onEmbeddedVictory = null,
   onEmbeddedLearningXp = null,
   demoLaunchStartTime = null,
+  liteFirstActivity = false,
 }) {
+  const isSimpleDemo = Boolean(liteFirstActivity);
   const { panelLayoutProps, ...state } = useTowerDefenseV2GameState({
     isDemo,
     demoTitleSlug,
@@ -36,6 +38,7 @@ export default function useTowerDefenseV2PageState({
     onEmbeddedVictory,
     onEmbeddedLearningXp,
     demoLaunchStartTime,
+    isSimpleDemo,
   });
 
   const layout = useTowerDefenseV2PanelLayout({
@@ -47,6 +50,7 @@ export default function useTowerDefenseV2PageState({
 
   return {
     ...state,
+    isSimpleDemo,
     layout,
   };
 }

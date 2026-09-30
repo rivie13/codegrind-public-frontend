@@ -32,6 +32,7 @@ export default function useTowerDefenseV2EngineState({
   initialLives,
   isDemo,
   isHomepageDemo,
+  isSimpleDemo = false,
   normalizeTerminalOutput,
   onEmbeddedVictory,
   setGameStats,
@@ -134,6 +135,7 @@ export default function useTowerDefenseV2EngineState({
     coreTowerRequirements,
     waveRef,
     isHomepageDemo,
+    isSimpleDemo,
   });
 
   const engineState = useTowerDefenseV2Engine({

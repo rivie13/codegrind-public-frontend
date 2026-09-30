@@ -341,6 +341,9 @@ export default function TowerDefenseV2Test({
     handleContinueLearning,
     handleReturnToMap,
     problemError,
+    simpleDemoEditorShownAt = null,
+    simpleDemoSubmitReady = false,
+    simpleDemoCodeLingerDone = false,
   } = useTowerDefenseV2PageState({
     isDemo: effectiveIsDemo,
     demoTitleSlug,
@@ -356,6 +359,7 @@ export default function TowerDefenseV2Test({
     onEmbeddedVictory,
     onEmbeddedLearningXp,
     demoLaunchStartTime,
+    liteFirstActivity,
   });
 
   const toast = useToast();
@@ -373,6 +377,10 @@ export default function TowerDefenseV2Test({
         gameState,
         codeSubmitted: Boolean(codeSubmitted),
         verifyAttemptInProgress: Boolean(verifyAttemptInProgress),
+        rightPanel,
+        editorShownAt: simpleDemoEditorShownAt,
+        submitReady: simpleDemoSubmitReady,
+        codeLingerDone: simpleDemoCodeLingerDone,
       },
       version: liteScript.version,
       onComplete: () => setLearningPathOnboardingActive(false),

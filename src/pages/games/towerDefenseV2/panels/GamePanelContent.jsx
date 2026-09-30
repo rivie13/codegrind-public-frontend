@@ -132,6 +132,7 @@ export default function GamePanelContent({
   terminalOutput = '',
   isDemo: _isDemo = false,
   isHomepageDemo = false,
+  isSimpleDemo = false,
   shellTheme = 'default',
   slotSwitcherControl = null,
   slotChrome = null,
@@ -625,6 +626,7 @@ export default function GamePanelContent({
   const showRotateLandscapeGuard =
     requireLandscapeOnMobile && !isLandscapeViewport && !isMobileChatFocus;
   const showMobileContinuePrompt =
+    !isSimpleDemo &&
     isMobileCanvasMode &&
     gameState.status === 'ready' &&
     !initialCodeGenerated &&
@@ -646,7 +648,11 @@ export default function GamePanelContent({
       ? 36
       : 12
     : showStartWaveButton ||
-        (gameState.status === 'ready' && !initialCodeGenerated && !isGameOver && !isVictory)
+        (!isSimpleDemo &&
+          gameState.status === 'ready' &&
+          !initialCodeGenerated &&
+          !isGameOver &&
+          !isVictory)
       ? 96
       : 20;
   const availableCanvasWidth = Math.max(
@@ -1240,7 +1246,7 @@ export default function GamePanelContent({
         />
       ) : null}
 
-      {!towerSelectorEnabled && !deployableMenuEnabled && (
+      {!towerSelectorEnabled && !deployableMenuEnabled && !isSimpleDemo && (
         <Box px={4} py={6} textAlign="center">
           <Text
             color={isRetroDesktopTheme ? '#1f2430' : 'gray.400'}

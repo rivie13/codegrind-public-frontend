@@ -256,6 +256,43 @@ describe('SlottableLayout retro desktop theme', () => {
     });
   });
 
+  it('keeps the bottom taskbar slots locked during lite-start-wave and lite-submit steps', () => {
+    const { container } = render(
+      <ChakraProvider>
+        <SlottableLayout
+          shellTheme="retro-desktop"
+          leftPanel="game"
+          rightPanel="problem"
+          gameContent={<div>Game content</div>}
+          editorContent={<div>Editor content</div>}
+          chatContent={<div>Chat content</div>}
+          problemContent={<div>Problem content</div>}
+        />
+      </ChakraProvider>
+    );
+
+    for (const stepId of ['lite-start-wave', 'lite-code', 'lite-submit']) {
+      act(() => {
+        window.dispatchEvent(
+          new CustomEvent(TD_ONBOARDING_STEP_CHANGE_EVENT, {
+            detail: {
+              step: {
+                id: stepId,
+              },
+            },
+          })
+        );
+      });
+
+      const taskbar = container.querySelector('[data-tutorial="slot-switch-taskbar"]');
+      expect(taskbar).toHaveStyle({
+        filter: 'blur(3px)',
+        pointerEvents: 'none',
+        opacity: '0.65',
+      });
+    }
+  });
+
   it('uses a single-slot bottom taskbar on handheld retro layouts', () => {
     setResponsiveProfile({
       isHandheldSinglePanelLayout: true,

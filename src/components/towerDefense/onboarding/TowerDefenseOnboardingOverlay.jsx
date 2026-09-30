@@ -504,7 +504,8 @@ function TypedText({
 
     let index = 0;
     const timer = window.setInterval(() => {
-      index += 1;
+      // Snappy tutorial pacing: reveal a few chars per tick.
+      index += 3;
       setVisibleText(nextText.slice(0, index));
       if (index >= nextText.length) {
         window.clearInterval(timer);
