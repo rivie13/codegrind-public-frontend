@@ -331,15 +331,29 @@ describe('renderer behavior', () => {
     const renderer = createRenderer();
     const retroCosmetics = getEmbeddedShellCosmetics('retro-desktop');
     const towerSprite = retroCosmetics.towerPack.towerSprites.FOR_LOOP;
-    const enemySprite = retroCosmetics.enemyPack.enemySprites.basic;
     const projectileSprite = retroCosmetics.towerPack.projectileSprites.FOR_LOOP;
     const preloadedImage = { complete: true, naturalWidth: 16, naturalHeight: 16 };
+    const enemySheetImage = { complete: true, naturalWidth: 304, naturalHeight: 176 };
+
+    // Enemies now render from the dyed /assets/Enemies.png spritesheet,
+    // not from enemyPack sprites. Mock the 16x16 dye scratchpad.
+    const dyeCtx = {
+      clearRect: vi.fn(),
+      drawImage: vi.fn(),
+      getImageData: vi.fn(() => ({ data: new Uint8ClampedArray(16 * 16 * 4).fill(255) })),
+      putImageData: vi.fn(),
+    };
+    const dyeCanvasEl = { width: 16, height: 16, getContext: vi.fn(() => dyeCtx) };
+    const createElementSpy = vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+      if (String(tag).toLowerCase() === 'canvas') return dyeCanvasEl;
+      return document.createElement(tag);
+    });
 
     renderer.settings.towerPack = retroCosmetics.towerPack;
     renderer.settings.enemyPack = retroCosmetics.enemyPack;
     renderer.spriteImageCache = new Map([
       [towerSprite, { image: preloadedImage, status: 'loaded' }],
-      [enemySprite, { image: preloadedImage, status: 'loaded' }],
+      ['/assets/Enemies.png', { image: enemySheetImage, status: 'loaded' }],
       [projectileSprite, { image: preloadedImage, status: 'loaded' }],
     ]);
     renderer.ctx.drawImage.mockClear();
@@ -364,6 +378,8 @@ describe('renderer behavior', () => {
       maxHealth: 100,
       size: 18,
       color: '#ff0000',
+      headingAngle: 0,
+      spawnTime: Date.now(),
     });
 
     drawProjectile(renderer, {
@@ -379,6 +395,7 @@ describe('renderer behavior', () => {
     });
 
     expect(renderer.ctx.drawImage).toHaveBeenCalledTimes(3);
+    createElementSpy.mockRestore();
   });
 
   it('simplifies retro projectile chrome earlier once projectile count rises', () => {

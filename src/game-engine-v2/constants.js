@@ -167,6 +167,20 @@ const ENEMY_SHAPES = {
   PATH_SHAPER: 'square',
 };
 
+// Map enemy types to their 16x16 block position in Enemies.png spritesheet
+// Each block is 64x80 containing a 4x5 grid of 16x16 sub-frames
+// (walk cols x direction rows: down=1, right=2, up=3, left=4)
+export const ENEMY_SPRITE_MAP = {
+  BASIC: { col: 0, row: 0 }, // beetle/bug
+  PATH_SHAPER: { col: 1, row: 0 }, // skeleton trooper
+  HIJACKER: { col: 2, row: 0 }, // wraith/ghost
+  COMPLEX: { col: 3, row: 0 }, // frog demon
+  TIME_LIMIT: { col: 0, row: 1 }, // tiny slime
+  BUFFER: { col: 1, row: 1 }, // big slime
+  EDGE: { col: 2, row: 1 }, // antenna-bot
+  SPACE_COMPLEX: { col: 3, row: 1 }, // mainframe box
+};
+
 // Merge V1 enemy types with V2 shape extensions
 export const ENEMY_TYPES = Object.fromEntries(
   Object.entries(V1_ENEMY_TYPES).map(([key, value]) => [
