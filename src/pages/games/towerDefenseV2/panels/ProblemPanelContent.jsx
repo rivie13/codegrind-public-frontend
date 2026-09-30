@@ -17,6 +17,7 @@ export default function ProblemPanelContent({
   totalWaves,
   isMissionComplete,
   isHomepageDemo,
+  isSimpleDemo = false,
   autoSwitchRemaining,
   autoSwitchActive,
   showIntroNote,
@@ -243,11 +244,11 @@ export default function ProblemPanelContent({
           }
         >
           <Text color={isRetroDesktopTheme ? '#404957' : 'green.100'} fontSize="xs">
-            Then switch to the Editor slot to solve the problem after unlocking. Use tower defense
-            and code to defend against waves of enemies. You can generate code snippets by deploying
-            towers, or you can write your own code from scratch to generate towers.
+            {isSimpleDemo
+              ? 'Read the mission brief, then press START WAVE on the Game panel. Your tower is deployed and your solution is written — watch it defend, then press Verify Solution.'
+              : 'Then switch to the Editor slot to solve the problem after unlocking. Use tower defense and code to defend against waves of enemies. You can generate code snippets by deploying towers, or you can write your own code from scratch to generate towers.'}
           </Text>
-          {autoSwitchLabel && (
+          {autoSwitchLabel && !isSimpleDemo && (
             <Text color={isRetroDesktopTheme ? '#000082' : 'cyan.200'} fontSize="xs" mt={2}>
               Auto-switching to the Editor in {autoSwitchLabel}.
             </Text>

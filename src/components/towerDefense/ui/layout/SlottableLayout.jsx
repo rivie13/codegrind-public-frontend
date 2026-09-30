@@ -533,6 +533,18 @@ function SlottableLayout({
     return window.__tdInlineOnboardingStepDetail?.step || null;
   });
   const isBriefStep = activeOnboardingStep?.id === 'mission-objective';
+  // Homepage lite tutorial (brief → start-wave → code → submit): keep the
+  // bottom slot switchers locked for the whole flow so the fixed Game/Problem
+  // layout can't be rearranged mid-tutorial. These step ids only exist in
+  // the lite script, so other flows are unaffected.
+  const isLiteTutorialStep = Boolean(
+    activeOnboardingStep?.id &&
+    (isBriefStep ||
+      activeOnboardingStep.id === 'lite-start-wave' ||
+      activeOnboardingStep.id === 'lite-code' ||
+      activeOnboardingStep.id === 'lite-submit')
+  );
+  const isSlotSwitcherLocked = isLiteTutorialStep;
   const isResizingRef = useRef(false);
   const mobilePreviousNonChatPanelRef = useRef(defaultLeftPanel ?? defaultRightPanel ?? null);
   const chatFocusShellVisibilityRef = useRef(null);
@@ -1211,11 +1223,11 @@ function SlottableLayout({
         label={label}
         activePanel={activePanel}
         onClick={onClick}
-        isLocked={isLocked || isBriefStep}
-        isBriefStep={isBriefStep}
+        isLocked={isLocked || isSlotSwitcherLocked}
+        isBriefStep={isSlotSwitcherLocked}
         lockReason={
-          isBriefStep
-            ? 'This slot is locked during onboarding brief reading.'
+          isSlotSwitcherLocked
+            ? 'This slot is locked during the tutorial.'
             : 'Active combat is running in this slot. Wait for the wave to end before reassigning it.'
         }
       />
@@ -1250,10 +1262,10 @@ function SlottableLayout({
             }
           : undefined
       }
-      filter={isBriefStep ? 'blur(3px)' : undefined}
-      pointerEvents={isBriefStep ? 'none' : undefined}
-      opacity={isBriefStep ? 0.65 : undefined}
-      userSelect={isBriefStep ? 'none' : undefined}
+      filter={isSlotSwitcherLocked ? 'blur(3px)' : undefined}
+      pointerEvents={isSlotSwitcherLocked ? 'none' : undefined}
+      opacity={isSlotSwitcherLocked ? 0.65 : undefined}
+      userSelect={isSlotSwitcherLocked ? 'none' : undefined}
       transition="filter 0.3s ease, opacity 0.3s ease"
     >
       {availablePanels.map((panelType) => {
@@ -1478,10 +1490,10 @@ function SlottableLayout({
       wrap={{ base: 'wrap', md: 'nowrap' }}
       overflowX={{ base: 'visible', md: 'auto' }}
       flex="0 0 auto"
-      filter={isBriefStep ? 'blur(3px)' : undefined}
-      pointerEvents={isBriefStep ? 'none' : undefined}
-      opacity={isBriefStep ? 0.65 : undefined}
-      userSelect={isBriefStep ? 'none' : undefined}
+      filter={isSlotSwitcherLocked ? 'blur(3px)' : undefined}
+      pointerEvents={isSlotSwitcherLocked ? 'none' : undefined}
+      opacity={isSlotSwitcherLocked ? 0.65 : undefined}
+      userSelect={isSlotSwitcherLocked ? 'none' : undefined}
       transition="filter 0.3s ease, opacity 0.3s ease"
     >
       <Box
@@ -1577,10 +1589,10 @@ function SlottableLayout({
       align="stretch"
       gap={2.5}
       flex="0 0 auto"
-      filter={isBriefStep ? 'blur(3px)' : undefined}
-      pointerEvents={isBriefStep ? 'none' : undefined}
-      opacity={isBriefStep ? 0.65 : undefined}
-      userSelect={isBriefStep ? 'none' : undefined}
+      filter={isSlotSwitcherLocked ? 'blur(3px)' : undefined}
+      pointerEvents={isSlotSwitcherLocked ? 'none' : undefined}
+      opacity={isSlotSwitcherLocked ? 0.65 : undefined}
+      userSelect={isSlotSwitcherLocked ? 'none' : undefined}
       transition="filter 0.3s ease, opacity 0.3s ease"
     >
       <Box

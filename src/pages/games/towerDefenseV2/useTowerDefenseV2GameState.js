@@ -99,6 +99,7 @@ export default function useTowerDefenseV2GameState({
   onEmbeddedVictory = null,
   onEmbeddedLearningXp = null,
   demoLaunchStartTime = null,
+  isSimpleDemo = false,
 }) {
   const toast = useToast();
   const location = useLocation();
@@ -378,6 +379,13 @@ export default function useTowerDefenseV2GameState({
     preservePanelsOnSlugChange: isMultiProblemTower,
   });
 
+  // Simple demo: no auto-switch countdown — the player reads the brief,
+  // then presses START WAVE and SUBMIT themselves.
+  useEffect(() => {
+    if (!isSimpleDemo) return;
+    cancelProblemAutoSwitch();
+  }, [isSimpleDemo, cancelProblemAutoSwitch]);
+
   const { autoStartWaveSeconds, difficultyBaseStats, difficultyConfig, problemDifficulty } =
     useTowerDefenseV2DifficultyState({ problem });
 
@@ -634,6 +642,7 @@ export default function useTowerDefenseV2GameState({
     canSpendBits,
     spendBits,
     resolveHasTowerType,
+    placeTowerAt,
   } = useTowerDefenseV2EngineState({
     pathNodes,
     gridCols,
@@ -656,6 +665,7 @@ export default function useTowerDefenseV2GameState({
     initialLives,
     isDemo,
     isHomepageDemo,
+    isSimpleDemo,
     normalizeTerminalOutput,
     onEmbeddedVictory,
     setGameStats,
@@ -858,6 +868,7 @@ export default function useTowerDefenseV2GameState({
     coreTowerRequirements,
     sharedUnlockActive,
     totalWavesByDifficulty,
+    isSimpleDemo,
   });
 
   const { canEditGameSettings } = useTowerDefenseV2SettingsEffects({
@@ -1047,6 +1058,9 @@ export default function useTowerDefenseV2GameState({
   }, []);
 
   useEffect(() => {
+    // Simple demo pre-places the tower and pre-writes code directly —
+    // never wait on the legacy laser-hit animation.
+    if (isSimpleDemo) return;
     if (typeof window === 'undefined') return;
 
     const handleLaserHit = () => {
@@ -1097,7 +1111,142 @@ export default function useTowerDefenseV2GameState({
     return () => {
       window.removeEventListener('td-laser-hit', handleLaserHit);
     };
-  }, [language, problem, setCode, setInitialCodeGenerated, addTerminalMessage]);
+  }, [isSimpleDemo, language, problem, setCode, setInitialCodeGenerated, addTerminalMessage]);
+
+  // Simple demo (two-button first activity): keep two Function towers
+  // pre-placed mid-map next to the grid path and the solved starter code
+  // pre-written so the player only presses START WAVE then SUBMIT. Guards use
+  // live state (not a one-shot ref) so the effect retries once the engine is
+  // ready and re-runs after Reset. Legacy laser flow not involved.
+  const SIMPLE_DEMO_TOWER_COUNT = 2;
+  useEffect(() => {
+    if (!isSimpleDemo) return;
+    if (!problem) return;
+    if (!Array.isArray(pathNodes) || pathNodes.length === 0) return;
+
+    const towers = Array.isArray(gameState.towers) ? gameState.towers : [];
+    if (towers.length < SIMPLE_DEMO_TOWER_COUNT) {
+      const candidates = [];
+      const offsets = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+        [1, 1],
+        [1, -1],
+        [-1, 1],
+        [-1, -1],
+        [2, 0],
+        [-2, 0],
+        [0, 2],
+        [0, -2],
+      ];
+      // Middle-out: order waypoints by distance to the middle of the path so
+      // towers land mid-map instead of piling up near START.
+      const mid = Math.floor(pathNodes.length / 2);
+      const orderedNodes = pathNodes
+        .map((node, index) => ({ node, index }))
+        .sort((a, b) => Math.abs(a.index - mid) - Math.abs(b.index - mid));
+      for (const { node } of orderedNodes) {
+        // Path nodes are [row, col] arrays (see useTowerDefenseV2MapState).
+        const baseRow = Array.isArray(node) ? node[0] : (node?.row ?? node?.y);
+        const baseCol = Array.isArray(node) ? node[1] : (node?.col ?? node?.x);
+        if (!Number.isFinite(baseRow) || !Number.isFinite(baseCol)) continue;
+        for (const [dr, dc] of offsets) {
+          candidates.push({ row: baseRow + dr, col: baseCol + dc });
+        }
+      }
+      const configured = learningTowerConfig?.prePlacedTowers;
+      if (Array.isArray(configured)) {
+        for (const spot of configured) {
+          if (Number.isFinite(spot?.row) && Number.isFinite(spot?.col)) {
+            candidates.push({ row: spot.row, col: spot.col });
+          }
+        }
+      }
+
+      let placed = towers.length;
+      for (const position of candidates) {
+        if (placed >= SIMPLE_DEMO_TOWER_COUNT) break;
+        try {
+          if (placeTowerAt?.('Function', position, 'simple-demo')) placed += 1;
+        } catch {
+          // Try the next candidate cell on the next run.
+        }
+      }
+    }
+
+    setFunctionTowerPlaced(true);
+    setObjectTowerPlaced(true);
+    if (!initialCodeGenerated) {
+      // Prime snippet tracking, then overwrite with the solved demo code.
+      generateInitialCodeSnippet({ force: true });
+      const snippet = getCodeSnippetForLanguage(language, problem) || '';
+      const solved = snippet.replace(/^\s*pass\s*$/m, '    print("hello codegrind")');
+      setCode(solved || snippet);
+    }
+  }, [
+    isSimpleDemo,
+    problem,
+    pathNodes,
+    gameState.towers,
+    initialCodeGenerated,
+    placeTowerAt,
+    generateInitialCodeSnippet,
+    getCodeSnippetForLanguage,
+    language,
+    setCode,
+    setFunctionTowerPlaced,
+    setObjectTowerPlaced,
+    learningTowerConfig,
+  ]);
+
+  // Simple demo: after a wave completes, hold beats before advancing the
+  // tutorial — SUBMIT after ~2s, and the WRITE CODE callout lingers ~8s so
+  // it can actually be read instead of vanishing the instant the wave ends.
+  const [simpleDemoSubmitReady, setSimpleDemoSubmitReady] = useState(false);
+  const [simpleDemoCodeLingerDone, setSimpleDemoCodeLingerDone] = useState(false);
+  useEffect(() => {
+    if (!isSimpleDemo) return undefined;
+    if (gameState.status !== 'wave-complete') {
+      setSimpleDemoSubmitReady((prev) => (prev === false ? prev : false));
+      setSimpleDemoCodeLingerDone((prev) => (prev === false ? prev : false));
+      return undefined;
+    }
+    const submitTimerId = window.setTimeout(() => {
+      setSimpleDemoSubmitReady(true);
+    }, 2000);
+    const lingerTimerId = window.setTimeout(() => {
+      setSimpleDemoCodeLingerDone(true);
+    }, 8000);
+    return () => {
+      window.clearTimeout(submitTimerId);
+      window.clearTimeout(lingerTimerId);
+    };
+  }, [isSimpleDemo, gameState.status]);
+  // Simple demo: once wave 1 starts, let the game play for a beat so the
+  // player watches the towers defend, then show the Editor (solved code) on
+  // the right for the WRITE CODE callout. Taskbar stays locked; this is a
+  // programmatic switch, not user rearrangement.
+  const [simpleDemoEditorShownAt, setSimpleDemoEditorShownAt] = useState(null);
+  useEffect(() => {
+    if (!isSimpleDemo) return undefined;
+    if (gameState.status !== 'playing' || (gameState.wave || 1) !== 1) {
+      // Wave over or reset: drop the timestamp so a replay re-arms the wait.
+      setSimpleDemoEditorShownAt((prev) => (prev === null ? prev : null));
+      return undefined;
+    }
+    if (rightPanel === PANEL_TYPES.EDITOR) {
+      // Already looking at code (e.g. replay): start the wait from now.
+      setSimpleDemoEditorShownAt((prev) => (prev === null ? Date.now() : prev));
+      return undefined;
+    }
+    const timerId = window.setTimeout(() => {
+      setRightPanel(PANEL_TYPES.EDITOR);
+      setSimpleDemoEditorShownAt(Date.now());
+    }, 2500);
+    return () => window.clearTimeout(timerId);
+  }, [isSimpleDemo, gameState.status, gameState.wave, rightPanel, setRightPanel]);
 
   const { handleTerminalCommandTracked, handleCodeLineCommitted, clearSuggestionQueueForTower } =
     useTowerDefenseV2TerminalHandlers({
@@ -1265,6 +1414,7 @@ export default function useTowerDefenseV2GameState({
     lockedLearningLanguage,
     isDemo,
     isHomepageDemo,
+    isSimpleDemo,
     handleTerminalCommandTracked,
     problem,
     problemDescription,
@@ -1333,5 +1483,9 @@ export default function useTowerDefenseV2GameState({
     learningNextNode,
     handleContinueLearning,
     handleReturnToMap,
+    isSimpleDemo,
+    simpleDemoEditorShownAt,
+    simpleDemoSubmitReady,
+    simpleDemoCodeLingerDone,
   };
 }

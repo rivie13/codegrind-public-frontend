@@ -145,13 +145,17 @@ const Home = () => {
     isDemoBootComplete;
   const showOverlayHero =
     !isRetroDesktopTakeover && (revealPhase === 'prelaunch' || revealPhase === 'launching');
-  const isFunnelTakeover = funnelStarted && Boolean(qualifier.activeQuestion || qualifier.pendingReassurance);
+  const isFunnelTakeover =
+    funnelStarted && Boolean(qualifier.activeQuestion || qualifier.pendingReassurance);
   const showBelowFold =
     !isFunnelTakeover &&
     !isRetroDesktopTakeover &&
     (revealPhase === 'prelaunch' || (revealPhase === 'settled' && isDemoBootComplete));
   const demoSectionRef = useRef(null);
   const demoLaunchStartTimeRef = useRef(null);
+  // Set when the lite-activity victory starts its delayed funnel advance so
+  // the post-victory home reset below never tears the demo down mid-advance.
+  const demoVictoryAdvanceRef = useRef(false);
   const mountTimeRef = useRef(Date.now());
   const typingAudioRef = useRef(null);
   const allowEmbeddedHandheldPageScroll = isMobileDevice && isRetroDesktopTakeover;
@@ -403,15 +407,31 @@ const Home = () => {
       } catch {
         // ignore SFX failure
       }
-      // Wave 0+Wave1 are one activity — advance funnel after this single victory, not between waves
-      setLiteActivityIndex((v) => v + 1);
-      qualifier.markActivityComplete();
+      // Let the victory moment land before the funnel moves on: a short beat
+      // so the player registers the win. Wave 0+Wave1 are one activity —
+      // advance funnel after this single victory, not between waves.
+      // Flag the pending advance so the home reset below (which reads a
+      // stale qualifier phase from this closure) never tears the demo
+      // back to its beginning mid-transition.
+      if (funnelStarted) {
+        demoVictoryAdvanceRef.current = true;
+      }
+      window.setTimeout(() => {
+        setLiteActivityIndex((v) => v + 1);
+        qualifier.markActivityComplete();
+      }, 2500);
 
       // Deferred gate: character/path choice remains gated (owner will place later) — keep returning to home after activities for now
       // Cut-scene stays present but not invoked for this lite path
       setTimeout(() => {
-        // If funnel still has between questions (time/obstacle), keep demo visible and let funnel overlay drive next reassurance
-        if (qualifier.phase === 'between' || qualifier.pendingReassurance) {
+        // Victory advance pending (or funnel already between questions):
+        // keep the demo visible and let the funnel drive the next step.
+        // No reset — resetting here flashes the demo beginning.
+        if (
+          demoVictoryAdvanceRef.current ||
+          qualifier.phase === 'between' ||
+          qualifier.pendingReassurance
+        ) {
           // stay in place, let funnel reassurance overlay handle continuation; no reset yet
           return;
         }
@@ -426,7 +446,7 @@ const Home = () => {
         }
       }, 1200);
     },
-    [funnel, guest, isAuthenticated, refreshAuth, qualifier]
+    [funnel, funnelStarted, guest, isAuthenticated, refreshAuth, qualifier]
   );
 
   const handleDemoReady = useCallback(() => {
@@ -573,34 +593,31 @@ const Home = () => {
     await handleLaunchCityTarget('/city', pendingPlayerCharacterLaunchSourceRect);
   }, [funnel, handleLaunchCityTarget, pendingPlayerCharacterLaunchSourceRect]);
 
-  const launchLiteActivity = useCallback(
-    async () => {
-      if (typeof window !== 'undefined') {
-        window.__codegrindQuickDemoActive = true;
-      }
-      try {
-        phaserInstanceManager.pauseGame();
-      } catch (err) {
-        console.warn('[Home] Failed to pause Phaser background instance:', err);
-      }
-      // Non-blocking: kick Phaser preload in background on first Begin Demo click and while funnel is active,
-      // so it never blocks qualifier interactions. The spinner overlay is NOT used here.
-      preloadPhaserBackground().catch(() => {});
-      prebootPhaserInstance().catch((err) => {
-        console.warn('[Home] Quick demo Phaser preboot error:', err);
-      });
-      setIsQuickDemo(true);
-      demoLaunchStartTimeRef.current = performance.now();
-      const timeToDemoClickMs = Date.now() - mountTimeRef.current;
-      funnel.demoLoadingStarted('quick', { timeToDemoClickMs: String(timeToDemoClickMs) });
-      beginDemoLaunch({
-        playTypingAudio: false,
-        shellTheme: demoShellTheme,
-        skipBootSequence: true,
-      });
-    },
-    [beginDemoLaunch, demoShellTheme, funnel]
-  );
+  const launchLiteActivity = useCallback(async () => {
+    if (typeof window !== 'undefined') {
+      window.__codegrindQuickDemoActive = true;
+    }
+    try {
+      phaserInstanceManager.pauseGame();
+    } catch (err) {
+      console.warn('[Home] Failed to pause Phaser background instance:', err);
+    }
+    // Non-blocking: kick Phaser preload in background on first Begin Demo click and while funnel is active,
+    // so it never blocks qualifier interactions. The spinner overlay is NOT used here.
+    preloadPhaserBackground().catch(() => {});
+    prebootPhaserInstance().catch((err) => {
+      console.warn('[Home] Quick demo Phaser preboot error:', err);
+    });
+    setIsQuickDemo(true);
+    demoLaunchStartTimeRef.current = performance.now();
+    const timeToDemoClickMs = Date.now() - mountTimeRef.current;
+    funnel.demoLoadingStarted('quick', { timeToDemoClickMs: String(timeToDemoClickMs) });
+    beginDemoLaunch({
+      playTypingAudio: false,
+      shellTheme: demoShellTheme,
+      skipBootSequence: true,
+    });
+  }, [beginDemoLaunch, demoShellTheme, funnel]);
 
   // Start Phaser preload early — on mount and on Begin Demo — so game is ready before first activity without blocking funnel
   useEffect(() => {
@@ -639,7 +656,13 @@ const Home = () => {
     if (qualifier.phase === 'first_activity') {
       launchLiteActivity();
     }
-  }, [funnelStarted, qualifier.phase, qualifier.pendingReassurance, isQuickDemo, launchLiteActivity]);
+  }, [
+    funnelStarted,
+    qualifier.phase,
+    qualifier.pendingReassurance,
+    isQuickDemo,
+    launchLiteActivity,
+  ]);
 
   const handleEmbeddedChatFocusChange = useCallback((isNonGameFocusActive) => {
     setIsHomeDemoNonGameFocusActive(Boolean(isNonGameFocusActive));
@@ -880,7 +903,7 @@ const Home = () => {
             isRetroDesktopTakeover && !allowEmbeddedHandheldPageScroll ? 'hidden' : 'visible'
           }
           bg={
-            isRetroDesktopTakeover
+            isRetroDesktopTakeover && !isFunnelTakeover
               ? '#09070d'
               : 'linear-gradient(180deg, var(--home-retro-desktop) 0%, var(--home-retro-desktop-dark) 100%)'
           }
@@ -933,232 +956,232 @@ const Home = () => {
 
           {/* Scrollable content container — hidden during funnel takeover */}
           {!isFunnelTakeover ? (
-          <Box
-            width="100%"
-            flex="1"
-            position="relative"
-            zIndex="1"
-            overflow={
-              isRetroDesktopTakeover && !allowEmbeddedHandheldPageScroll ? 'hidden' : 'visible'
-            }
-            sx={{
-              '@media (min-width: 62em)': isRetroDesktopTakeover
-                ? undefined
-                : {
-                    '&::-webkit-scrollbar': {
-                      width: '8px',
+            <Box
+              width="100%"
+              flex="1"
+              position="relative"
+              zIndex="1"
+              overflow={
+                isRetroDesktopTakeover && !allowEmbeddedHandheldPageScroll ? 'hidden' : 'visible'
+              }
+              sx={{
+                '@media (min-width: 62em)': isRetroDesktopTakeover
+                  ? undefined
+                  : {
+                      '&::-webkit-scrollbar': {
+                        width: '8px',
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        background: 'rgba(0, 0, 0, 0.1)',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        background: 'rgba(0, 255, 255, 0.3)',
+                        borderRadius: '4px',
+                      },
+                      '&::-webkit-scrollbar-thumb:hover': {
+                        background: 'rgba(0, 255, 255, 0.5)',
+                      },
                     },
-                    '&::-webkit-scrollbar-track': {
-                      background: 'rgba(0, 0, 0, 0.1)',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      background: 'rgba(0, 255, 255, 0.3)',
-                      borderRadius: '4px',
-                    },
-                    '&::-webkit-scrollbar-thumb:hover': {
-                      background: 'rgba(0, 255, 255, 0.5)',
-                    },
-                  },
-            }}
-          >
-            {showOverlayHero ? (
-              <HomeHeroSection
-                variant="overlay"
-                revealPhase={revealPhase}
-                canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
-                requiresLandscapeForDemo={requiresLandscapeForDemo}
-                hasCompletedQuickDemo={hasCompletedQuickDemo}
-                onBeginDemo={handleBeginDemo}
-                onSignIn={onAuthOpen}
-                isAuthenticated={isAuthenticated}
-                user={user}
-              />
-            ) : null}
+              }}
+            >
+              {showOverlayHero ? (
+                <HomeHeroSection
+                  variant="overlay"
+                  revealPhase={revealPhase}
+                  canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
+                  requiresLandscapeForDemo={requiresLandscapeForDemo}
+                  hasCompletedQuickDemo={hasCompletedQuickDemo}
+                  onBeginDemo={handleBeginDemo}
+                  onSignIn={onAuthOpen}
+                  isAuthenticated={isAuthenticated}
+                  user={user}
+                />
+              ) : null}
 
-            {showDemoSection &&
-              (hasHydrated ? (
-                <Box
-                  ref={demoSectionRef}
-                  position="relative"
-                  minH={
-                    isRetroDesktopTakeover && !allowEmbeddedHandheldPageScroll
-                      ? '100dvh'
-                      : undefined
-                  }
-                >
+              {showDemoSection &&
+                (hasHydrated ? (
                   <Box
-                    opacity={requiresLandscapeForDemo ? 0.35 : 1}
-                    filter={requiresLandscapeForDemo ? 'blur(2px)' : 'none'}
-                    pointerEvents={requiresLandscapeForDemo ? 'none' : 'auto'}
-                    transition="opacity 0.2s ease"
+                    ref={demoSectionRef}
+                    position="relative"
+                    minH={
+                      isRetroDesktopTakeover && !allowEmbeddedHandheldPageScroll
+                        ? '100dvh'
+                        : undefined
+                    }
                   >
-                    <Suspense fallback={null}>
-                      <HomepageTDDemo
-                        bootPrepDelayMs={demoBootPrepDelayMs}
-                        revealPhase={revealPhase}
-                        embeddedShellTheme={demoShellTheme}
-                        allowEmbeddedHandheldPageScroll={allowEmbeddedHandheldPageScroll}
-                        skipBootSequence={isQuickDemo}
-                        onReady={handleDemoReady}
-                        onVictory={handleDemoVictory}
-                        onLearningXp={handleDemoLearningXp}
-                        onBootStateChange={handleDemoBootStateChange}
-                        onEmbeddedChatFocusChange={handleEmbeddedChatFocusChange}
-                        preinitTypingAudio={typingAudioRef}
-                        demoLaunchStartTime={demoLaunchStartTimeRef.current}
-                        liteFirstActivity={funnelStarted}
-                      />
-                    </Suspense>
-                  </Box>
-
-                  {requiresLandscapeForDemo ? (
                     <Box
-                      position="absolute"
-                      inset="0"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      px={{ base: 5, md: 8 }}
-                      py={{ base: 3, md: 4 }}
-                      pointerEvents="auto"
+                      opacity={requiresLandscapeForDemo ? 0.35 : 1}
+                      filter={requiresLandscapeForDemo ? 'blur(2px)' : 'none'}
+                      pointerEvents={requiresLandscapeForDemo ? 'none' : 'auto'}
+                      transition="opacity 0.2s ease"
                     >
-                      <Box className="cg-panel-window" overflow="hidden" maxW="560px">
-                        <Box className="cg-titlebar" px={{ base: 3, md: 4 }} py={2}>
-                          <Text
-                            color="#f5f7ff"
-                            fontFamily="var(--cg-font-retro-display)"
-                            fontSize={{ base: 'xs', md: 'sm' }}
-                            fontWeight="700"
-                            letterSpacing="0.08em"
-                            textTransform="uppercase"
-                          >
-                            orientation-check.exe
-                          </Text>
-                        </Box>
-                        <Box p={{ base: 4, md: 5 }} bg="#d4d0c8">
-                          <Box
-                            bg="#efebe7"
-                            border="1px solid #7f7f7f"
-                            boxShadow="var(--cg-window-inset)"
-                            p={{ base: 4, md: 5 }}
-                          >
+                      <Suspense fallback={null}>
+                        <HomepageTDDemo
+                          bootPrepDelayMs={demoBootPrepDelayMs}
+                          revealPhase={revealPhase}
+                          embeddedShellTheme={demoShellTheme}
+                          allowEmbeddedHandheldPageScroll={allowEmbeddedHandheldPageScroll}
+                          skipBootSequence={isQuickDemo}
+                          onReady={handleDemoReady}
+                          onVictory={handleDemoVictory}
+                          onLearningXp={handleDemoLearningXp}
+                          onBootStateChange={handleDemoBootStateChange}
+                          onEmbeddedChatFocusChange={handleEmbeddedChatFocusChange}
+                          preinitTypingAudio={typingAudioRef}
+                          demoLaunchStartTime={demoLaunchStartTimeRef.current}
+                          liteFirstActivity={funnelStarted}
+                        />
+                      </Suspense>
+                    </Box>
+
+                    {requiresLandscapeForDemo ? (
+                      <Box
+                        position="absolute"
+                        inset="0"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        px={{ base: 5, md: 8 }}
+                        py={{ base: 3, md: 4 }}
+                        pointerEvents="auto"
+                      >
+                        <Box className="cg-panel-window" overflow="hidden" maxW="560px">
+                          <Box className="cg-titlebar" px={{ base: 3, md: 4 }} py={2}>
                             <Text
-                              fontSize={{ base: 'md', md: 'lg' }}
-                              fontWeight="700"
-                              color="#7a2800"
+                              color="#f5f7ff"
                               fontFamily="var(--cg-font-retro-display)"
-                              mb={2}
-                              textTransform="uppercase"
-                              letterSpacing="0.08em"
-                            >
-                              Rotate To Landscape To Continue Demo
-                            </Text>
-                            <Text
-                              color="#1f2430"
-                              fontSize={{ base: 'sm', md: 'md' }}
-                              lineHeight="1.7"
-                              fontFamily="var(--cg-font-retro-display)"
-                            >
-                              Game view stays landscape-only for control stability. Switch to
-                              Editor, Problem, or Chat to keep working in portrait.
-                            </Text>
-                            <Text
-                              color="#0a2c9a"
                               fontSize={{ base: 'xs', md: 'sm' }}
-                              lineHeight="1.6"
-                              mt={3}
-                              fontFamily="var(--cg-font-retro-display)"
+                              fontWeight="700"
+                              letterSpacing="0.08em"
+                              textTransform="uppercase"
                             >
-                              Rotate sideways to resume without losing your current progress.
+                              orientation-check.exe
                             </Text>
+                          </Box>
+                          <Box p={{ base: 4, md: 5 }} bg="#d4d0c8">
+                            <Box
+                              bg="#efebe7"
+                              border="1px solid #7f7f7f"
+                              boxShadow="var(--cg-window-inset)"
+                              p={{ base: 4, md: 5 }}
+                            >
+                              <Text
+                                fontSize={{ base: 'md', md: 'lg' }}
+                                fontWeight="700"
+                                color="#7a2800"
+                                fontFamily="var(--cg-font-retro-display)"
+                                mb={2}
+                                textTransform="uppercase"
+                                letterSpacing="0.08em"
+                              >
+                                Rotate To Landscape To Continue Demo
+                              </Text>
+                              <Text
+                                color="#1f2430"
+                                fontSize={{ base: 'sm', md: 'md' }}
+                                lineHeight="1.7"
+                                fontFamily="var(--cg-font-retro-display)"
+                              >
+                                Game view stays landscape-only for control stability. Switch to
+                                Editor, Problem, or Chat to keep working in portrait.
+                              </Text>
+                              <Text
+                                color="#0a2c9a"
+                                fontSize={{ base: 'xs', md: 'sm' }}
+                                lineHeight="1.6"
+                                mt={3}
+                                fontFamily="var(--cg-font-retro-display)"
+                              >
+                                Rotate sideways to resume without losing your current progress.
+                              </Text>
+                            </Box>
                           </Box>
                         </Box>
                       </Box>
-                    </Box>
-                  ) : null}
-                </Box>
-              ) : (
-                <Box px={{ base: 5, md: 8 }} pb={{ base: 3, md: 4 }}>
-                  <Box className="cg-panel-window" overflow="hidden">
-                    <Box className="cg-titlebar" px={{ base: 3, md: 4 }} py={2}>
-                      <Text
-                        color="#f5f7ff"
-                        fontFamily="var(--cg-font-retro-display)"
-                        fontSize={{ base: 'xs', md: 'sm' }}
-                        fontWeight="700"
-                        letterSpacing="0.08em"
-                        textTransform="uppercase"
-                      >
-                        demo-loader.exe
-                      </Text>
-                    </Box>
-                    <Box p={{ base: 4, md: 5 }} bg="#d4d0c8">
-                      <Box
-                        bg="#efebe7"
-                        border="1px solid #7f7f7f"
-                        boxShadow="var(--cg-window-inset)"
-                        p={{ base: 4, md: 5 }}
-                      >
+                    ) : null}
+                  </Box>
+                ) : (
+                  <Box px={{ base: 5, md: 8 }} pb={{ base: 3, md: 4 }}>
+                    <Box className="cg-panel-window" overflow="hidden">
+                      <Box className="cg-titlebar" px={{ base: 3, md: 4 }} py={2}>
                         <Text
-                          fontSize={{ base: 'md', md: 'lg' }}
+                          color="#f5f7ff"
+                          fontFamily="var(--cg-font-retro-display)"
+                          fontSize={{ base: 'xs', md: 'sm' }}
                           fontWeight="700"
-                          color="#0a2c9a"
-                          fontFamily="var(--cg-font-retro-display)"
-                          mb={2}
-                          textTransform="uppercase"
                           letterSpacing="0.08em"
+                          textTransform="uppercase"
                         >
-                          Code Breach Demo
+                          demo-loader.exe
                         </Text>
-                        <Text
-                          color="#1f2430"
-                          fontSize={{ base: 'sm', md: 'md' }}
-                          lineHeight="1.7"
-                          fontFamily="var(--cg-font-retro-display)"
+                      </Box>
+                      <Box p={{ base: 4, md: 5 }} bg="#d4d0c8">
+                        <Box
+                          bg="#efebe7"
+                          border="1px solid #7f7f7f"
+                          boxShadow="var(--cg-window-inset)"
+                          p={{ base: 4, md: 5 }}
                         >
-                          The live onboarding mission loads after the page becomes interactive. You
-                          will solve a real intro problem, defend your base, and then choose between
-                          the beginner learning path and interview prep clusters.
-                        </Text>
+                          <Text
+                            fontSize={{ base: 'md', md: 'lg' }}
+                            fontWeight="700"
+                            color="#0a2c9a"
+                            fontFamily="var(--cg-font-retro-display)"
+                            mb={2}
+                            textTransform="uppercase"
+                            letterSpacing="0.08em"
+                          >
+                            Code Breach Demo
+                          </Text>
+                          <Text
+                            color="#1f2430"
+                            fontSize={{ base: 'sm', md: 'md' }}
+                            lineHeight="1.7"
+                            fontFamily="var(--cg-font-retro-display)"
+                          >
+                            The live onboarding mission loads after the page becomes interactive.
+                            You will solve a real intro problem, defend your base, and then choose
+                            between the beginner learning path and interview prep clusters.
+                          </Text>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
-                </Box>
-              ))}
+                ))}
 
-            {showCompactHero ? (
-              <HomeHeroSection
-                variant="compact"
-                revealPhase={revealPhase}
-                canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
-                requiresLandscapeForDemo={requiresLandscapeForDemo}
-                hasCompletedQuickDemo={hasCompletedQuickDemo}
-                onBeginDemo={handleBeginDemo}
-                isAuthenticated={isAuthenticated}
-                user={user}
-              />
-            ) : null}
+              {showCompactHero ? (
+                <HomeHeroSection
+                  variant="compact"
+                  revealPhase={revealPhase}
+                  canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
+                  requiresLandscapeForDemo={requiresLandscapeForDemo}
+                  hasCompletedQuickDemo={hasCompletedQuickDemo}
+                  onBeginDemo={handleBeginDemo}
+                  isAuthenticated={isAuthenticated}
+                  user={user}
+                />
+              ) : null}
 
-            {/* CTA + showcase are rendered immediately after the hero on the hydrated route. */}
-            {/* Below-fold CTA + showcase render immediately beneath the hero content. */}
-            <AnimatePresence>
-              {showBelowFold && (
-                <MotionBox
-                  key="below-fold"
-                  {...(hasHydrated
-                    ? {
-                        initial: { opacity: 0, y: 30 },
-                        animate: { opacity: 1, y: 0 },
-                        transition: { duration: 0.6, ease: 'easeOut' },
-                      }
-                    : {})}
-                >
-                  <HomeActionBar />
-                  <HomeShowcaseSection />
-                </MotionBox>
-              )}
-            </AnimatePresence>
-          </Box>
+              {/* CTA + showcase are rendered immediately after the hero on the hydrated route. */}
+              {/* Below-fold CTA + showcase render immediately beneath the hero content. */}
+              <AnimatePresence>
+                {showBelowFold && (
+                  <MotionBox
+                    key="below-fold"
+                    {...(hasHydrated
+                      ? {
+                          initial: { opacity: 0, y: 30 },
+                          animate: { opacity: 1, y: 0 },
+                          transition: { duration: 0.6, ease: 'easeOut' },
+                        }
+                      : {})}
+                  >
+                    <HomeActionBar />
+                    <HomeShowcaseSection />
+                  </MotionBox>
+                )}
+              </AnimatePresence>
+            </Box>
           ) : null}
         </Box>
 

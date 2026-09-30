@@ -23,6 +23,7 @@ export default function useTowerDefenseV2TowerPlacementHandler({
   coreTowerRequirements,
   waveRef,
   isHomepageDemo,
+  isSimpleDemo = false,
 }) {
   return useCallback(
     ({ towerType, position, placementSource }) => {
@@ -54,6 +55,7 @@ export default function useTowerDefenseV2TowerPlacementHandler({
           coreTowerRequirements,
           currentWave: waveRef.current,
           isHomepageDemo,
+          isSimpleDemo,
         }
       );
 
@@ -91,7 +93,7 @@ export default function useTowerDefenseV2TowerPlacementHandler({
       setObjectTowerPlaced,
       waveRef,
       isHomepageDemo,
+      isSimpleDemo,
     ]
   );
 }
-

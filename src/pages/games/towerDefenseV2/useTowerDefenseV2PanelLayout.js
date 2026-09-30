@@ -80,6 +80,7 @@ export default function useTowerDefenseV2PanelLayout({
   handleCodeLineCommitted,
   isDemo,
   isHomepageDemo,
+  isSimpleDemo = false,
   handleTerminalCommandTracked,
   problem,
   problemDescription,
@@ -101,8 +102,8 @@ export default function useTowerDefenseV2PanelLayout({
   desktopShellSizingMode = 'embedded',
 }) {
   const towerSelectorEnabled =
-    validatedGameSettings.towerSelectorEnabled && towerPlacementLocked !== true;
-  const deployableMenuEnabled = validatedGameSettings.deployableMenuEnabled;
+    !isSimpleDemo && validatedGameSettings.towerSelectorEnabled && towerPlacementLocked !== true;
+  const deployableMenuEnabled = !isSimpleDemo && validatedGameSettings.deployableMenuEnabled;
 
   const gameContent = React.createElement(GamePanelContent, {
     isGameOver: gameState.status === GAME_STATUS.GAME_OVER,
@@ -180,6 +181,7 @@ export default function useTowerDefenseV2PanelLayout({
     terminalOutput,
     isDemo,
     isHomepageDemo,
+    isSimpleDemo,
     shellTheme,
   });
 
@@ -254,6 +256,7 @@ export default function useTowerDefenseV2PanelLayout({
     totalWaves: gameState.totalWaves,
     isMissionComplete: gameState.status === GAME_STATUS.LEVEL_COMPLETE,
     isHomepageDemo,
+    isSimpleDemo,
     autoSwitchRemaining: problemAutoSwitchRemaining,
     autoSwitchActive: problemAutoSwitchActive,
     showIntroNote: showProblemIntroNote,
