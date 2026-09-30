@@ -1,515 +1,183 @@
-import { drawCenteredSpriteIcon, getThemeSprite } from './themeSprites.js';
+import { getRendererSpriteImage } from './themeSprites.js';
+import { ENEMY_SPRITE_MAP } from '../constants.js';
 
-export function drawEnemies(renderer, enemies) {
-  enemies.forEach((enemy) => drawEnemy(renderer, enemy, renderer.performanceTier));
+// Spritesheet constants for 16x16 retro frames (ported from CyberCrawler)
+const ENEMY_SHEET_SRC = '/assets/Enemies.png';
+const FRAME_WIDTH = 16;
+const FRAME_HEIGHT = 16;
+const BLOCK_WIDTH = 64; // 4 columns * 16px
+const BLOCK_HEIGHT = 80; // 5 rows * 16px
+const FRAME_COLS = 4;
+const WALK_FRAME_MS = 120;
+
+// Offscreen scratchpad to dynamically dye transparent 1-bit sprites
+let dyeCanvas = null;
+let dyeCtx = null;
+
+function getDyeCanvas(width, height) {
+  if (typeof document === 'undefined') return null;
+  if (!dyeCanvas) {
+    dyeCanvas = document.createElement('canvas');
+    dyeCtx = dyeCanvas.getContext('2d', { willReadFrequently: true });
+  }
+  dyeCanvas.width = width;
+  dyeCanvas.height = height;
+  dyeCtx.clearRect(0, 0, width, height);
+  return { canvas: dyeCanvas, ctx: dyeCtx };
 }
 
-function drawRetroEnemyBadge(renderer, size, accentColor) {
-  const halfSize = size * 0.48;
-  const { ctx } = renderer;
-
-  ctx.fillStyle = '#d4d0c8';
-  ctx.fillRect(-halfSize, -halfSize, halfSize * 2, halfSize * 2);
-
-  ctx.fillStyle = '#f7f3ea';
-  ctx.fillRect(-halfSize + 2, -halfSize + 2, halfSize * 2 - 4, 2);
-  ctx.fillRect(-halfSize + 2, -halfSize + 2, 2, halfSize * 2 - 4);
-
-  ctx.fillStyle = 'rgba(66, 72, 82, 0.34)';
-  ctx.fillRect(halfSize - 4, -halfSize + 2, 2, halfSize * 2 - 4);
-  ctx.fillRect(-halfSize + 2, halfSize - 4, halfSize * 2 - 4, 2);
-
-  ctx.globalAlpha = 0.26;
-  ctx.fillStyle = accentColor || '#8a6f4f';
-  ctx.fillRect(-halfSize + 3, halfSize - 8, halfSize * 2 - 6, 4);
-  ctx.globalAlpha = 1;
-
-  ctx.strokeStyle = '#5d636e';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(-halfSize, -halfSize, halfSize * 2, halfSize * 2);
+function hexToRgb(hex) {
+  const normalized = String(hex || '#ff5555').replace('#', '');
+  const r = parseInt(normalized.substring(0, 2), 16);
+  const g = parseInt(normalized.substring(2, 4), 16);
+  const b = parseInt(normalized.substring(4, 6), 16);
+  return { r, g, b };
 }
 
-function drawRetroEnemySpriteBody(renderer, enemy, size, colors) {
-  const spriteSrc = getThemeSprite(renderer.settings?.enemyPack?.enemySprites, enemy.type);
-  if (!spriteSrc) return false;
+/**
+ * Iterates through the 16x16 frame, applies bounding-envelope slicing to make the
+ * surrounding black pixels transparent, and dyes foreground lines to match the highlights.
+ */
+function dyeMonochromeFrame(data, w, h, dyeColorRGB) {
+  const leftBound = new Array(h).fill(w);
+  const rightBound = new Array(h).fill(-1);
+  const topBound = new Array(w).fill(h);
+  const bottomBound = new Array(w).fill(-1);
 
-  drawRetroEnemyBadge(renderer, size, colors.highlight);
+  // 1. Scan local frame to find white outline boundaries
+  for (let ly = 0; ly < h; ly++) {
+    for (let lx = 0; lx < w; lx++) {
+      const pixelIdx = (ly * w + lx) * 4;
 
-  const spriteDrawn = drawCenteredSpriteIcon(renderer, spriteSrc, 0, 0, size * 0.72, {
-    shadowColor: colors.highlight,
-    shadowBlur: 3,
-  });
+      const r = data[pixelIdx];
+      const g = data[pixelIdx + 1];
+      const b = data[pixelIdx + 2];
+      const a = data[pixelIdx + 3];
 
-  if (!spriteDrawn) {
-    renderer.ctx.fillStyle = '#1f2430';
-    renderer.ctx.fillRect(-size * 0.14, -size * 0.14, size * 0.28, size * 0.28);
+      if (a > 0 && r > 180 && g > 180 && b > 180) {
+        if (lx < leftBound[ly]) leftBound[ly] = lx;
+        if (lx > rightBound[ly]) rightBound[ly] = lx;
+        if (ly < topBound[lx]) topBound[lx] = ly;
+        if (ly > bottomBound[lx]) bottomBound[lx] = ly;
+      }
+    }
   }
 
-  return true;
+  // 2. Apply orthographic envelope masking and color detailing
+  for (let ly = 0; ly < h; ly++) {
+    for (let lx = 0; lx < w; lx++) {
+      const pixelIdx = (ly * w + lx) * 4;
+
+      const isInsideHorizontal = lx >= leftBound[ly] && lx <= rightBound[ly];
+      const isInsideVertical = ly >= topBound[lx] && ly <= bottomBound[lx];
+
+      if (isInsideHorizontal && isInsideVertical) {
+        const r = data[pixelIdx];
+        const g = data[pixelIdx + 1];
+        const b = data[pixelIdx + 2];
+
+        if (r > 180 && g > 180 && b > 180) {
+          // Outline detail is dyed to the enemy's highlight color
+          data[pixelIdx] = dyeColorRGB.r;
+          data[pixelIdx + 1] = dyeColorRGB.g;
+          data[pixelIdx + 2] = dyeColorRGB.b;
+          data[pixelIdx + 3] = 255;
+        } else {
+          // Solid black body features stay intact and fully opaque
+          data[pixelIdx] = 0;
+          data[pixelIdx + 1] = 0;
+          data[pixelIdx + 2] = 0;
+          data[pixelIdx + 3] = 255;
+        }
+      } else {
+        // Unused outer background space is cropped to transparent
+        data[pixelIdx + 3] = 0;
+      }
+    }
+  }
 }
 
-function getEnemyMotionState(renderer, enemy, performanceTier) {
-  const hpRatio = enemy.maxHealth > 0 ? enemy.health / enemy.maxHealth : 1;
-  const pulseBase = 1 + Math.sin(renderer.glowPhase * 2 + (enemy.spawnTime || 0) * 0.001) * 0.04;
-  const hitScale = enemy.isHit ? 1.16 : 1;
-  const hijackScale = enemy.hijackedTowerId ? 1 + Math.sin(renderer.glowPhase * 3) * 0.08 : 1;
-  const scale = pulseBase * hitScale * hijackScale;
+function getNormalizedEnemyKey(enemyType) {
+  return String(enemyType || '')
+    .replace(/([A-Z])/g, '_$1')
+    .toUpperCase()
+    .replace(/\s+/g, '_');
+}
 
-  const lowHealth = hpRatio <= 0.25;
-  const jitterMagnitude = lowHealth && performanceTier === 'normal' ? enemy.size * 0.04 : 0;
-  const jitterX = jitterMagnitude
-    ? Math.sin(renderer.glowPhase * 28 + enemy.id.length * 0.9) * jitterMagnitude
-    : 0;
-  const jitterY = jitterMagnitude
-    ? Math.cos(renderer.glowPhase * 23 + enemy.id.length * 0.7) * jitterMagnitude
-    : 0;
+function getDirectionFromAngle(angleRad) {
+  if (!Number.isFinite(angleRad)) return 'down';
+  let angle = angleRad;
+  while (angle > Math.PI) angle -= Math.PI * 2;
+  while (angle < -Math.PI) angle += Math.PI * 2;
+
+  const deg = (angle * 180) / Math.PI;
+  if (deg > -45 && deg <= 45) return 'right';
+  if (deg > 45 && deg <= 135) return 'down';
+  if (deg > -135 && deg <= -45) return 'up';
+  return 'left';
+}
+
+function getEnemySheetFrameRect(enemyType, angleRad, spawnTime) {
+  const key = getNormalizedEnemyKey(enemyType);
+  const block = ENEMY_SPRITE_MAP[key];
+  if (!block) return null;
+
+  let frameRow = 1;
+  const dir = getDirectionFromAngle(angleRad);
+  if (dir === 'down') frameRow = 1;
+  else if (dir === 'right') frameRow = 2;
+  else if (dir === 'up') frameRow = 3;
+  else if (dir === 'left') frameRow = 4;
+
+  const elapsed = Date.now() - (spawnTime || Date.now());
+  const frameCol = Math.floor(elapsed / WALK_FRAME_MS) % FRAME_COLS;
 
   return {
-    scale,
-    hpRatio,
-    heading: Number.isFinite(enemy.headingAngle) ? enemy.headingAngle : 0,
-    jitterX,
-    jitterY,
-    lowHealth,
+    srcX: block.col * BLOCK_WIDTH + frameCol * FRAME_WIDTH,
+    srcY: block.row * BLOCK_HEIGHT + frameRow * FRAME_HEIGHT,
+    srcW: FRAME_WIDTH,
+    srcH: FRAME_HEIGHT,
   };
 }
 
-function drawBaseShapeAtOrigin(renderer, type, size) {
-  switch (getEnemyShape(type)) {
-    case 'square':
-      renderer.ctx.rect(-size / 2, -size / 2, size, size);
-      break;
-    case 'rectangle':
-      renderer.ctx.rect(-size / 2, -size / 3, size, size * 0.66);
-      break;
-    case 'blob':
-      drawBlob(renderer, 0, 0, size);
-      break;
-    case 'circle':
-    default:
-      renderer.ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-      break;
-  }
+function drawDyedEnemySheetFrame(renderer, enemy, size, colorHex) {
+  const image = getRendererSpriteImage(renderer, ENEMY_SHEET_SRC);
+  if (!image) return false;
+
+  const frameRect = getEnemySheetFrameRect(enemy.type, enemy.headingAngle, enemy.spawnTime);
+  if (!frameRect) return false;
+
+  const dye = getDyeCanvas(FRAME_WIDTH, FRAME_HEIGHT);
+  if (!dye) return false;
+
+  dye.ctx.drawImage(
+    image,
+    frameRect.srcX,
+    frameRect.srcY,
+    FRAME_WIDTH,
+    FRAME_HEIGHT,
+    0,
+    0,
+    FRAME_WIDTH,
+    FRAME_HEIGHT
+  );
+
+  const imgData = dye.ctx.getImageData(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+  dyeMonochromeFrame(imgData.data, FRAME_WIDTH, FRAME_HEIGHT, hexToRgb(colorHex));
+  dye.ctx.putImageData(imgData, 0, 0);
+
+  const { ctx } = renderer;
+  const prevSmoothing = ctx.imageSmoothingEnabled;
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(dye.canvas, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, -size / 2, -size / 2, size, size);
+  ctx.imageSmoothingEnabled = prevSmoothing;
+  ctx.restore();
+  return true;
 }
 
-function drawBasicEnemyBody(renderer, size, colors, useHeavyEffects) {
-  const coreRadius = size * 0.28;
-
-  // Core
-  renderer.ctx.beginPath();
-  renderer.ctx.arc(0, 0, coreRadius, 0, Math.PI * 2);
-  if (useHeavyEffects) {
-    const coreGradient = renderer.ctx.createRadialGradient(
-      0,
-      0,
-      coreRadius * 0.1,
-      0,
-      0,
-      coreRadius
-    );
-    coreGradient.addColorStop(0, '#a8f4ff');
-    coreGradient.addColorStop(1, colors.highlight);
-    renderer.ctx.fillStyle = coreGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.highlight;
-  }
-  renderer.ctx.fill();
-
-  // Outer shell
-  renderer.ctx.beginPath();
-  renderer.ctx.arc(0, 0, size * 0.42, 0, Math.PI * 2);
-  if (useHeavyEffects) {
-    const shellGradient = renderer.ctx.createRadialGradient(0, 0, coreRadius, 0, 0, size * 0.45);
-    shellGradient.addColorStop(0, colors.highlight);
-    shellGradient.addColorStop(1, colors.body);
-    renderer.ctx.fillStyle = shellGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.body;
-  }
-  renderer.ctx.globalAlpha = 0.9;
-  renderer.ctx.fill();
-  renderer.ctx.globalAlpha = 1;
-
-  // Firewall ring segments
-  const segments = 9;
-  const ringRadius = size * 0.62;
-  for (let i = 0; i < segments; i++) {
-    const segmentPhase = renderer.glowPhase * 0.9 + i * 0.72;
-    const start = segmentPhase;
-    const end = start + 0.34;
-    renderer.ctx.beginPath();
-    renderer.ctx.strokeStyle = i % 2 === 0 ? '#40d9ff' : colors.highlight;
-    renderer.ctx.lineWidth = Math.max(1, size * 0.08);
-    renderer.ctx.arc(0, 0, ringRadius, start, end);
-    renderer.ctx.stroke();
-  }
-}
-
-function drawEdgeEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier) {
-  const trailLength = size * 1.15;
-
-  // Glitch afterimage streaks
-  if (performanceTier !== 'low') {
-    const streakCount = performanceTier === 'ultra' ? 5 : 3;
-    for (let i = 0; i < streakCount; i++) {
-      const offset = (i + 1) * size * 0.16;
-      renderer.ctx.beginPath();
-      renderer.ctx.moveTo(-size * 0.18 - offset, -size * 0.18 + i * 2);
-      renderer.ctx.lineTo(-trailLength - offset, -size * 0.28 + i * 3);
-      renderer.ctx.lineTo(-trailLength + size * 0.2 - offset, -size * 0.06 + i * 3);
-      renderer.ctx.closePath();
-      renderer.ctx.globalAlpha = performanceTier === 'ultra' ? 0.28 - i * 0.04 : 0.22 - i * 0.05;
-      renderer.ctx.fillStyle = i % 2 === 0 ? '#ff2ad6' : '#ff6a8a';
-      renderer.ctx.fill();
-    }
-    renderer.ctx.globalAlpha = 1;
-  }
-
-  // Razor packet body (diamond)
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(size * 0.55, 0);
-  renderer.ctx.lineTo(0, size * 0.25);
-  renderer.ctx.lineTo(-size * 0.45, 0);
-  renderer.ctx.lineTo(0, -size * 0.25);
-  renderer.ctx.closePath();
-  if (useHeavyEffects) {
-    const packetGradient = renderer.ctx.createLinearGradient(-size * 0.5, 0, size * 0.6, 0);
-    packetGradient.addColorStop(0, '#8d114f');
-    packetGradient.addColorStop(0.52, colors.body);
-    packetGradient.addColorStop(1, '#ff95b7');
-    renderer.ctx.fillStyle = packetGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.body;
-  }
-  renderer.ctx.fill();
-
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(size * 0.28, 0);
-  renderer.ctx.lineTo(-size * 0.08, size * 0.1);
-  renderer.ctx.lineTo(-size * 0.22, 0);
-  renderer.ctx.lineTo(-size * 0.08, -size * 0.1);
-  renderer.ctx.closePath();
-  renderer.ctx.fillStyle = '#ffd4f2';
-  renderer.ctx.globalAlpha = 0.85;
-  renderer.ctx.fill();
-  renderer.ctx.globalAlpha = 1;
-}
-
-function drawHijackerEnemyBody(renderer, size, colors, useHeavyEffects, hijackedTowerId) {
-  // Injector head
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(size * 0.5, 0);
-  renderer.ctx.lineTo(-size * 0.15, size * 0.2);
-  renderer.ctx.lineTo(-size * 0.2, 0);
-  renderer.ctx.lineTo(-size * 0.15, -size * 0.2);
-  renderer.ctx.closePath();
-  if (useHeavyEffects) {
-    const headGradient = renderer.ctx.createLinearGradient(-size * 0.3, 0, size * 0.5, 0);
-    headGradient.addColorStop(0, '#60103d');
-    headGradient.addColorStop(0.65, colors.body);
-    headGradient.addColorStop(1, '#ffbfd0');
-    renderer.ctx.fillStyle = headGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.body;
-  }
-  renderer.ctx.fill();
-
-  // Malware tail (animated data tether look)
-  renderer.ctx.strokeStyle = hijackedTowerId ? '#cc5dff' : '#7c4dff';
-  renderer.ctx.lineWidth = Math.max(1, size * 0.1);
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(-size * 0.15, 0);
-  renderer.ctx.quadraticCurveTo(-size * 0.46, -size * 0.25, -size * 0.72, 0);
-  renderer.ctx.quadraticCurveTo(-size * 0.96, size * 0.25, -size * 1.2, 0);
-  renderer.ctx.stroke();
-
-  if (hijackedTowerId) {
-    renderer.ctx.beginPath();
-    renderer.ctx.strokeStyle = '#f4b9ff';
-    renderer.ctx.lineWidth = Math.max(1, size * 0.06);
-    renderer.ctx.moveTo(-size * 0.18, -size * 0.06);
-    renderer.ctx.lineTo(-size * 1.15, -size * 0.06);
-    renderer.ctx.stroke();
-  }
-
-  // Core eye
-  renderer.ctx.beginPath();
-  renderer.ctx.arc(size * 0.04, 0, size * 0.12, 0, Math.PI * 2);
-  renderer.ctx.fillStyle = '#ffe5f2';
-  renderer.ctx.fill();
-}
-
-function drawComplexEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier) {
-  const plateCount = performanceTier === 'low' ? 4 : performanceTier === 'ultra' ? 8 : 6;
-  const ringRadius = size * 0.44;
-
-  // Armored plate ring that subtly shifts over time.
-  for (let i = 0; i < plateCount; i++) {
-    const angle = renderer.glowPhase * 0.35 + (Math.PI * 2 * i) / plateCount;
-    const wobble = Math.sin(renderer.glowPhase * 2 + i * 1.7) * size * 0.03;
-    const px = Math.cos(angle) * (ringRadius + wobble);
-    const py = Math.sin(angle) * (ringRadius + wobble);
-
-    renderer.ctx.save();
-    renderer.ctx.translate(px, py);
-    renderer.ctx.rotate(angle + Math.PI / 4);
-    renderer.ctx.beginPath();
-    renderer.ctx.rect(-size * 0.14, -size * 0.12, size * 0.28, size * 0.24);
-    if (useHeavyEffects) {
-      const plateGradient = renderer.ctx.createLinearGradient(-size * 0.14, 0, size * 0.14, 0);
-      plateGradient.addColorStop(0, '#213c65');
-      plateGradient.addColorStop(1, colors.highlight);
-      renderer.ctx.fillStyle = plateGradient;
-    } else {
-      renderer.ctx.fillStyle = '#4f75a8';
-    }
-    renderer.ctx.fill();
-    renderer.ctx.restore();
-  }
-
-  // Compiler core node.
-  renderer.ctx.save();
-  renderer.ctx.rotate(-renderer.glowPhase * 0.5);
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(0, -size * 0.26);
-  renderer.ctx.lineTo(size * 0.22, -size * 0.06);
-  renderer.ctx.lineTo(size * 0.12, size * 0.24);
-  renderer.ctx.lineTo(-size * 0.14, size * 0.2);
-  renderer.ctx.lineTo(-size * 0.24, -size * 0.04);
-  renderer.ctx.closePath();
-  if (useHeavyEffects) {
-    const coreGradient = renderer.ctx.createLinearGradient(-size * 0.2, 0, size * 0.22, 0);
-    coreGradient.addColorStop(0, '#264a7a');
-    coreGradient.addColorStop(1, '#9ec5ff');
-    renderer.ctx.fillStyle = coreGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.body;
-  }
-  renderer.ctx.fill();
-  renderer.ctx.restore();
-}
-
-function drawTimeLimitEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier) {
-  // Deadline scanline trail.
-  if (performanceTier !== 'low') {
-    const lines = performanceTier === 'ultra' ? 6 : performanceTier === 'normal' ? 4 : 3;
-    for (let i = 0; i < lines; i++) {
-      const y = (-lines / 2 + i) * size * 0.12;
-      renderer.ctx.beginPath();
-      renderer.ctx.moveTo(-size * 1.1, y);
-      renderer.ctx.lineTo(-size * 0.18, y);
-      renderer.ctx.strokeStyle = i % 2 === 0 ? '#63d8ff' : '#7fdcff';
-      renderer.ctx.globalAlpha = 0.28 - i * 0.04;
-      renderer.ctx.lineWidth = Math.max(1, size * 0.06);
-      renderer.ctx.stroke();
-    }
-    renderer.ctx.globalAlpha = 1;
-  }
-
-  // Interceptor spear body.
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(size * 0.56, 0);
-  renderer.ctx.lineTo(-size * 0.2, size * 0.16);
-  renderer.ctx.lineTo(-size * 0.46, 0);
-  renderer.ctx.lineTo(-size * 0.2, -size * 0.16);
-  renderer.ctx.closePath();
-  if (useHeavyEffects) {
-    const spearGradient = renderer.ctx.createLinearGradient(-size * 0.46, 0, size * 0.56, 0);
-    spearGradient.addColorStop(0, '#1c3f54');
-    spearGradient.addColorStop(0.5, '#6de9ff');
-    spearGradient.addColorStop(1, '#d8f7ff');
-    renderer.ctx.fillStyle = spearGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.highlight;
-  }
-  renderer.ctx.fill();
-
-  // Dual thrusters.
-  const thrusterPulse = 0.82 + Math.sin(renderer.glowPhase * 7) * 0.18;
-  renderer.ctx.beginPath();
-  renderer.ctx.arc(-size * 0.05, -size * 0.09, size * 0.08 * thrusterPulse, 0, Math.PI * 2);
-  renderer.ctx.arc(-size * 0.05, size * 0.09, size * 0.08 * thrusterPulse, 0, Math.PI * 2);
-  renderer.ctx.fillStyle = '#ff9b38';
-  renderer.ctx.fill();
-}
-
-function drawBufferEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier) {
-  const pulse = 1 + Math.sin(renderer.glowPhase * 2.4) * 0.08;
-
-  // Core broker orb.
-  renderer.ctx.beginPath();
-  renderer.ctx.arc(0, 0, size * 0.24 * pulse, 0, Math.PI * 2);
-  if (useHeavyEffects) {
-    const coreGradient = renderer.ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.28);
-    coreGradient.addColorStop(0, '#d8fff0');
-    coreGradient.addColorStop(1, '#67d9a3');
-    renderer.ctx.fillStyle = coreGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.highlight;
-  }
-  renderer.ctx.fill();
-
-  // Rotating buff glyph ring.
-  const glyphCount = performanceTier === 'low' ? 6 : performanceTier === 'ultra' ? 14 : 10;
-  const ringRadius = size * 0.58;
-  renderer.ctx.save();
-  renderer.ctx.rotate(renderer.glowPhase * 0.9);
-  for (let i = 0; i < glyphCount; i++) {
-    const angle = (Math.PI * 2 * i) / glyphCount;
-    const x = Math.cos(angle) * ringRadius;
-    const y = Math.sin(angle) * ringRadius;
-
-    renderer.ctx.save();
-    renderer.ctx.translate(x, y);
-    renderer.ctx.rotate(angle);
-    renderer.ctx.beginPath();
-    renderer.ctx.rect(-size * 0.06, -size * 0.03, size * 0.12, size * 0.06);
-    renderer.ctx.fillStyle = i % 2 === 0 ? '#8bffd1' : '#5de8b3';
-    renderer.ctx.globalAlpha = 0.8;
-    renderer.ctx.fill();
-    renderer.ctx.restore();
-  }
-  renderer.ctx.globalAlpha = 1;
-  renderer.ctx.restore();
-}
-
-function drawPathShaperEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier) {
-  const pulse = 1 + Math.sin(renderer.glowPhase * 3.1) * 0.07;
-
-  // Route rewriter wedge body.
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(size * 0.56, 0);
-  renderer.ctx.lineTo(-size * 0.05, size * 0.24);
-  renderer.ctx.lineTo(-size * 0.42, size * 0.15);
-  renderer.ctx.lineTo(-size * 0.42, -size * 0.15);
-  renderer.ctx.lineTo(-size * 0.05, -size * 0.24);
-  renderer.ctx.closePath();
-  if (useHeavyEffects) {
-    const wedgeGradient = renderer.ctx.createLinearGradient(-size * 0.42, 0, size * 0.56, 0);
-    wedgeGradient.addColorStop(0, '#2b4a61');
-    wedgeGradient.addColorStop(0.5, colors.body);
-    wedgeGradient.addColorStop(1, '#d5f1ff');
-    renderer.ctx.fillStyle = wedgeGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.body;
-  }
-  renderer.ctx.fill();
-
-  // Forward fracture pulse arcs.
-  if (performanceTier !== 'low') {
-    renderer.ctx.beginPath();
-    renderer.ctx.arc(size * 0.2, 0, size * 0.34 * pulse, -0.6, 0.6);
-    renderer.ctx.strokeStyle = '#9ee6ff';
-    renderer.ctx.globalAlpha = 0.7;
-    renderer.ctx.lineWidth = Math.max(1, size * 0.08);
-    renderer.ctx.stroke();
-
-    renderer.ctx.beginPath();
-    renderer.ctx.arc(size * 0.24, 0, size * 0.47 * pulse, -0.5, 0.5);
-    renderer.ctx.globalAlpha = 0.45;
-    renderer.ctx.lineWidth = Math.max(1, size * 0.06);
-    renderer.ctx.stroke();
-
-    if (performanceTier === 'ultra') {
-      renderer.ctx.beginPath();
-      renderer.ctx.arc(size * 0.28, 0, size * 0.6 * pulse, -0.45, 0.45);
-      renderer.ctx.globalAlpha = 0.32;
-      renderer.ctx.lineWidth = Math.max(1, size * 0.05);
-      renderer.ctx.stroke();
-    }
-
-    renderer.ctx.globalAlpha = 1;
-  }
-}
-
-function drawSpaceComplexEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier) {
-  // Heavy ICE fortress crystal core.
-  renderer.ctx.beginPath();
-  renderer.ctx.moveTo(0, -size * 0.48);
-  renderer.ctx.lineTo(size * 0.24, -size * 0.18);
-  renderer.ctx.lineTo(size * 0.21, size * 0.35);
-  renderer.ctx.lineTo(0, size * 0.5);
-  renderer.ctx.lineTo(-size * 0.21, size * 0.35);
-  renderer.ctx.lineTo(-size * 0.24, -size * 0.18);
-  renderer.ctx.closePath();
-  if (useHeavyEffects) {
-    const coreGradient = renderer.ctx.createLinearGradient(-size * 0.24, 0, size * 0.24, 0);
-    coreGradient.addColorStop(0, '#1f2b5d');
-    coreGradient.addColorStop(0.5, '#416ee0');
-    coreGradient.addColorStop(1, '#b8d4ff');
-    renderer.ctx.fillStyle = coreGradient;
-  } else {
-    renderer.ctx.fillStyle = colors.body;
-  }
-  renderer.ctx.fill();
-
-  // Orbiting shard satellites.
-  const shardCount = performanceTier === 'low' ? 3 : performanceTier === 'ultra' ? 7 : 5;
-  const orbitRadius = size * 0.76;
-  for (let i = 0; i < shardCount; i++) {
-    const angle = renderer.glowPhase * 0.55 + (Math.PI * 2 * i) / shardCount;
-    const x = Math.cos(angle) * orbitRadius;
-    const y = Math.sin(angle) * orbitRadius;
-
-    renderer.ctx.save();
-    renderer.ctx.translate(x, y);
-    renderer.ctx.rotate(angle + renderer.glowPhase);
-    renderer.ctx.beginPath();
-    renderer.ctx.moveTo(0, -size * 0.12);
-    renderer.ctx.lineTo(size * 0.08, 0);
-    renderer.ctx.lineTo(0, size * 0.12);
-    renderer.ctx.lineTo(-size * 0.08, 0);
-    renderer.ctx.closePath();
-    renderer.ctx.fillStyle = '#a7beff';
-    renderer.ctx.globalAlpha = 0.78;
-    renderer.ctx.fill();
-    renderer.ctx.restore();
-  }
-  renderer.ctx.globalAlpha = 1;
-}
-
-function drawThemedEnemyBody(renderer, enemy, size, colors, useHeavyEffects, performanceTier) {
-  if (enemy.type === 'basic') {
-    drawBasicEnemyBody(renderer, size, colors, useHeavyEffects);
-    return true;
-  }
-
-  if (enemy.type === 'edge') {
-    drawEdgeEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier);
-    return true;
-  }
-
-  if (enemy.type === 'hijacker') {
-    drawHijackerEnemyBody(renderer, size, colors, useHeavyEffects, enemy.hijackedTowerId);
-    return true;
-  }
-
-  if (enemy.type === 'complex') {
-    drawComplexEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier);
-    return true;
-  }
-
-  if (enemy.type === 'timeLimit') {
-    drawTimeLimitEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier);
-    return true;
-  }
-
-  if (enemy.type === 'buffer') {
-    drawBufferEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier);
-    return true;
-  }
-
-  if (enemy.type === 'pathShaper') {
-    drawPathShaperEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier);
-    return true;
-  }
-
-  if (enemy.type === 'spaceComplex') {
-    drawSpaceComplexEnemyBody(renderer, size, colors, useHeavyEffects, performanceTier);
-    return true;
-  }
-
-  return false;
+export function drawEnemies(renderer, enemies) {
+  enemies.forEach((enemy) => drawEnemy(renderer, enemy, renderer.performanceTier));
 }
 
 export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
@@ -520,7 +188,6 @@ export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
     health,
     maxHealth,
     size,
-    color,
     isSlowed,
     isFrozen,
     isBoss,
@@ -528,20 +195,9 @@ export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
     hijackedTowerId,
   } = enemy;
 
-  // Get color scheme — allow enemy pack to override colors (separate from tower pack)
-  const _defaultColors = getEnemyColors(type);
-  const _ePack = renderer.settings?.enemyPack;
-  const colors = _ePack?.enemyBodyColor
-    ? {
-        ..._defaultColors,
-        body: _ePack.enemyBodyColor,
-        highlight: _ePack.enemyHighlightColor || _ePack.enemyBodyColor,
-      }
-    : _defaultColors;
-
+  const colors = getEnemyColors(type);
   const useHeavyEffects = performanceTier !== 'low';
   const isUltra = performanceTier === 'ultra';
-  const motion = getEnemyMotionState(renderer, enemy, performanceTier);
 
   // If defeated, only render the death effect (no frozen body)
   if (!enemy.isActive && defeatTime) {
@@ -553,42 +209,26 @@ export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
     renderer.ctx.globalCompositeOperation = 'lighter';
     renderer.ctx.globalAlpha = alpha;
 
-    // Shock ring
     const ringSize = size * (1 + t * 1.8);
-    renderer.ctx.strokeStyle = color + 'CC';
+    renderer.ctx.strokeStyle = '#ff3366CC';
     renderer.ctx.lineWidth = Math.max(1, size * 0.12);
-    renderer.ctx.beginPath();
-    renderer.ctx.arc(x, y, ringSize, 0, Math.PI * 2);
-    renderer.ctx.stroke();
-
-    // Glitch shards
-    const shards = performanceTier === 'ultra' ? 4 : 8;
-    for (let i = 0; i < shards; i++) {
-      const angle = ((Math.PI * 2) / shards) * i + renderer.glowPhase;
-      const len = size * (0.6 + t * 1.3);
-      renderer.ctx.strokeStyle = i % 2 === 0 ? '#00ccff' : '#ff00de';
-      renderer.ctx.lineWidth = Math.max(1, size * 0.1);
-      renderer.ctx.beginPath();
-      renderer.ctx.moveTo(x + Math.cos(angle) * size * 0.3, y + Math.sin(angle) * size * 0.3);
-      renderer.ctx.lineTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
-      renderer.ctx.stroke();
-    }
+    renderer.ctx.strokeRect(-ringSize / 2 + x, -ringSize / 2 + y, ringSize, ringSize);
 
     renderer.ctx.restore();
     return;
   }
 
-  // Draw glow
-  if (renderer.settings.glowEffects) {
-    renderer.ctx.shadowColor = colors.glow;
-    renderer.ctx.shadowBlur = isUltra
-      ? size * 0.9
-      : performanceTier === 'normal'
-        ? size / 2
-        : size / 3;
+  // Status effect/damage coloring overrides the dye
+  let dyeColor = colors.highlight;
+  if (enemy.isFrozen) {
+    dyeColor = '#00FFFF';
+  } else if (enemy.isSlowed) {
+    dyeColor = '#00CCFF';
+  } else if (enemy.isHit) {
+    dyeColor = '#FFFFFF';
   }
 
-  // Aura pulse for buffer enemies
+  // Aura pulse for buffer enemies (preserved from previous renderer)
   if (type === 'buffer' && performanceTier !== 'low') {
     const pulse = 1 + Math.sin(renderer.glowPhase * 2) * 0.08;
     const radius = size * 1.8 * pulse;
@@ -630,20 +270,17 @@ export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
     renderer.ctx.globalAlpha = 0.7;
   }
 
-  // Draw enemy body in local space so we can rotate by heading and add jitter.
-  const scaledSize = size * motion.scale;
-
   // Ultra-tier wake trail to clearly differentiate from normal.
-  if (isUltra && type !== 'buffer') {
-    const dirX = Math.cos(motion.heading || 0);
-    const dirY = Math.sin(motion.heading || 0);
+  if (isUltra && type !== 'buffer' && Number.isFinite(enemy.headingAngle)) {
+    const dirX = Math.cos(enemy.headingAngle || 0);
+    const dirY = Math.sin(enemy.headingAngle || 0);
     for (let i = 1; i <= 3; i++) {
-      const trailOffset = scaledSize * 0.35 * i;
+      const trailOffset = size * 0.35 * i;
       renderer.ctx.beginPath();
       renderer.ctx.arc(
         x - dirX * trailOffset,
         y - dirY * trailOffset,
-        Math.max(1, scaledSize * (0.34 - i * 0.07)),
+        Math.max(1, size * (0.34 - i * 0.07)),
         0,
         Math.PI * 2
       );
@@ -652,54 +289,30 @@ export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
     }
   }
 
+  // Draw glow shadow (optional setting)
+  if (renderer.settings.glowEffects) {
+    renderer.ctx.save();
+    renderer.ctx.shadowColor = dyeColor;
+    renderer.ctx.shadowBlur = performanceTier === 'low' ? size / 3 : size / 2;
+  }
+
   renderer.ctx.save();
-  renderer.ctx.translate(x + motion.jitterX, y + motion.jitterY);
-  if (type === 'basic' || type === 'edge' || type === 'hijacker' || type === 'timeLimit') {
-    renderer.ctx.rotate(motion.heading);
-  }
+  renderer.ctx.translate(x, y);
 
-  const usedRetroSpriteBody = drawRetroEnemySpriteBody(renderer, enemy, scaledSize, colors);
-
-  const usedThemedBody =
-    usedRetroSpriteBody ||
-    drawThemedEnemyBody(renderer, enemy, scaledSize, colors, useHeavyEffects, performanceTier);
-
-  if (!usedThemedBody) {
-    renderer.ctx.beginPath();
-    drawBaseShapeAtOrigin(renderer, type, scaledSize);
-
-    // Fill with gradient (skip under heavy load)
-    if (useHeavyEffects) {
-      const gradient = renderer.ctx.createRadialGradient(0, 0, 0, 0, 0, scaledSize / 2);
-      gradient.addColorStop(0, colors.highlight);
-      gradient.addColorStop(1, colors.body);
-      renderer.ctx.fillStyle = gradient;
-    } else {
-      renderer.ctx.fillStyle = colors.body;
-    }
-    renderer.ctx.fill();
-  }
-
-  // Outline
-  if (!usedRetroSpriteBody) {
-    renderer.ctx.beginPath();
-    drawBaseShapeAtOrigin(renderer, type, scaledSize);
-    renderer.ctx.strokeStyle = colors.body;
-    renderer.ctx.lineWidth = 2;
-    renderer.ctx.stroke();
-  }
-
-  if (motion.lowHealth && performanceTier !== 'low') {
-    renderer.ctx.beginPath();
-    renderer.ctx.arc(0, 0, scaledSize * 0.62, 0, Math.PI * 2);
-    renderer.ctx.strokeStyle = '#ff6a7a';
-    renderer.ctx.globalAlpha = 0.55;
-    renderer.ctx.lineWidth = Math.max(1, scaledSize * 0.08);
-    renderer.ctx.stroke();
-    renderer.ctx.globalAlpha = 1;
+  // Sprite pixels ARE the enemy — no wrapper badge or geometric shape.
+  // 2.5x base scale matches CyberCrawler sizing.
+  const drewSprite = drawDyedEnemySheetFrame(renderer, enemy, size * 2.5, dyeColor);
+  if (!drewSprite) {
+    // Square grid outline fallback instead of round fallback circles
+    renderer.ctx.strokeStyle = dyeColor;
+    renderer.ctx.lineWidth = 1;
+    renderer.ctx.strokeRect(-size * 0.8, -size * 0.8, size * 1.6, size * 1.6);
   }
 
   renderer.ctx.restore();
+  if (renderer.settings.glowEffects) {
+    renderer.ctx.restore();
+  }
 
   if (isUltra) {
     // Chromatic halo for clearer ultra identity.
@@ -707,43 +320,42 @@ export function drawEnemy(renderer, enemy, performanceTier = 'normal') {
     renderer.ctx.globalCompositeOperation = 'lighter';
     renderer.ctx.globalAlpha = 0.5;
     renderer.ctx.beginPath();
-    renderer.ctx.arc(x, y, scaledSize * 0.68, 0, Math.PI * 2);
+    renderer.ctx.arc(x, y, size * 0.68, 0, Math.PI * 2);
     renderer.ctx.strokeStyle = '#9ee6ff';
-    renderer.ctx.lineWidth = Math.max(1, scaledSize * 0.07);
+    renderer.ctx.lineWidth = Math.max(1, size * 0.07);
     renderer.ctx.stroke();
 
     renderer.ctx.globalAlpha = 0.35;
     renderer.ctx.beginPath();
-    renderer.ctx.arc(x, y, scaledSize * 0.82, 0, Math.PI * 2);
+    renderer.ctx.arc(x, y, size * 0.82, 0, Math.PI * 2);
     renderer.ctx.strokeStyle = '#ff8cf5';
-    renderer.ctx.lineWidth = Math.max(1, scaledSize * 0.05);
+    renderer.ctx.lineWidth = Math.max(1, size * 0.05);
     renderer.ctx.stroke();
     renderer.ctx.restore();
   }
 
-  // Boss indicator
+  // Boss indicator (drawn as block frame bounds)
   if (isBoss) {
     renderer.ctx.strokeStyle = '#FFFF00';
-    renderer.ctx.lineWidth = 3;
-    renderer.ctx.beginPath();
-    renderer.ctx.arc(x, y, scaledSize * 0.62, 0, Math.PI * 2);
-    renderer.ctx.stroke();
+    renderer.ctx.lineWidth = 2.5;
+    const bossRingSize = size * 1.44;
+    renderer.ctx.strokeRect(x - bossRingSize / 2, y - bossRingSize / 2, bossRingSize, bossRingSize);
   }
 
   renderer.ctx.shadowBlur = 0;
   renderer.ctx.globalAlpha = 1;
 
   // Health bar (skip under ultra load)
-  if (performanceTier !== 'low') {
-    drawHealthBar(renderer, x, y + scaledSize / 2 + 5, scaledSize * 1.2, health / maxHealth);
+  if (performanceTier !== 'low' && useHeavyEffects) {
+    drawHealthBar(renderer, x, y + size * 1.25 + 5, size * 2.2, health / maxHealth);
   }
 
   // Status effect indicators
   if (isSlowed && !isFrozen && performanceTier !== 'low') {
-    drawStatusIndicator(renderer, x, y - scaledSize / 2 - 8, '↓', '#00CCFF');
+    drawStatusIndicator(renderer, x, y - size * 1.25 - 8, '↓', '#00CCFF');
   }
   if (isFrozen && performanceTier !== 'low') {
-    drawStatusIndicator(renderer, x, y - scaledSize / 2 - 8, '❄', '#00FFFF');
+    drawStatusIndicator(renderer, x, y - size * 1.25 - 8, '❄', '#00FFFF');
   }
 }
 
