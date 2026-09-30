@@ -58,3 +58,14 @@ dist-ssr
 src/utils/assets/assetUrl.test.js
 scripts/rename-cloudinary-assets.mjs
 scripts/upload-missing-assets.mjs
+#cloudinary safe-upload tooling (allowlist-only publishing, local use only)
+scripts/cloudinary-allowlist.mjs
+scripts/cloudinary-safe-upload.mjs
+scripts/cloudinary-verify.mjs
+scripts/cloudinary-allowlist.code.json
+scripts/cloudinary-allowlist.json
+scripts/cloudinary-dropped.json
+scripts/cloudinary-missing.json
+scripts/cloudinary-checkpoint.json
+scripts/cloudinary-verify-report.json
+scripts/tiled-assets/manifests/city-v2-library-assets.json

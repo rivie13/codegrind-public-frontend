@@ -34,7 +34,7 @@ const SOUND_EFFECTS_RAW = [
   {
     id: 'wave-start',
     name: 'Wave Start',
-    path: '/audio/wave-start.mp3',
+    path: '/audio/wave-start.wav',
     volume: 0.8,
   },
   {
@@ -379,7 +379,7 @@ const soundEffectsRaw = {
     id: 'enemy-reach-end',
     path: '/audio/generated_sound_effects/event_sound_effects/cyberpunk_enemy_reach_end1.wav',
   },
-  'wave-start': { id: 'wave-start', path: '/audio/wave-start.mp3' },
+  'wave-start': { id: 'wave-start', path: '/audio/wave-start.wav' },
   'wave-complete': {
     id: 'wave-complete',
     path: '/audio/generated_sound_effects/event_sound_effects/cyberpunk_wave_complete.wav',
