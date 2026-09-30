@@ -16,21 +16,24 @@
       "name": "d01-mi-animated-objects",
       "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/3_Animated_objects",
       "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/animated-objects",
-      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj"
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-animated-objects.tsj",
+      "exclude": "(^|/)(32x32|48x48)/|@2x"
     },
     {
       "type": "collectionTileset",
       "name": "d01-mi-ui-elements",
       "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/4_User_Interface_Elements",
       "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/ui-elements",
-      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj"
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-ui-elements.tsj",
+      "exclude": "(^|/)(32x32|48x48)/|@2x"
     },
     {
       "type": "collectionTileset",
       "name": "d01-mi-home-designs",
       "sourceDir": "public/city-v2/tiled/interiors/moderninteriors-win/6_Home_Designs",
       "destDir": "public/city-v2/tiled/raw/district-01/interiors/moderninteriors/home-designs",
-      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj"
+      "output": "public/city-v2/tiled/tilesets/district-01/d01-mi-home-designs.tsj",
+      "exclude": "/(32x32|48x48)/(?!Shooting_Range_Design_layer_1_32x32\\.png$|Gym_layer_1_32x32\\.png$|Ice_Cream_Shop_Design_layer_1_48x48\\.png$|Condominium_Design_layer_1_48x48\\.png$)|@2x"
     },
     {
       "type": "collectionTileset",
