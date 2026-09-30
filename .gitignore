@@ -40,6 +40,10 @@ dist-ssr
 /public/audio/karl-casey/*
 /public/audio/phaser_sound_effects/*
 
+#only keep Enemies spritesheet local by ignoring file
+#not allowed to distribute this asset (licensing)
+/public/assets/Enemies.png
+
 #No coverage files in the git...
 /coverage/*
 
