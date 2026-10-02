@@ -3,12 +3,14 @@ import {
   Box,
   Button,
   HStack,
+  Input,
   ListItem,
   SimpleGrid,
   Stack,
   Text,
   UnorderedList,
 } from '@chakra-ui/react';
+import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import PageTemplate from '../../components/layout/PageTemplate';
 import PageSeo from '../../components/seo/PageSeo';
@@ -41,6 +43,8 @@ const LANGUAGE_CARDS = [
     path: '/learning/javascript-path',
     desc: 'The language of the web. Every interactive site you have used runs on JavaScript.',
     isBeta: true,
+    // Unlinked from the catalog for now; the route stays live and the data stays.
+    isHidden: true,
   },
   {
     label: 'Java',
@@ -52,6 +56,32 @@ const LANGUAGE_CARDS = [
     path: '/learning/java-path',
     desc: 'Widely used in enterprise, Android, and CS courses. Strict types teach good habits early.',
     isBeta: true,
+    // Unlinked from the catalog for now; the route stays live and the data stays.
+    isHidden: true,
+  },
+];
+
+// Catalog entries that live outside learning paths (plain links, no trial logic).
+const LINK_CARDS = [
+  {
+    label: 'DSA Interview Prep',
+    accent: 'var(--cg-accent-red)',
+    badgeBg: 'rgba(139, 31, 31, 0.14)',
+    badgeColor: 'var(--cg-accent-red)',
+    hoverBg: 'rgba(139, 31, 31, 0.12)',
+    path: '/problems',
+    desc: 'Coming as a full Op. For now, drill the live interview problem bank directly.',
+    badge: 'Bank live',
+  },
+  {
+    label: 'Forge Sims',
+    accent: 'var(--cg-accent-blue)',
+    badgeBg: 'rgba(10, 44, 154, 0.14)',
+    badgeColor: 'var(--cg-accent-blue)',
+    hoverBg: 'rgba(10, 44, 154, 0.12)',
+    path: '/ai-problems/browse',
+    desc: 'Browse AI-forged challenges or forge your own custom problems to train on.',
+    badge: 'Sims',
   },
 ];
 
@@ -59,6 +89,7 @@ function LearningLandingPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const guest = useGuestProgressCtx();
+  const [catalogQuery, setCatalogQuery] = useState('');
   const selectedTrialTrack = guest?.selectedTrialTrack || guest?.progress?.pathChoice || null;
   const selectedTrialLearningPath =
     guest?.selectedTrialLearningPath || guest?.progress?.trialLearningPath || null;
@@ -84,19 +115,28 @@ function LearningLandingPage() {
     navigate(card.path);
   };
 
+  const query = catalogQuery.trim().toLowerCase();
+  const matchesQuery = (label, desc) =>
+    query.length === 0 || label.toLowerCase().includes(query) || desc.toLowerCase().includes(query);
+  // Hidden cards stay out of the catalog; their routes and data are untouched.
+  const visibleLanguageCards = LANGUAGE_CARDS.filter(
+    (card) => !card.isHidden && matchesQuery(card.label, card.desc)
+  );
+  const visibleLinkCards = LINK_CARDS.filter((card) => matchesQuery(card.label, card.desc));
+
   return (
     <PageTemplate showGiphyBackground>
       <PageSeo
-        title="Learn to Code with Interactive Learning Paths"
-        description="Start learning to code with CodeGrind's interactive learning paths for Python, JavaScript and Java: short lessons, real coding exercises, an AI assistant you control, and games that reinforce every concept."
+        title="All Ops: Interactive Coding Courses"
+        description="Browse CodeGrind ops: Intro Python for absolute beginners, the DSA interview prep bank, and AI-forged sim challenges. Short lessons, real coding exercises, and games that reinforce every concept."
         path="/learning"
-        keywords="learn to code, coding learning path, python for beginners, javascript beginner, java beginner, gamified coding, coding game for beginners"
+        keywords="learn to code, coding courses, python for beginners, dsa interview prep, gamified coding, coding game for beginners"
       />
       <RetroPageShell
         mainMaxW="container.lg"
-        heroFileLabel="learning.exe"
-        heroTitle="Choose Your Language"
-        heroSubtitle="A fast learning loop: pick a language, work through short lessons, solve real problems in the editor, and use AI as a tool you verify instead of a black box. Module 0 stays open to guests so you can start immediately."
+        heroFileLabel="ops-catalog.exe"
+        heroTitle="All Ops"
+        heroSubtitle="A fast learning loop: pick an op, work through short lessons, solve real problems in the editor, and use AI as a tool you verify instead of a black box. Module 0 stays open to guests so you can start immediately."
         heroMeta="Module 0 open"
         topSlot={
           <Box
@@ -124,12 +164,27 @@ function LearningLandingPage() {
         }
       >
         <RetroPanel
-          fileLabel="paths.ini"
-          title="Learning Path Catalog"
-          subtitle="Guest trials lock onto the first language you choose, while signed-in users can move freely between paths."
+          fileLabel="ops.ini"
+          title="Op Catalog"
+          subtitle="Guest trials lock onto the first op you choose, while signed-in users can move freely between ops."
         >
+          <Box mb={5} maxW="420px">
+            <Input
+              value={catalogQuery}
+              onChange={(event) => setCatalogQuery(event.target.value)}
+              placeholder="Search ops..."
+              aria-label="Search ops"
+              bg="var(--cg-panel-shell)"
+              border="2px solid var(--cg-window-shadow)"
+              borderRadius="0"
+              color="var(--cg-text)"
+              fontFamily="var(--cg-font-retro-display)"
+              _placeholder={{ color: 'var(--cg-muted)' }}
+              _focus={{ borderColor: 'var(--cg-link)', boxShadow: 'var(--cg-window-inset)' }}
+            />
+          </Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 5 }}>
-            {LANGUAGE_CARDS.map((card) => {
+            {visibleLanguageCards.map((card) => {
               const isGuestLanguageLocked =
                 !isAuthenticated &&
                 Boolean(selectedTrialLearningPath) &&
@@ -199,6 +254,51 @@ function LearningLandingPage() {
                 </RetroInset>
               );
             })}
+            {visibleLinkCards.map((card) => (
+              <RetroInset
+                key={card.label}
+                p={{ base: 4, md: 5 }}
+                display="flex"
+                flexDirection="column"
+                gap={4}
+                minH="100%"
+                transition="background 120ms ease, transform 120ms ease"
+                _hover={{
+                  bg: card.hoverBg,
+                  transform: 'translate(-1px, -1px)',
+                }}
+              >
+                <HStack justify="space-between" align="start" spacing={3}>
+                  <Box>
+                    <Text
+                      color={card.accent}
+                      fontSize={{ base: 'lg', md: 'xl' }}
+                      fontWeight="700"
+                      textTransform="uppercase"
+                      letterSpacing="0.08em"
+                    >
+                      {card.label}
+                    </Text>
+                  </Box>
+                  <Badge bg={card.badgeBg} color={card.badgeColor}>
+                    {card.badge}
+                  </Badge>
+                </HStack>
+
+                <Text color="var(--cg-text)" fontSize="sm" lineHeight="1.7" flex="1">
+                  {card.desc}
+                </Text>
+
+                <Button as={RouterLink} to={card.path} alignSelf="flex-start" color={card.accent}>
+                  Open
+                </Button>
+              </RetroInset>
+            ))}
+            {visibleLanguageCards.length === 0 && visibleLinkCards.length === 0 ? (
+              <Text color="var(--cg-muted)" fontSize="sm" fontFamily="var(--cg-font-retro-display)">
+                No ops match that search. Clear the search to see everything.
+              </Text>
+            ) : null}
           </SimpleGrid>
         </RetroPanel>
 

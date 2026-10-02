@@ -19,7 +19,6 @@ import {
   Text,
   Tooltip,
   useDisclosure,
-  useToast,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import React, { lazy, Suspense, useEffect, useState } from 'react';
@@ -29,7 +28,6 @@ import useHasHydrated from '../../hooks/useHasHydrated';
 import useCompactLandscapeShellMode from '../../hooks/useCompactLandscapeShellMode';
 import { api } from '../../services/api';
 import { normalizeSitePath } from '../seo/siteMetadata';
-import { SEO_LANDING_PAGE_PATHS } from '../../data/seoLandingPages';
 import CodegrindWordmark from './CodegrindWordmark';
 
 //import logger from utils
@@ -65,7 +63,6 @@ function Navigation() {
   const hasHydrated = useHasHydrated();
   const isCompactLandscapeShellMode = useCompactLandscapeShellMode();
   const { logout, user, isAuthenticated } = useAuth();
-  const toast = useToast();
   const {
     isOpen: isAuthModalOpen,
     onOpen: onAuthModalOpen,
@@ -75,8 +72,6 @@ function Navigation() {
   const [isLogoAnimationEnabled, setIsLogoAnimationEnabled] = useState(true);
   const normalizedPathname = normalizeSitePath(location.pathname);
   const isLearningRoute = normalizedPathname.startsWith('/learning');
-  const isProblemRoute = normalizedPathname.includes('/problems') && !isLearningRoute;
-  const isPracticeGuideRoute = SEO_LANDING_PAGE_PATHS.includes(normalizedPathname);
   const [learningRateLimit, setLearningRateLimit] = useState(null);
   const [learningCooldownRemaining, setLearningCooldownRemaining] = useState(0);
   const displayName = user?.username || user?.displayName || user?.email || 'Agent';
@@ -185,87 +180,6 @@ function Navigation() {
       logger.error('Logout failed:');
       logger.debug(error.stack);
     }
-  };
-
-  // Helper function to show authentication required toast
-  const showAuthToast = (featureName) => {
-    toast({
-      title: 'Authentication Required',
-      description: `Please sign up or log in to access ${featureName}. Create an account to unlock all features!`,
-      status: 'warning',
-      duration: 5000,
-      isClosable: true,
-      position: 'top',
-      render: ({ title, description, onClose }) => (
-        <Box
-          bg="var(--cg-window-face)"
-          border="2px solid var(--cg-window-shadow)"
-          p={4}
-          color="var(--cg-text)"
-          boxShadow="var(--cg-window-outset), 10px 10px 0 rgba(0, 0, 0, 0.12)"
-          maxW="450px"
-        >
-          <Box
-            fontWeight="bold"
-            color="var(--cg-accent-amber)"
-            mb={2}
-            fontFamily="var(--cg-font-retro-display)"
-            textTransform="uppercase"
-            letterSpacing="0.08em"
-          >
-            {title}
-          </Box>
-          <Box fontSize="sm" mb={3} fontFamily="var(--cg-font-retro-display)">
-            {description}
-          </Box>
-          <HStack spacing={2}>
-            <Box
-              as="button"
-              fontSize="xs"
-              bg="var(--cg-window-face)"
-              color="var(--cg-accent-amber)"
-              border="2px solid var(--cg-window-shadow)"
-              boxShadow="var(--cg-window-outset)"
-              px={3}
-              py={1}
-              fontFamily="var(--cg-font-retro-display)"
-              _hover={{ bg: 'rgba(255,255,255,0.18)' }}
-              onClick={() => {
-                onClose();
-                onAuthModalOpen();
-              }}
-            >
-              Sign Up / Login
-            </Box>
-            <Box
-              as="button"
-              fontSize="xs"
-              bg="var(--cg-window-face)"
-              color="var(--cg-muted)"
-              border="2px solid var(--cg-window-shadow)"
-              boxShadow="var(--cg-window-outset)"
-              px={3}
-              py={1}
-              fontFamily="var(--cg-font-retro-display)"
-              _hover={{ bg: 'rgba(255,255,255,0.18)', color: 'var(--cg-text)' }}
-              onClick={onClose}
-            >
-              Close
-            </Box>
-          </HStack>
-        </Box>
-      ),
-    });
-  };
-
-  // Helper function to handle protected link clicks
-  const handleProtectedLinkClick = (e, path, featureName) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      showAuthToast(featureName);
-      return false;
-    }
-    return true;
   };
 
   const formatCooldown = (seconds) => {
@@ -559,128 +473,106 @@ function Navigation() {
           ) : null}
         </Box>
         <HStack spacing={6} display={desktopNavDisplay}>
-          <ChakraLink as={Link} to="/" {...getNavTone(location.pathname === '/')}>
-            Home
-          </ChakraLink>
-          <Menu>
-            <MenuButton {...getNavTone(isProblemRoute)}>Problems</MenuButton>
-            <MenuList {...dropdownMenuProps}>
-              <MenuItem
-                as={isAuthenticated ? Link : 'button'}
-                to={isAuthenticated ? '/problems' : undefined}
-                onClick={(e) =>
-                  !isAuthenticated && handleProtectedLinkClick(e, '/problems', 'Interview Problems')
-                }
-                {...dropdownItemProps}
+          {!isAuthenticated ? (
+            <>
+              <ChakraLink
+                as={Link}
+                to="/about"
+                {...getNavTone(location.pathname.startsWith('/about'))}
               >
-                Interview Problems
-              </MenuItem>
-              <MenuItem as={Link} to="/ai-problems" {...dropdownItemProps}>
-                AI Generated Problems
-              </MenuItem>
-            </MenuList>
-          </Menu>
-          <ChakraLink as={Link} to="/games" {...getNavTone(location.pathname.includes('/games'))}>
-            Games
-          </ChakraLink>
-          <ChakraLink
-            as={Link}
-            to="/learning"
-            {...getNavTone(location.pathname.startsWith('/learning'))}
-          >
-            Learning
-          </ChakraLink>
-          <ChakraLink
-            as={isAuthenticated ? Link : 'button'}
-            to={isAuthenticated ? '/store' : undefined}
-            onClick={(e) =>
-              !isAuthenticated && handleProtectedLinkClick(e, '/store', 'Data Packet Store')
-            }
-            {...getNavTone(location.pathname.startsWith('/store'))}
-          >
-            Store
-          </ChakraLink>
-          <ChakraLink
-            as={Link}
-            to="/leaderboards"
-            {...getNavTone(location.pathname === '/leaderboards')}
-          >
-            Leaderboards
-          </ChakraLink>
-
-          {/* More Menu for less frequently used items */}
-          <Menu>
-            <MenuButton
-              {...getNavTone(
-                ['about', 'privacy-policy', 'updates', 'blog', 'faq'].some((path) =>
-                  location.pathname.includes(path)
-                ) || isPracticeGuideRoute
-              )}
-            >
-              More
-            </MenuButton>
-            <MenuList {...dropdownMenuProps}>
-              <MenuItem as={Link} to="/about" {...dropdownItemProps}>
-                How It Works
-              </MenuItem>
-              <MenuItem as={Link} to="/faq" {...dropdownItemProps}>
-                FAQ
-              </MenuItem>
-              <MenuItem as={Link} to="/coding-interview-practice" {...dropdownItemProps}>
-                Practice Guides
-              </MenuItem>
-              <MenuItem as={Link} to="/blog" {...dropdownItemProps}>
-                Blog
-              </MenuItem>
-              <MenuItem as={Link} to="/updates" {...dropdownItemProps}>
-                Updates
-              </MenuItem>
-              <MenuItem
-                as="a"
-                href="https://stats.uptimerobot.com/MYXleQpuCX"
-                target="_blank"
-                rel="noopener noreferrer"
-                {...dropdownItemProps}
+                Learn More
+              </ChakraLink>
+              <ChakraLink
+                as="button"
+                type="button"
+                onClick={onAuthModalOpen}
+                {...getNavTone(false)}
               >
-                CodeGrind Status Page (External)
-              </MenuItem>
-              <MenuItem as={Link} to="/privacy-policy" {...dropdownItemProps}>
-                Privacy & Your Data
-              </MenuItem>
-            </MenuList>
-          </Menu>
-
-          {/* Upgrade Membership - Keep prominent */}
-          <ChakraLink
-            as={isAuthenticated ? Link : 'button'}
-            to={isAuthenticated ? '/pricing' : undefined}
-            onClick={(e) =>
-              !isAuthenticated && handleProtectedLinkClick(e, '/pricing', 'Upgrade Membership')
-            }
-            {...getUpgradeTone(location.pathname === '/pricing')}
-          >
-            Upgrade
-          </ChakraLink>
-
-          {isAuthenticated ? (
-            <Menu>
-              <MenuButton {...getNavTone(location.pathname.startsWith('/profile'))}>
-                Profile
-              </MenuButton>
-              <MenuList {...dropdownMenuProps}>
-                {renderProfileSummary()}
-                <MenuItem as={Link} to="/profile" {...dropdownItemProps}>
-                  Dashboard
-                </MenuItem>
-                <MenuItem onClick={handleLogout} {...dropdownItemProps}>
-                  Logout
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                Sign In
+              </ChakraLink>
+            </>
           ) : (
-            <ChakraLink as="button" type="button" onClick={onAuthModalOpen} {...getNavTone(false)}>
-              Sign In
-            </ChakraLink>
+            <>
+              <Menu>
+                <MenuButton {...getNavTone(location.pathname.startsWith('/profile'))}>
+                  Safehouse
+                </MenuButton>
+                <MenuList {...dropdownMenuProps}>
+                  {renderProfileSummary()}
+                  <MenuItem as={Link} to="/profile" {...dropdownItemProps}>
+                    Dashboard
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout} {...dropdownItemProps}>
+                    Logout
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <Menu>
+                <MenuButton {...getNavTone(location.pathname.startsWith('/learning'))}>
+                  Ops
+                </MenuButton>
+                <MenuList {...dropdownMenuProps}>
+                  <MenuItem as={Link} to="/learning" {...dropdownItemProps}>
+                    All Ops
+                  </MenuItem>
+                  <MenuItem as={Link} to="/learning/python-path" {...dropdownItemProps}>
+                    Intro Python
+                  </MenuItem>
+                  <MenuItem as={Link} to="/problems" {...dropdownItemProps}>
+                    DSA Interview Prep
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <Menu>
+                <MenuButton {...getNavTone(location.pathname.includes('/ai-problems'))}>
+                  Sims
+                </MenuButton>
+                <MenuList {...dropdownMenuProps}>
+                  <MenuItem as={Link} to="/ai-problems/browse" {...dropdownItemProps}>
+                    Browse Challenges
+                  </MenuItem>
+                  <MenuItem as={Link} to="/ai-problems/create" {...dropdownItemProps}>
+                    Forge a Challenge
+                  </MenuItem>
+                  <MenuItem as={Link} to="/ai-problems/browse" {...dropdownItemProps}>
+                    Search Challenges
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <ChakraLink
+                as={Link}
+                to="/leaderboards"
+                {...getNavTone(location.pathname === '/leaderboards')}
+              >
+                Ranks
+              </ChakraLink>
+              <Menu>
+                <MenuButton
+                  {...getNavTone(
+                    ['blog', 'updates'].some((path) => location.pathname.includes(path))
+                  )}
+                >
+                  Crew
+                </MenuButton>
+                <MenuList {...dropdownMenuProps}>
+                  <MenuItem as={Link} to="/blog" {...dropdownItemProps}>
+                    Blog
+                  </MenuItem>
+                  <MenuItem as={Link} to="/updates" {...dropdownItemProps}>
+                    Updates
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+
+              {/* Upgrade Membership - Keep prominent */}
+              <ChakraLink
+                as={Link}
+                to="/pricing"
+                {...getUpgradeTone(location.pathname === '/pricing')}
+              >
+                Upgrade
+              </ChakraLink>
+            </>
           )}
         </HStack>
 
@@ -706,102 +598,66 @@ function Navigation() {
                 WebkitOverflowScrolling: 'touch',
               }}
             >
-              <MenuItem as={Link} to="/" {...dropdownItemProps}>
-                Home
-              </MenuItem>
-              <MenuItem
-                as={isAuthenticated ? Link : 'button'}
-                to={isAuthenticated ? '/problems' : undefined}
-                onClick={(e) =>
-                  !isAuthenticated && handleProtectedLinkClick(e, '/problems', 'Interview Problems')
-                }
-                {...dropdownItemProps}
-              >
-                Problems — Interview
-              </MenuItem>
-              <MenuItem as={Link} to="/ai-problems" {...dropdownItemProps}>
-                Problems — AI Generated
-              </MenuItem>
-              <MenuItem as={Link} to="/games" {...dropdownItemProps}>
-                Games
-              </MenuItem>
-              <MenuItem as={Link} to="/learning" {...dropdownItemProps}>
-                Learning
-              </MenuItem>
-              <MenuItem
-                as={isAuthenticated ? Link : 'button'}
-                to={isAuthenticated ? '/store' : undefined}
-                onClick={(e) =>
-                  !isAuthenticated && handleProtectedLinkClick(e, '/store', 'Data Packet Store')
-                }
-                {...dropdownItemProps}
-              >
-                Store
-              </MenuItem>
-              <MenuItem as={Link} to="/leaderboards" {...dropdownItemProps}>
-                Leaderboards
-              </MenuItem>
-              <Box height="1px" bg="var(--cg-window-dark)" my={1} mx={3} />
-              <MenuItem as={Link} to="/about" {...dropdownItemProps}>
-                How It Works
-              </MenuItem>
-              <MenuItem as={Link} to="/faq" {...dropdownItemProps}>
-                FAQ
-              </MenuItem>
-              <MenuItem as={Link} to="/coding-interview-practice" {...dropdownItemProps}>
-                Practice Guides
-              </MenuItem>
-              <MenuItem as={Link} to="/blog" {...dropdownItemProps}>
-                Blog
-              </MenuItem>
-              <MenuItem as={Link} to="/updates" {...dropdownItemProps}>
-                Updates
-              </MenuItem>
-              <MenuItem
-                as="a"
-                href="https://stats.uptimerobot.com/MYXleQpuCX"
-                target="_blank"
-                rel="noopener noreferrer"
-                {...dropdownItemProps}
-              >
-                CodeGrind Status Page (External)
-              </MenuItem>
-              <MenuItem as={Link} to="/privacy-policy" {...dropdownItemProps}>
-                Privacy & Your Data
-              </MenuItem>
-              <Box height="1px" bg="var(--cg-window-dark)" my={1} mx={3} />
-              <MenuItem
-                as={isAuthenticated ? Link : 'button'}
-                to={isAuthenticated ? '/pricing' : undefined}
-                onClick={(e) =>
-                  !isAuthenticated && handleProtectedLinkClick(e, '/pricing', 'Upgrade Membership')
-                }
-                {...dropdownItemProps}
-                bg="rgba(118, 81, 0, 0.12)"
-                color="var(--cg-accent-amber)"
-                _hover={{ bg: 'rgba(118, 81, 0, 0.2)', color: 'var(--cg-accent-amber)' }}
-                _focus={{
-                  bg: 'rgba(118, 81, 0, 0.2)',
-                  color: 'var(--cg-accent-amber)',
-                  boxShadow: 'var(--cg-window-inset)',
-                }}
-              >
-                Upgrade
-              </MenuItem>
-              {isAuthenticated ? (
+              {!isAuthenticated ? (
+                <>
+                  <MenuItem as={Link} to="/about" {...dropdownItemProps}>
+                    Learn More
+                  </MenuItem>
+                  <MenuItem onClick={onAuthModalOpen} {...dropdownItemProps}>
+                    Sign In
+                  </MenuItem>
+                </>
+              ) : (
                 <>
                   {renderProfileSummary()}
                   <MenuItem as={Link} to="/profile" {...dropdownItemProps}>
-                    Dashboard
+                    Safehouse
+                  </MenuItem>
+                  <Box height="1px" bg="var(--cg-window-dark)" my={1} mx={3} />
+                  <MenuItem as={Link} to="/learning" {...dropdownItemProps}>
+                    Ops — All Ops
+                  </MenuItem>
+                  <MenuItem as={Link} to="/learning/python-path" {...dropdownItemProps}>
+                    Ops — Intro Python
+                  </MenuItem>
+                  <MenuItem as={Link} to="/problems" {...dropdownItemProps}>
+                    Ops — DSA Interview Prep
+                  </MenuItem>
+                  <MenuItem as={Link} to="/ai-problems/browse" {...dropdownItemProps}>
+                    Sims — Browse Challenges
+                  </MenuItem>
+                  <MenuItem as={Link} to="/ai-problems/create" {...dropdownItemProps}>
+                    Sims — Forge a Challenge
+                  </MenuItem>
+                  <MenuItem as={Link} to="/leaderboards" {...dropdownItemProps}>
+                    Ranks
+                  </MenuItem>
+                  <MenuItem as={Link} to="/blog" {...dropdownItemProps}>
+                    Crew — Blog
+                  </MenuItem>
+                  <MenuItem as={Link} to="/updates" {...dropdownItemProps}>
+                    Crew — Updates
+                  </MenuItem>
+                  <Box height="1px" bg="var(--cg-window-dark)" my={1} mx={3} />
+                  <MenuItem
+                    as={Link}
+                    to="/pricing"
+                    {...dropdownItemProps}
+                    bg="rgba(118, 81, 0, 0.12)"
+                    color="var(--cg-accent-amber)"
+                    _hover={{ bg: 'rgba(118, 81, 0, 0.2)', color: 'var(--cg-accent-amber)' }}
+                    _focus={{
+                      bg: 'rgba(118, 81, 0, 0.2)',
+                      color: 'var(--cg-accent-amber)',
+                      boxShadow: 'var(--cg-window-inset)',
+                    }}
+                  >
+                    Upgrade
                   </MenuItem>
                   <MenuItem onClick={handleLogout} {...dropdownItemProps}>
                     Logout
                   </MenuItem>
                 </>
-              ) : (
-                <MenuItem onClick={onAuthModalOpen} {...dropdownItemProps}>
-                  Sign In
-                </MenuItem>
               )}
             </MenuList>
           </Menu>

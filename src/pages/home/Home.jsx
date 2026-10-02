@@ -992,8 +992,6 @@ const Home = () => {
                   requiresLandscapeForDemo={requiresLandscapeForDemo}
                   hasCompletedQuickDemo={hasCompletedQuickDemo}
                   onBeginDemo={handleBeginDemo}
-                  onSignIn={onAuthOpen}
-                  isAuthenticated={isAuthenticated}
                   user={user}
                 />
               ) : null}

@@ -1,4 +1,15 @@
-import { Box, Container, Divider, Grid, GridItem, HStack, Link, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Divider,
+  Grid,
+  GridItem,
+  HStack,
+  Link,
+  SimpleGrid,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import versionData from '../../data/updates/version.json';
@@ -22,6 +33,45 @@ const detectReducedMotion = () => {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 };
+
+const FOOTER_COLUMNS = [
+  {
+    heading: 'Ops',
+    links: [
+      { label: 'All Ops', href: '/learning' },
+      { label: 'Intro Python', href: '/learning/python-path' },
+      { label: 'DSA Interview Prep', href: '/problems' },
+      { label: 'Browse Sims', href: '/ai-problems/browse' },
+      { label: 'Forge a Challenge', href: '/ai-problems/create' },
+    ],
+  },
+  {
+    heading: 'Help',
+    links: [
+      { label: 'How It Works', href: '/about' },
+      { label: 'FAQ', href: '/faq' },
+      { label: 'Practice Guides', href: '/coding-interview-practice' },
+      { label: 'Updates', href: '/updates' },
+    ],
+  },
+  {
+    heading: 'Legal',
+    links: [
+      { label: 'Privacy & Your Data', href: '/privacy-policy' },
+      { label: 'Contact', href: `mailto:${getSupportEmail('info')}` },
+    ],
+  },
+  {
+    heading: 'Company',
+    links: [
+      { label: 'Blog', href: '/blog' },
+      { label: 'Ranks', href: '/leaderboards' },
+      { label: 'Upgrade', href: '/pricing' },
+      { label: 'Status', href: 'https://stats.uptimerobot.com/MYXleQpuCX', isExternal: true },
+      { label: "Riviera's GitHub", href: 'https://github.com/rivie13/', isExternal: true },
+    ],
+  },
+];
 
 function Footer() {
   const siteVersion = versionData.version || import.meta.env.VITE_SITE_VERSION;
@@ -63,137 +113,198 @@ function Footer() {
   }, []);
 
   return (
-    <Box
-      as="footer"
-      bg="linear-gradient(180deg, var(--cg-window-face-strong) 0%, var(--cg-window) 100%)"
-      position="fixed"
-      bottom="0"
-      width="100%"
-      left="0"
-      right="0"
-      borderTop="2px solid var(--cg-window-light)"
-      boxShadow="inset 0 1px 0 rgba(255,255,255,0.65), 0 -1px 0 var(--cg-window-dark)"
-      zIndex="1000"
-      height={isCompactLandscapeFooterMode ? '56px' : { base: '56px', md: '60px' }}
-      minHeight={isCompactLandscapeFooterMode ? '56px' : { base: '56px', md: '60px' }}
-      py={isCompactLandscapeFooterMode ? 2 : { base: 2, md: 0 }}
-      overflow="hidden"
-    >
-      <Container
-        maxW="container.xl"
-        px={isCompactLandscapeFooterMode ? 4 : { base: 4, md: '40px' }}
-        h={isCompactLandscapeFooterMode ? 'auto' : { base: 'auto', md: '100%' }}
-        display="flex"
-        alignItems={isCompactLandscapeFooterMode ? 'stretch' : { base: 'stretch', md: 'center' }}
+    <>
+      {/* Rich sitemap footer (desktop, in-flow above the fixed status bar) */}
+      <Box
+        as="footer"
+        bg="linear-gradient(180deg, var(--cg-window-face-strong) 0%, var(--cg-window) 100%)"
+        borderTop="2px solid var(--cg-window-light)"
+        boxShadow="inset 0 1px 0 rgba(255,255,255,0.65)"
+        display={isCompactLandscapeFooterMode ? 'none' : { base: 'none', md: 'block' }}
       >
-        {/* Mobile footer (compact) */}
-        <Box
-          width="100%"
-          display={isCompactLandscapeFooterMode ? 'flex' : { base: 'flex', md: 'none' }}
-          alignItems="center"
-          justifyContent="center"
-          color="var(--cg-text)"
-          fontSize="xs"
-        >
-          <Text fontWeight="medium" letterSpacing="tight">
-            © {new Date().getFullYear()} Riviera Sperduto. All rights reserved.
+        <Container maxW="container.xl" px={{ md: '40px' }} py={8}>
+          <SimpleGrid columns={{ md: 2, lg: 4 }} spacing={8}>
+            {FOOTER_COLUMNS.map((column) => (
+              <VStack key={column.heading} align="start" spacing={3}>
+                <Text
+                  fontWeight="700"
+                  fontSize="sm"
+                  textTransform="uppercase"
+                  letterSpacing="0.08em"
+                  color="var(--cg-text)"
+                  fontFamily="var(--cg-font-retro-display)"
+                >
+                  {column.heading}
+                </Text>
+                {column.links.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    isExternal={link.isExternal}
+                    fontSize="sm"
+                    color="var(--cg-muted)"
+                    fontFamily="var(--cg-font-retro-display)"
+                    _hover={{ color: 'var(--cg-link)', textDecoration: 'none' }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </VStack>
+            ))}
+          </SimpleGrid>
+          <Text
+            fontSize="2xs"
+            color="var(--cg-muted)"
+            fontFamily="var(--cg-font-retro-display)"
+            textAlign="center"
+            maxW="640px"
+            mx="auto"
+            mt={8}
+          >
+            {FOOTER_DISCLAIMER_NOTICE}
           </Text>
-        </Box>
-        {/* Use Grid with three columns */}
-        <Grid
-          display={isCompactLandscapeFooterMode ? 'none' : { base: 'none', md: 'grid' }}
-          templateColumns={{ base: '1fr', md: '1fr 2fr 1fr' }}
-          gap={{ base: 2, md: 3 }}
-          color="var(--cg-text)"
-          fontSize="xs"
-          alignItems={{ base: 'start', md: 'center' }}
-          width="100%"
+        </Container>
+      </Box>
+      <Box
+        as="footer"
+        bg="linear-gradient(180deg, var(--cg-window-face-strong) 0%, var(--cg-window) 100%)"
+        position="fixed"
+        bottom="0"
+        width="100%"
+        left="0"
+        right="0"
+        borderTop="2px solid var(--cg-window-light)"
+        boxShadow="inset 0 1px 0 rgba(255,255,255,0.65), 0 -1px 0 var(--cg-window-dark)"
+        zIndex="1000"
+        height={isCompactLandscapeFooterMode ? '56px' : { base: '56px', md: '60px' }}
+        minHeight={isCompactLandscapeFooterMode ? '56px' : { base: '56px', md: '60px' }}
+        py={isCompactLandscapeFooterMode ? 2 : { base: 2, md: 0 }}
+        overflow="hidden"
+      >
+        <Container
+          maxW="container.xl"
+          px={isCompactLandscapeFooterMode ? 4 : { base: 4, md: '40px' }}
+          h={isCompactLandscapeFooterMode ? 'auto' : { base: 'auto', md: '100%' }}
+          display="flex"
+          alignItems={isCompactLandscapeFooterMode ? 'stretch' : { base: 'stretch', md: 'center' }}
         >
-          {/* Left: Copyright */}
-          <GridItem display="flex" justifyContent={{ base: 'center', md: 'flex-end' }}>
+          {/* Mobile footer (compact) */}
+          <Box
+            width="100%"
+            display={isCompactLandscapeFooterMode ? 'flex' : { base: 'flex', md: 'none' }}
+            alignItems="center"
+            justifyContent="center"
+            color="var(--cg-text)"
+            fontSize="xs"
+          >
             <Text fontWeight="medium" letterSpacing="tight">
               © {new Date().getFullYear()} Riviera Sperduto. All rights reserved.
             </Text>
-          </GridItem>
-
-          {/* Middle: Disclaimer */}
-          <GridItem
-            textAlign="center"
-            display={{ base: 'none', md: 'block' }}
-            px={4}
-            borderX={{ md: '1px solid' }}
-            borderColor={{ md: 'var(--cg-window-dark)' }}
-            overflow="hidden"
+          </Box>
+          {/* Use Grid with three columns */}
+          <Grid
+            display={isCompactLandscapeFooterMode ? 'none' : { base: 'none', md: 'grid' }}
+            templateColumns={{ base: '1fr', md: '1fr 2fr 1fr' }}
+            gap={{ base: 2, md: 3 }}
+            color="var(--cg-text)"
+            fontSize="xs"
+            alignItems={{ base: 'start', md: 'center' }}
+            width="100%"
           >
-            {isCompactLandscapeFooterMode ? (
-              <Box overflow="hidden" whiteSpace="nowrap" maxW="100%" mx="auto">
-                <Box
-                  display="inline-flex"
-                  minW="max-content"
-                  animation={
-                    prefersReducedMotion ? undefined : `${footerNoticeTicker} 24s linear infinite`
-                  }
-                >
-                  <Text as="span" fontSize="2xs" flexShrink={0} pr={12}>
-                    {FOOTER_DISCLAIMER_NOTICE}
-                  </Text>
-                  <Text as="span" fontSize="2xs" flexShrink={0} pr={12}>
-                    {FOOTER_DISCLAIMER_NOTICE}
-                  </Text>
-                </Box>
-              </Box>
-            ) : (
-              <Text fontSize="2xs" maxW="600px" mx="auto">
-                {FOOTER_DISCLAIMER_NOTICE}
+            {/* Left: Copyright */}
+            <GridItem display="flex" justifyContent={{ base: 'center', md: 'flex-end' }}>
+              <Text fontWeight="medium" letterSpacing="tight">
+                © {new Date().getFullYear()} Riviera Sperduto. All rights reserved.
               </Text>
-            )}
-          </GridItem>
+            </GridItem>
 
-          {/* Right: Links */}
-          <GridItem display="flex" justifyContent={{ base: 'center', md: 'flex-end' }}>
-            <HStack
-              spacing={{ base: 3, md: 5 }}
-              divider={
-                <Divider orientation="vertical" height="16px" borderColor="var(--cg-window-dark)" />
-              }
-              px={2}
-              py={1}
-              bg="rgba(255,255,255,0.18)"
-              border="1px solid var(--cg-window-shadow)"
-              boxShadow="var(--cg-window-inset)"
-              flexWrap={{ base: 'wrap', md: 'nowrap' }}
-              rowGap={{ base: 2, md: 0 }}
-              justify={{ base: 'center', md: 'flex-end' }}
+            {/* Middle: Disclaimer */}
+            <GridItem
+              textAlign="center"
+              display={{ base: 'none', md: 'block' }}
+              px={4}
+              borderX={{ md: '1px solid' }}
+              borderColor={{ md: 'var(--cg-window-dark)' }}
+              overflow="hidden"
             >
-              <Link href="/about" {...footerLinkProps}>
-                About
-              </Link>
-              <Link href="/faq" {...footerLinkProps}>
-                FAQ
-              </Link>
-              <Link href="/privacy-policy" {...footerLinkProps}>
-                Privacy
-              </Link>
-              <Link href="/blog" {...footerLinkProps}>
-                Blog
-              </Link>
-              <Link href="https://stats.uptimerobot.com/MYXleQpuCX" isExternal {...footerLinkProps}>
-                Status
-              </Link>
-              <Link href="/updates" {...footerLinkProps}>
-                Version {siteVersion}
-              </Link>
-              <Link href="https://github.com/rivie13/" isExternal {...footerLinkProps}>
-                Riviera's GitHub
-              </Link>
-              <Link href={`mailto:${getSupportEmail('info')}`} {...footerLinkProps}>
-                Contact
-              </Link>
-            </HStack>
-          </GridItem>
-        </Grid>
-      </Container>
-    </Box>
+              {isCompactLandscapeFooterMode ? (
+                <Box overflow="hidden" whiteSpace="nowrap" maxW="100%" mx="auto">
+                  <Box
+                    display="inline-flex"
+                    minW="max-content"
+                    animation={
+                      prefersReducedMotion ? undefined : `${footerNoticeTicker} 24s linear infinite`
+                    }
+                  >
+                    <Text as="span" fontSize="2xs" flexShrink={0} pr={12}>
+                      {FOOTER_DISCLAIMER_NOTICE}
+                    </Text>
+                    <Text as="span" fontSize="2xs" flexShrink={0} pr={12}>
+                      {FOOTER_DISCLAIMER_NOTICE}
+                    </Text>
+                  </Box>
+                </Box>
+              ) : (
+                <Text fontSize="2xs" maxW="600px" mx="auto">
+                  {FOOTER_DISCLAIMER_NOTICE}
+                </Text>
+              )}
+            </GridItem>
+
+            {/* Right: Links */}
+            <GridItem display="flex" justifyContent={{ base: 'center', md: 'flex-end' }}>
+              <HStack
+                spacing={{ base: 3, md: 5 }}
+                divider={
+                  <Divider
+                    orientation="vertical"
+                    height="16px"
+                    borderColor="var(--cg-window-dark)"
+                  />
+                }
+                px={2}
+                py={1}
+                bg="rgba(255,255,255,0.18)"
+                border="1px solid var(--cg-window-shadow)"
+                boxShadow="var(--cg-window-inset)"
+                flexWrap={{ base: 'wrap', md: 'nowrap' }}
+                rowGap={{ base: 2, md: 0 }}
+                justify={{ base: 'center', md: 'flex-end' }}
+              >
+                <Link href="/about" {...footerLinkProps}>
+                  About
+                </Link>
+                <Link href="/faq" {...footerLinkProps}>
+                  FAQ
+                </Link>
+                <Link href="/privacy-policy" {...footerLinkProps}>
+                  Privacy
+                </Link>
+                <Link href="/blog" {...footerLinkProps}>
+                  Blog
+                </Link>
+                <Link
+                  href="https://stats.uptimerobot.com/MYXleQpuCX"
+                  isExternal
+                  {...footerLinkProps}
+                >
+                  Status
+                </Link>
+                <Link href="/updates" {...footerLinkProps}>
+                  Version {siteVersion}
+                </Link>
+                <Link href="https://github.com/rivie13/" isExternal {...footerLinkProps}>
+                  Riviera's GitHub
+                </Link>
+                <Link href={`mailto:${getSupportEmail('info')}`} {...footerLinkProps}>
+                  Contact
+                </Link>
+              </HStack>
+            </GridItem>
+          </Grid>
+        </Container>
+      </Box>
+    </>
   );
 }
 
