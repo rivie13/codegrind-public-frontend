@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCompactLandscapeShellMode from '../../hooks/useCompactLandscapeShellMode';
+import useIsMobileDevice from '../../hooks/useIsMobileDevice';
 import AnimatedLogo from './AnimatedLogo';
 
 const MotionBox = motion(Box);
@@ -25,20 +26,20 @@ const CHROME_INSET = WINDOW_INSET;
 const CHROME_LABEL_BG = 'var(--home-retro-surface-muted)';
 
 const HERO_LEAD = 'Write Code. Defend It.';
-const HERO_DESCRIPTION = 'Write code that powers defenses. Learn coding by playing a game.';
+const HERO_DESCRIPTION = 'Learn how to write real code by playing games.';
 
 const HERO_FEATURES = [
   {
     title: 'Write Code',
-    text: 'Type real Python and run it instantly.',
+    text: 'Type out code and watch it run.',
   },
   {
     title: 'Defend',
-    text: 'Towers defend what your code does.',
+    text: 'Your code makes defenses and attacks.',
   },
   {
     title: 'Level Up',
-    text: 'AI helps, you verify and grow.',
+    text: 'Go through levels, gain xp and learn new coding skills.',
   },
 ];
 
@@ -305,6 +306,7 @@ const HomeHeroSection = ({
   const isOverlay = variant === 'overlay';
   const isPrelaunch = revealPhase === 'prelaunch';
   const isCompactLandscapeShellMode = useCompactLandscapeShellMode();
+  const isMobileDevice = useIsMobileDevice();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [isSecondaryExpanded, setIsSecondaryExpanded] = useState(false);
 
@@ -314,7 +316,6 @@ const HomeHeroSection = ({
   const overlayPaddingY = isCompactLandscapeShellMode ? 3 : { base: 6, md: 10 };
   const heroSpacing = isCompactLandscapeShellMode ? 3 : { base: 4, md: 6 };
   const ctaButtonSize = isCompactLandscapeShellMode ? 'md' : 'lg';
-  const heroStatusFontSize = isCompactLandscapeShellMode ? '2xs' : { base: 'xs', md: 'sm' };
 
   if (!isOverlay) {
     return (
@@ -470,7 +471,7 @@ const HomeHeroSection = ({
                 lineHeight="1"
                 textTransform="uppercase"
               >
-                {requiresLandscapeForDemo ? 'portrait lock' : 'active window'}
+                {requiresLandscapeForDemo && !isMobileDevice ? 'portrait lock' : 'active window'}
               </Text>
               <WindowControls />
             </HStack>
@@ -581,7 +582,7 @@ const HomeHeroSection = ({
                     </Collapse>
                   </VStack>
 
-                  {requiresLandscapeForDemo ? (
+                  {requiresLandscapeForDemo && !isMobileDevice ? (
                     <Box alignSelf="center" width="100%" maxW="420px">
                       <RotatePhonePrompt
                         isCompactLandscapeShellMode={isCompactLandscapeShellMode}
@@ -606,42 +607,6 @@ const HomeHeroSection = ({
                           boxShadow={WINDOW_OUTSET}
                         >
                           <VStack align="stretch" spacing={3.5}>
-                            <Box
-                              py={2.5}
-                              bg="var(--home-retro-surface-shell)"
-                              boxShadow={WINDOW_INSET}
-                            >
-                              <Text
-                                color="var(--home-retro-title-start)"
-                                fontFamily="var(--cg-font-retro-display)"
-                                fontSize={heroStatusFontSize}
-                                fontWeight="700"
-                                letterSpacing="0.04em"
-                                textTransform="uppercase"
-                                textAlign="center"
-                              >
-                                {user?.onboardingComplete
-                                  ? 'Onboarding complete. Choose safehouse or profile to resume.'
-                                  : hasCompletedQuickDemo
-                                    ? 'Demo completed — check back soon.'
-                                    : requiresLandscapeForDemo
-                                      ? 'Rotate to landscape to unlock the playable demo.'
-                                      : 'Press Begin Demo to boot the game when you are set.'}
-                              </Text>
-                            </Box>
-
-                            <Text
-                              color="var(--home-retro-text-muted)"
-                              fontFamily="var(--cg-font-retro-terminal)"
-                              fontSize={{ base: 'sm', md: 'md' }}
-                              lineHeight="1.6"
-                              textAlign="center"
-                            >
-                              {user?.onboardingComplete
-                                ? 'C:\\> cd safehouse && start'
-                                : 'C:\\> run city --live'}
-                            </Text>
-
                             <Stack
                               direction={{ base: 'column', md: 'row' }}
                               spacing={3}
@@ -716,28 +681,6 @@ const HomeHeroSection = ({
                                 </>
                               )}
                             </Stack>
-
-                            <Text
-                              color={
-                                user?.onboardingComplete
-                                  ? 'var(--home-retro-accent-green)'
-                                  : requiresLandscapeForDemo
-                                    ? 'var(--home-retro-accent-amber)'
-                                    : 'var(--home-retro-accent-green)'
-                              }
-                              fontFamily="var(--cg-font-retro-terminal)"
-                              fontSize={{ base: 'sm', md: 'md' }}
-                              lineHeight="1.6"
-                              textAlign="center"
-                            >
-                              {hasCompletedQuickDemo
-                                ? 'Demo completed — check back soon for the full experience.'
-                                : user?.onboardingComplete
-                                  ? 'Onboarding complete. Safehouse and profile ready.'
-                                  : requiresLandscapeForDemo
-                                    ? 'Demo launch stays disabled until your phone is in landscape mode.'
-                                    : 'Press begin demo to select your character and load into the world.'}
-                            </Text>
                           </VStack>
                         </Box>
                       </MotionBox>
@@ -760,13 +703,17 @@ const HomeHeroSection = ({
             {['home.exe', 'city.exe', 'notes.txt'].map((entryLabel) => (
               <TaskbarButton key={entryLabel}>{entryLabel}</TaskbarButton>
             ))}
-            <Box
+            <Text
               ml="auto"
-              px={3}
-              py={1.5}
-              bg="var(--home-retro-surface-shell)"
-              boxShadow={WINDOW_INSET}
+              color="var(--home-retro-text-muted)"
+              fontFamily="var(--cg-font-retro-terminal)"
+              fontSize={{ base: 'xs', md: 'sm' }}
+              lineHeight="1.6"
+              aria-hidden="true"
             >
+              {user?.onboardingComplete ? 'C:\\> cd safehouse && start' : 'C:\\> run city --live'}
+            </Text>
+            <Box px={3} py={1.5} bg="var(--home-retro-surface-shell)" boxShadow={WINDOW_INSET}>
               <Text
                 color="var(--home-retro-text)"
                 fontFamily="var(--cg-font-retro-display)"

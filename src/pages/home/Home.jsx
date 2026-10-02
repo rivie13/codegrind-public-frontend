@@ -18,7 +18,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import CityCodegrindLaunchExperience from '../../components/city/CityCodegrindLaunchExperience';
 import PageTemplate from '../../components/layout/PageTemplate';
 import PageSeo from '../../components/seo/PageSeo';
-import HomeActionBar from './HomeActionBar';
 import HomeBackgroundEffects from './HomeBackgroundEffects';
 import HomeHeroSection from './HomeHeroSection';
 import HomeShowcaseSection from './HomeShowcaseSection';
@@ -192,6 +191,9 @@ const Home = () => {
     isMobileDevice && !isLandscapeViewport && isHomeDemoNonGameFocusActive;
   const canLaunchDemo = !isMobileDevice || isLandscapeViewport || canStayInPortraitDemo;
   const requiresLandscapeForDemo = isMobileDevice && !isLandscapeViewport && !canStayInPortraitDemo;
+  // No landscape enforcement on handhelds: content routes are blocked by MobileAccessGuard
+  // and portrait is a first-class state, so the demo never blurs/nags on mobile.
+  const enforceLandscapeForDemo = requiresLandscapeForDemo && !isMobileDevice;
 
   const beginDemoLaunch = useCallback(
     ({ playTypingAudio = false, shellTheme = 'retro-desktop', skipBootSequence = false } = {}) => {
@@ -1010,9 +1012,9 @@ const Home = () => {
                     }
                   >
                     <Box
-                      opacity={requiresLandscapeForDemo ? 0.35 : 1}
-                      filter={requiresLandscapeForDemo ? 'blur(2px)' : 'none'}
-                      pointerEvents={requiresLandscapeForDemo ? 'none' : 'auto'}
+                      opacity={enforceLandscapeForDemo ? 0.35 : 1}
+                      filter={enforceLandscapeForDemo ? 'blur(2px)' : 'none'}
+                      pointerEvents={enforceLandscapeForDemo ? 'none' : 'auto'}
                       transition="opacity 0.2s ease"
                     >
                       <Suspense fallback={null}>
@@ -1034,7 +1036,7 @@ const Home = () => {
                       </Suspense>
                     </Box>
 
-                    {requiresLandscapeForDemo ? (
+                    {enforceLandscapeForDemo ? (
                       <Box
                         position="absolute"
                         inset="0"
@@ -1176,7 +1178,6 @@ const Home = () => {
                         }
                       : {})}
                   >
-                    <HomeActionBar />
                     <HomeShowcaseSection />
                   </MotionBox>
                 )}
