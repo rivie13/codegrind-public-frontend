@@ -990,8 +990,6 @@ const Home = () => {
                   canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
                   hasCompletedQuickDemo={hasCompletedQuickDemo}
                   onBeginDemo={handleBeginDemo}
-                  onSignIn={onAuthOpen}
-                  isAuthenticated={isAuthenticated}
                   user={user}
                 />
               ) : null}

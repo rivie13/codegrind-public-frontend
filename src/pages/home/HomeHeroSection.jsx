@@ -174,8 +174,6 @@ const HomeHeroSection = ({
   canBegin = false,
   hasCompletedQuickDemo = false,
   onBeginDemo,
-  onSignIn,
-  isAuthenticated = false,
   user = null,
 }) => {
   const navigate = useNavigate();
@@ -517,33 +515,6 @@ const HomeHeroSection = ({
                                       ? 'Demo Completed'
                                       : 'Begin Demo — 2 min'}
                                   </RetroButton>
-                                  {!isAuthenticated && onSignIn ? (
-                                    <Button
-                                      size={ctaButtonSize}
-                                      onClick={onSignIn}
-                                      px={isCompactLandscapeShellMode ? 7 : 10}
-                                      minW={{ base: '100%', md: '230px' }}
-                                      bg="transparent"
-                                      color="var(--home-retro-text-muted)"
-                                      border="1px solid var(--home-retro-border-mid)"
-                                      borderRadius="0"
-                                      fontFamily="var(--cg-font-retro-display)"
-                                      fontWeight="400"
-                                      letterSpacing="0.04em"
-                                      textTransform="uppercase"
-                                      boxShadow={CHROME_INSET}
-                                      _hover={{
-                                        bg: 'var(--home-retro-surface-shell)',
-                                        color: 'var(--home-retro-text)',
-                                      }}
-                                      _active={{
-                                        boxShadow: CHROME_INSET,
-                                        bg: 'var(--home-retro-surface-muted)',
-                                      }}
-                                    >
-                                      Sign In
-                                    </Button>
-                                  ) : null}
                                 </>
                               )}
                             </Stack>
