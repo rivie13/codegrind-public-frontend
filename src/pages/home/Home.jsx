@@ -191,9 +191,6 @@ const Home = () => {
     isMobileDevice && !isLandscapeViewport && isHomeDemoNonGameFocusActive;
   const canLaunchDemo = !isMobileDevice || isLandscapeViewport || canStayInPortraitDemo;
   const requiresLandscapeForDemo = isMobileDevice && !isLandscapeViewport && !canStayInPortraitDemo;
-  // No landscape enforcement on handhelds: content routes are blocked by MobileAccessGuard
-  // and portrait is a first-class state, so the demo never blurs/nags on mobile.
-  const enforceLandscapeForDemo = requiresLandscapeForDemo && !isMobileDevice;
 
   const beginDemoLaunch = useCallback(
     ({ playTypingAudio = false, shellTheme = 'retro-desktop', skipBootSequence = false } = {}) => {
@@ -991,7 +988,6 @@ const Home = () => {
                   variant="overlay"
                   revealPhase={revealPhase}
                   canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
-                  requiresLandscapeForDemo={requiresLandscapeForDemo}
                   hasCompletedQuickDemo={hasCompletedQuickDemo}
                   onBeginDemo={handleBeginDemo}
                   onSignIn={onAuthOpen}
@@ -1011,96 +1007,23 @@ const Home = () => {
                         : undefined
                     }
                   >
-                    <Box
-                      opacity={enforceLandscapeForDemo ? 0.35 : 1}
-                      filter={enforceLandscapeForDemo ? 'blur(2px)' : 'none'}
-                      pointerEvents={enforceLandscapeForDemo ? 'none' : 'auto'}
-                      transition="opacity 0.2s ease"
-                    >
-                      <Suspense fallback={null}>
-                        <HomepageTDDemo
-                          bootPrepDelayMs={demoBootPrepDelayMs}
-                          revealPhase={revealPhase}
-                          embeddedShellTheme={demoShellTheme}
-                          allowEmbeddedHandheldPageScroll={allowEmbeddedHandheldPageScroll}
-                          skipBootSequence={isQuickDemo}
-                          onReady={handleDemoReady}
-                          onVictory={handleDemoVictory}
-                          onLearningXp={handleDemoLearningXp}
-                          onBootStateChange={handleDemoBootStateChange}
-                          onEmbeddedChatFocusChange={handleEmbeddedChatFocusChange}
-                          preinitTypingAudio={typingAudioRef}
-                          demoLaunchStartTime={demoLaunchStartTimeRef.current}
-                          liteFirstActivity={funnelStarted}
-                        />
-                      </Suspense>
-                    </Box>
-
-                    {enforceLandscapeForDemo ? (
-                      <Box
-                        position="absolute"
-                        inset="0"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        px={{ base: 5, md: 8 }}
-                        py={{ base: 3, md: 4 }}
-                        pointerEvents="auto"
-                      >
-                        <Box className="cg-panel-window" overflow="hidden" maxW="560px">
-                          <Box className="cg-titlebar" px={{ base: 3, md: 4 }} py={2}>
-                            <Text
-                              color="#f5f7ff"
-                              fontFamily="var(--cg-font-retro-display)"
-                              fontSize={{ base: 'xs', md: 'sm' }}
-                              fontWeight="700"
-                              letterSpacing="0.08em"
-                              textTransform="uppercase"
-                            >
-                              orientation-check.exe
-                            </Text>
-                          </Box>
-                          <Box p={{ base: 4, md: 5 }} bg="#d4d0c8">
-                            <Box
-                              bg="#efebe7"
-                              border="1px solid #7f7f7f"
-                              boxShadow="var(--cg-window-inset)"
-                              p={{ base: 4, md: 5 }}
-                            >
-                              <Text
-                                fontSize={{ base: 'md', md: 'lg' }}
-                                fontWeight="700"
-                                color="#7a2800"
-                                fontFamily="var(--cg-font-retro-display)"
-                                mb={2}
-                                textTransform="uppercase"
-                                letterSpacing="0.08em"
-                              >
-                                Rotate To Landscape To Continue Demo
-                              </Text>
-                              <Text
-                                color="#1f2430"
-                                fontSize={{ base: 'sm', md: 'md' }}
-                                lineHeight="1.7"
-                                fontFamily="var(--cg-font-retro-display)"
-                              >
-                                Game view stays landscape-only for control stability. Switch to
-                                Editor, Problem, or Chat to keep working in portrait.
-                              </Text>
-                              <Text
-                                color="#0a2c9a"
-                                fontSize={{ base: 'xs', md: 'sm' }}
-                                lineHeight="1.6"
-                                mt={3}
-                                fontFamily="var(--cg-font-retro-display)"
-                              >
-                                Rotate sideways to resume without losing your current progress.
-                              </Text>
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Box>
-                    ) : null}
+                    <Suspense fallback={null}>
+                      <HomepageTDDemo
+                        bootPrepDelayMs={demoBootPrepDelayMs}
+                        revealPhase={revealPhase}
+                        embeddedShellTheme={demoShellTheme}
+                        allowEmbeddedHandheldPageScroll={allowEmbeddedHandheldPageScroll}
+                        skipBootSequence={isQuickDemo}
+                        onReady={handleDemoReady}
+                        onVictory={handleDemoVictory}
+                        onLearningXp={handleDemoLearningXp}
+                        onBootStateChange={handleDemoBootStateChange}
+                        onEmbeddedChatFocusChange={handleEmbeddedChatFocusChange}
+                        preinitTypingAudio={typingAudioRef}
+                        demoLaunchStartTime={demoLaunchStartTimeRef.current}
+                        liteFirstActivity={funnelStarted}
+                      />
+                    </Suspense>
                   </Box>
                 ) : (
                   <Box px={{ base: 5, md: 8 }} pb={{ base: 3, md: 4 }}>
@@ -1156,7 +1079,6 @@ const Home = () => {
                   variant="compact"
                   revealPhase={revealPhase}
                   canBegin={hasHydrated && canLaunchDemo && !hasCompletedQuickDemo}
-                  requiresLandscapeForDemo={requiresLandscapeForDemo}
                   hasCompletedQuickDemo={hasCompletedQuickDemo}
                   onBeginDemo={handleBeginDemo}
                   isAuthenticated={isAuthenticated}
