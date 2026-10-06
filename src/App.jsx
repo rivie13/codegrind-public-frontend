@@ -116,13 +116,13 @@ const getLearningPathForTrialProblemSlug = (titleSlug) => {
     .trim()
     .toLowerCase();
   if (!normalized) return null;
-  if (normalized.startsWith('lp-js-')) return 'javascript-path';
-  if (normalized.startsWith('lp-java-')) return 'java-path';
-  if (normalized.startsWith('lp-')) return 'python-path';
+  if (normalized.startsWith('lp-js-')) return 'javascript-beginner';
+  if (normalized.startsWith('lp-java-')) return 'java-beginner';
+  if (normalized.startsWith('lp-')) return 'python-beginner';
   return null;
 };
 
-const getLearningFallbackPath = (guest, fallback = '/learning/python-path') => {
+const getLearningFallbackPath = (guest, fallback = '/learning/python-beginner') => {
   const selectedPath = getSelectedTrialLearningPath(guest);
   return selectedPath ? `/learning/${selectedPath}` : fallback;
 };
@@ -146,7 +146,7 @@ const RequireAuthOrGuestTrialProblem = ({ children, fallback = '/games/clusters'
   if (isAuthenticated) return children;
   // Guest chose beginner path → can't solve cluster problems
   if (selectedTrialTrack === 'beginner') {
-    return <Navigate to={`/learning/${selectedTrialLearningPath || 'python-path'}`} replace />;
+    return <Navigate to={`/learning/${selectedTrialLearningPath || 'python-beginner'}`} replace />;
   }
   // No path chosen yet → must complete demo & choose via modal first
   if (!selectedTrialTrack) {
@@ -195,7 +195,7 @@ const RequireAuthOrBeginnerTrialTrack = ({ children, pathId = null }) => {
   return children;
 };
 
-const RequireAuthOrLearningTrialNode = ({ children, fallback = '/learning/python-path' }) => {
+const RequireAuthOrLearningTrialNode = ({ children, fallback = '/learning/python-beginner' }) => {
   const { isAuthenticated, loading } = useAuth();
   const guest = useGuestProgressCtx();
   const { pathSlug, nodeId } = useParams();
@@ -215,19 +215,24 @@ const RequireAuthOrLearningTrialNode = ({ children, fallback = '/learning/python
   }
 
   const isM0Node =
-    (normalizedPath === 'python-path' &&
+    (normalizedPath === 'python-beginner' &&
       typeof nodeId === 'string' &&
-      nodeId.startsWith('py-m0-')) ||
-    (normalizedPath === 'javascript-path' &&
+      nodeId.startsWith('py-m01')) ||
+    (normalizedPath === 'javascript-beginner' &&
       typeof nodeId === 'string' &&
-      nodeId.startsWith('js-m0-')) ||
-    (normalizedPath === 'java-path' && typeof nodeId === 'string' && nodeId.startsWith('java-m0-'));
+      nodeId.startsWith('js-m01')) ||
+    (normalizedPath === 'java-beginner' &&
+      typeof nodeId === 'string' &&
+      nodeId.startsWith('ja-m01'));
 
   if (isM0Node) return children;
   return <Navigate to={getLearningFallbackPath(guest, fallback)} replace />;
 };
 
-const RequireAuthOrLearningTrialProblem = ({ children, fallback = '/learning/python-path' }) => {
+const RequireAuthOrLearningTrialProblem = ({
+  children,
+  fallback = '/learning/python-beginner',
+}) => {
   const { isAuthenticated, loading } = useAuth();
   const guest = useGuestProgressCtx();
   const { titleSlug, pathSlug } = useParams();
@@ -446,15 +451,15 @@ function App({ router: Router = BrowserRouter, routerProps = {} }) {
                           {/* Learning path routes — accessible to guests for trial (M0) */}
                           <Route
                             path="/learning/python"
-                            element={<Navigate to="/learning/python-path" replace />}
+                            element={<Navigate to="/learning/python-beginner" replace />}
                           />
                           <Route
                             path="/learning/javascript"
-                            element={<Navigate to="/learning/javascript-path" replace />}
+                            element={<Navigate to="/learning/javascript-beginner" replace />}
                           />
                           <Route
                             path="/learning/java"
-                            element={<Navigate to="/learning/java-path" replace />}
+                            element={<Navigate to="/learning/java-beginner" replace />}
                           />
                           <Route
                             path="/learning/:pathSlug"

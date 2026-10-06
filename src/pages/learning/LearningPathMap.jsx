@@ -29,6 +29,7 @@ import {
   FiStar,
 } from 'react-icons/fi';
 import PageTemplate from '../../components/layout/PageTemplate';
+import { RetroPanel } from '../../components/retro/RetroPageShell';
 import AdModal from '../../components/towerDefense/AdModal';
 import GuestSignupWall from '../../components/guest/GuestSignupWall';
 import BottomBannerAd from '../../components/ads/BottomBannerAd';
@@ -197,17 +198,16 @@ const TRANS_TOTAL_FWD = TRANS_ZOOM_MS + TRANS_STATIC_MS + TRANS_REVEAL_MS;
 const TRANS_TOTAL_BWD = 250 + 180 + 250;
 
 const PATH_M0_PREFIXES = {
-  'python-path': 'py-m0-',
-  'javascript-path': 'js-m0-',
-  'java-path': 'java-m0-',
-  'cpp-path': 'cpp-m0-',
+  'python-beginner': 'py-m01',
+  'javascript-beginner': 'js-m01',
+  'java-beginner': 'ja-m01',
+  'cpp-beginner': 'cp-m01',
 };
 
 function LearningPathMap() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [motionEnabled, setMotionEnabled] = useState(!prefersReducedMotion);
   const [selectedModuleId, setSelectedModuleId] = useState(null);
-  const [selectedCourseId, setSelectedCourseId] = useState(null);
   const toast = useToast();
   const location = useLocation();
   const navigate = useNavigate();
@@ -221,7 +221,6 @@ function LearningPathMap() {
   const isBeginnerTrialLocked = !isAuthenticated && Boolean(guestCtx?.isBeginnerTrialLocked);
   const [searchParams, setSearchParams] = useSearchParams();
   const moduleParam = searchParams.get('module');
-  const courseParam = searchParams.get('course');
   const profileCardCanvasRef = useRef(null);
   const trackedSurfaceKeyRef = useRef(null);
   const mapFlexRef = useRef(null);
@@ -271,9 +270,7 @@ function LearningPathMap() {
 
   const allNodes = useMemo(() => pathData?.nodes || [], [pathData?.nodes]);
   const nodesById = useMemo(() => new Map(allNodes.map((node) => [node.id, node])), [allNodes]);
-  const hasCourses = (pathData?.courseNodeIds?.length ?? 0) > 0;
-  const viewLevel =
-    !selectedCourseId && hasCourses ? 'course' : !selectedModuleId ? 'module' : 'activity';
+  const viewLevel = !selectedModuleId ? 'module' : 'activity';
   const [completedNodes, setCompletedNodes] = useState(() => new Set());
   const [learningRateLimit, setLearningRateLimit] = useState(null);
   const [showLearningAdModal, setShowLearningAdModal] = useState(false);
@@ -511,7 +508,7 @@ function LearningPathMap() {
       if (!node) return false;
       const nodeId = String(node.id || '');
       const moduleId = String(node.moduleId || '');
-      const m0Prefix = PATH_M0_PREFIXES[pathData?.pathId] || 'py-m0-';
+      const m0Prefix = PATH_M0_PREFIXES[pathData?.pathId] || 'py-m01';
       return nodeId.startsWith(m0Prefix) || moduleId.startsWith(m0Prefix);
     },
     [pathData?.pathId]
@@ -523,22 +520,9 @@ function LearningPathMap() {
         if (node.type === LEARNING_NODE_TYPES.ROOT) return true;
         if (![LEARNING_NODE_TYPES.MODULE, LEARNING_NODE_TYPES.CAPSTONE].includes(node.type))
           return false;
-        return !selectedCourseId || node.courseId === selectedCourseId;
+        return true;
       }),
-    [allNodes, selectedCourseId]
-  );
-
-  const courseNodes = useMemo(
-    () =>
-      allNodes.filter((node) =>
-        [LEARNING_NODE_TYPES.ROOT, LEARNING_NODE_TYPES.COURSE].includes(node.type)
-      ),
     [allNodes]
-  );
-
-  const selectedCourse = useMemo(
-    () => allNodes.find((node) => node.id === selectedCourseId) || null,
-    [allNodes, selectedCourseId]
   );
 
   const selectedModule = useMemo(
@@ -565,11 +549,10 @@ function LearningPathMap() {
   );
 
   const layoutNodes = useMemo(() => {
-    const viewNodes =
-      viewLevel === 'course' ? courseNodes : viewLevel === 'module' ? macroNodes : microNodes;
+    const viewNodes = viewLevel === 'module' ? macroNodes : microNodes;
     if (!viewNodes.length) return [];
 
-    if (viewLevel === 'course' || viewLevel === 'module') {
+    if (viewLevel === 'module') {
       const minRow = Math.min(...viewNodes.map((node) => node.position.row ?? 0));
       const minCol = Math.min(...viewNodes.map((node) => node.position.col ?? 0));
       const sorted = [...viewNodes].sort((a, b) => {
@@ -650,7 +633,6 @@ function LearningPathMap() {
     }));
   }, [
     viewLevel,
-    courseNodes,
     macroNodes,
     microNodes,
     macroColumnWidth,
@@ -692,7 +674,7 @@ function LearningPathMap() {
       return results;
     }
 
-    /* Course view & Module view — prereq-based edges */
+    /* Module view — prereq-based edges */
     const findViewAncestor = (nodeId, visited = new Set()) => {
       if (!nodeId || visited.has(nodeId)) return null;
       visited.add(nodeId);
@@ -900,22 +882,6 @@ function LearningPathMap() {
       return;
     }
 
-    /* Course view: click a course to enter its module map */
-    if (viewLevel === 'course') {
-      if (node.type === LEARNING_NODE_TYPES.COURSE) {
-        startViewTransition(
-          'forward',
-          () => {
-            setSelectedCourseId(node.id);
-            setSearchParams({ course: node.id });
-          },
-          node.x,
-          node.y
-        );
-      }
-      return;
-    }
-
     /* Module view: click a module to see its activities */
     if (viewLevel === 'module') {
       if (!isAuthenticated && isBeginnerTrialLocked) {
@@ -931,10 +897,7 @@ function LearningPathMap() {
           'forward',
           () => {
             setSelectedModuleId(node.id);
-            const params = selectedCourseId
-              ? { course: selectedCourseId, module: node.id }
-              : { module: node.id };
-            setSearchParams(params);
+            setSearchParams({ module: node.id });
           },
           node.x,
           node.y
@@ -1087,25 +1050,11 @@ function LearningPathMap() {
   ]);
 
   useEffect(() => {
-    if (!courseParam) {
-      if (selectedCourseId !== null) setSelectedCourseId(null);
-      return;
-    }
-    if (nodesById.has(courseParam)) {
-      if (selectedCourseId !== courseParam) setSelectedCourseId(courseParam);
-      return;
-    }
-    if (selectedCourseId !== null) setSelectedCourseId(null);
-    if (selectedModuleId !== null) setSelectedModuleId(null);
-    setSearchParams({});
-  }, [courseParam, nodesById, selectedCourseId, selectedModuleId, setSearchParams]);
-
-  useEffect(() => {
     if (!moduleParam) {
       if (selectedModuleId !== null) setSelectedModuleId(null);
       return;
     }
-    const m0Prefix = PATH_M0_PREFIXES[pathData?.pathId] || 'py-m0-';
+    const m0Prefix = PATH_M0_PREFIXES[pathData?.pathId] || 'py-m01';
     if (!isAuthenticated && !String(moduleParam).startsWith(m0Prefix)) {
       if (selectedModuleId !== null) setSelectedModuleId(null);
       setSearchParams((prev) => {
@@ -1197,7 +1146,6 @@ function LearningPathMap() {
     }
 
     setCompletedNodes(new Set(pathData.seedCompletedNodeIds || []));
-    setSelectedCourseId(null);
     setSelectedModuleId(null);
     setSearchParams({});
     toast({
@@ -1216,98 +1164,98 @@ function LearningPathMap() {
       </Box>
       <Container maxW="container.xl" py={{ base: 6, lg: 16 }}>
         <VStack spacing={8} align="stretch">
-          <Flex
-            direction={{ base: 'column', lg: 'row' }}
-            justify="space-between"
-            align={{ base: 'flex-start', lg: 'center' }}
-            gap={6}
-          >
-            <Box>
-              <Badge
-                bg="linear-gradient(180deg, rgba(248, 244, 236, 0.98), rgba(223, 214, 199, 0.96))"
-                color="var(--cg-link)"
-                border="1px solid var(--cg-window-shadow)"
-                borderRadius="0"
-                fontFamily="var(--cg-font-retro-display)"
-                boxShadow="inset 1px 1px 0 rgba(255, 255, 255, 0.8), inset -1px -1px 0 rgba(122, 122, 122, 0.75)"
-                mb={3}
-              >
-                LEARNING PATH • DEMO BUILD
-              </Badge>
-              <Heading
-                size="2xl"
-                fontFamily="var(--cg-font-retro-display)"
-                color="var(--cg-link)"
-                letterSpacing="0.01em"
-              >
-                {viewLevel === 'course' ? pathData.title : selectedCourse?.label || pathData.title}
-              </Heading>
-              <Text
-                mt={3}
-                color="var(--cg-text)"
-                fontFamily="var(--cg-font-retro-display)"
-                maxW="720px"
-              >
-                {viewLevel === 'course'
-                  ? pathData.summary || 'Select a course to begin your learning journey.'
-                  : selectedCourse?.description || ''}
-              </Text>
-            </Box>
-            <HStack
-              spacing={{ base: 2, md: 4 }}
-              align="center"
-              flexWrap="wrap"
-              justify={{ base: 'flex-start', lg: 'flex-end' }}
-              w={{ base: '100%', lg: 'auto' }}
+          <RetroPanel>
+            <Flex
+              direction={{ base: 'column', lg: 'row' }}
+              justify="space-between"
+              align={{ base: 'flex-start', lg: 'center' }}
+              gap={6}
             >
-              <HStack
-                spacing={2}
-                bg="linear-gradient(180deg, rgba(244, 239, 231, 0.98), rgba(216, 208, 198, 0.94))"
-                px={{ base: 3, md: 4 }}
-                py={2}
-                borderRadius="0"
-                border="2px solid var(--cg-window-shadow)"
-                boxShadow="var(--cg-window-outset)"
-              >
+              <Box>
+                <Badge
+                  bg="linear-gradient(180deg, rgba(248, 244, 236, 0.98), rgba(223, 214, 199, 0.96))"
+                  color="var(--cg-link)"
+                  border="1px solid var(--cg-window-shadow)"
+                  borderRadius="0"
+                  fontFamily="var(--cg-font-retro-display)"
+                  boxShadow="inset 1px 1px 0 rgba(255, 255, 255, 0.8), inset -1px -1px 0 rgba(122, 122, 122, 0.75)"
+                  mb={3}
+                >
+                  LEARNING PATH • DEMO BUILD
+                </Badge>
+                <Heading
+                  size="2xl"
+                  fontFamily="var(--cg-font-retro-display)"
+                  color="var(--cg-link)"
+                  letterSpacing="0.01em"
+                >
+                  {pathData.title}
+                </Heading>
                 <Text
-                  fontSize="sm"
+                  mt={3}
                   color="var(--cg-text)"
                   fontFamily="var(--cg-font-retro-display)"
+                  maxW="720px"
                 >
-                  Animations
+                  {pathData.summary || ''}
                 </Text>
-                <Switch
-                  isChecked={motionEnabled}
-                  onChange={(event) => setMotionEnabled(event.target.checked)}
-                  colorScheme="blue"
-                />
-              </HStack>
-              <Button
-                size={{ base: 'xs', md: 'sm' }}
-                bg="linear-gradient(180deg, #f4efe7 0%, #d5cec5 100%)"
-                color="var(--cg-text)"
-                border="2px solid var(--cg-window-shadow)"
-                borderRadius="0"
-                boxShadow={RETRO_BUTTON_OUTSET}
-                _hover={{ bg: 'linear-gradient(180deg, #fbf8f1 0%, #e0dad1 100%)' }}
-                _active={{ boxShadow: RETRO_BUTTON_INSET, transform: 'translate(1px, 1px)' }}
-                fontFamily="var(--cg-font-retro-display)"
-                onClick={handleResetProgress}
-              >
-                Reset progress
-              </Button>
+              </Box>
               <HStack
-                spacing={2}
-                fontFamily="var(--cg-font-retro-display)"
-                color="var(--cg-text)"
-                fontSize="sm"
-                display={{ base: 'none', lg: 'inline-flex' }}
+                spacing={{ base: 2, md: 4 }}
+                align="center"
+                flexWrap="wrap"
+                justify={{ base: 'flex-start', lg: 'flex-end' }}
+                w={{ base: '100%', lg: 'auto' }}
               >
-                <FiGitBranch />
-                <Text>Branch unlocks require both sides</Text>
+                <HStack
+                  spacing={2}
+                  bg="linear-gradient(180deg, rgba(244, 239, 231, 0.98), rgba(216, 208, 198, 0.94))"
+                  px={{ base: 3, md: 4 }}
+                  py={2}
+                  borderRadius="0"
+                  border="2px solid var(--cg-window-shadow)"
+                  boxShadow="var(--cg-window-outset)"
+                >
+                  <Text
+                    fontSize="sm"
+                    color="var(--cg-text)"
+                    fontFamily="var(--cg-font-retro-display)"
+                  >
+                    Animations
+                  </Text>
+                  <Switch
+                    isChecked={motionEnabled}
+                    onChange={(event) => setMotionEnabled(event.target.checked)}
+                    colorScheme="blue"
+                  />
+                </HStack>
+                <Button
+                  size={{ base: 'xs', md: 'sm' }}
+                  bg="linear-gradient(180deg, #f4efe7 0%, #d5cec5 100%)"
+                  color="var(--cg-text)"
+                  border="2px solid var(--cg-window-shadow)"
+                  borderRadius="0"
+                  boxShadow={RETRO_BUTTON_OUTSET}
+                  _hover={{ bg: 'linear-gradient(180deg, #fbf8f1 0%, #e0dad1 100%)' }}
+                  _active={{ boxShadow: RETRO_BUTTON_INSET, transform: 'translate(1px, 1px)' }}
+                  fontFamily="var(--cg-font-retro-display)"
+                  onClick={handleResetProgress}
+                >
+                  Reset progress
+                </Button>
+                <HStack
+                  spacing={2}
+                  fontFamily="var(--cg-font-retro-display)"
+                  color="var(--cg-text)"
+                  fontSize="sm"
+                  display={{ base: 'none', lg: 'inline-flex' }}
+                >
+                  <FiGitBranch />
+                  <Text>Branch unlocks require both sides</Text>
+                </HStack>
               </HStack>
-            </HStack>
-          </Flex>
+            </Flex>
+          </RetroPanel>
 
           <Box
             position="relative"
@@ -1357,56 +1305,11 @@ function LearningPathMap() {
                   color="var(--cg-text)"
                   fontFamily="var(--cg-font-retro-display)"
                 >
-                  {viewLevel === 'course'
-                    ? 'Course view: select a course to see its modules.'
-                    : viewLevel === 'module'
-                      ? 'Module view: click a module to zoom in.'
-                      : 'Activity view: module details.'}
+                  {viewLevel === 'module'
+                    ? 'Module view: click a module to zoom in.'
+                    : 'Activity view: module details.'}
                 </Text>
               </HStack>
-              {viewLevel === 'module' && selectedCourse && (
-                <HStack spacing={3} align="center">
-                  <Badge
-                    bg="linear-gradient(180deg, rgba(248, 244, 236, 0.98), rgba(223, 214, 199, 0.96))"
-                    color="var(--cg-link)"
-                    border="1px solid var(--cg-window-shadow)"
-                    borderRadius="0"
-                    fontFamily="var(--cg-font-retro-display)"
-                  >
-                    COURSE
-                  </Badge>
-                  <Text
-                    fontSize="sm"
-                    color="var(--cg-text)"
-                    fontFamily="var(--cg-font-retro-display)"
-                  >
-                    {selectedCourse.label}
-                  </Text>
-                  <Box
-                    as="button"
-                    px={3}
-                    py={1}
-                    fontSize="xs"
-                    fontFamily="var(--cg-font-retro-display)"
-                    color="var(--cg-text)"
-                    border="2px solid var(--cg-window-shadow)"
-                    borderRadius="0"
-                    bg="linear-gradient(180deg, #f4efe7 0%, #d5cec5 100%)"
-                    boxShadow={RETRO_BUTTON_OUTSET}
-                    _hover={{ bg: 'linear-gradient(180deg, #fbf8f1 0%, #e0dad1 100%)' }}
-                    _active={{ boxShadow: RETRO_BUTTON_INSET, transform: 'translate(1px, 1px)' }}
-                    onClick={() => {
-                      startViewTransition('backward', () => {
-                        setSelectedCourseId(null);
-                        setSelectedModuleId(null);
-                        setSearchParams({});
-                      });
-                    }}
-                  >
-                    Back to courses
-                  </Box>
-                </HStack>
-              )}
               {viewLevel === 'activity' && selectedModule && (
                 <HStack spacing={3} align="center">
                   <Badge
@@ -1441,7 +1344,7 @@ function LearningPathMap() {
                     onClick={() => {
                       startViewTransition('backward', () => {
                         setSelectedModuleId(null);
-                        setSearchParams(selectedCourseId ? { course: selectedCourseId } : {});
+                        setSearchParams({});
                       });
                     }}
                   >
@@ -1626,7 +1529,7 @@ function LearningPathMap() {
 
                   {/* Compute net objective — first available node in layout order */}
                   {(() => {
-                    /* In course/module views, COURSE/MODULE/CAPSTONE nodes ARE valid objectives.
+                    /* In module view, MODULE/CAPSTONE nodes ARE valid objectives.
                      In activity view, skip MODULE (it's the view root) and ROOT. */
                     const nextId =
                       layoutNodes.find((n) => {
@@ -1640,7 +1543,7 @@ function LearningPathMap() {
 
                     return layoutNodes.map((node, nodeIndex) => {
                       const isNextObjective = node.id === nextId;
-                      /* Root nodes (path root in course/module view, module header in activity view)
+                      /* Root nodes (path root in module view, module header in activity view)
                        are always shown as completed and are never interactive. */
                       const isViewRoot =
                         node.type === LEARNING_NODE_TYPES.ROOT ||

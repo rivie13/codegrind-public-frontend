@@ -26,10 +26,10 @@ const PATH_CHOICES = new Set(['beginner', 'pro']);
 const getLearningPathIdForNodeId = (nodeId) => {
   if (!nodeId) return null;
   const value = String(nodeId).toLowerCase();
-  if (value.startsWith('py-')) return 'python-path';
-  if (value.startsWith('js-')) return 'javascript-path';
-  if (value.startsWith('java-')) return 'java-path';
-  if (value.startsWith('cpp-')) return 'cpp-path';
+  if (value.startsWith('py-')) return 'python-beginner';
+  if (value.startsWith('js-')) return 'javascript-beginner';
+  if (value.startsWith('java-')) return 'java-beginner';
+  if (value.startsWith('cpp-')) return 'cpp-beginner';
   return null;
 };
 
@@ -37,10 +37,10 @@ const getLearningPathIdForSlug = (slug) => {
   if (!slug) return null;
   const value = String(slug).trim().toLowerCase();
   if (!value || GUEST_SHARED_PRE_CHOICE_SLUGS.has(value)) return null;
-  if (value.startsWith('lp-js-')) return 'javascript-path';
-  if (value.startsWith('lp-java-')) return 'java-path';
-  if (value.startsWith('lp-cpp-')) return 'cpp-path';
-  if (value.startsWith('lp-')) return 'python-path';
+  if (value.startsWith('lp-js-')) return 'javascript-beginner';
+  if (value.startsWith('lp-java-')) return 'java-beginner';
+  if (value.startsWith('lp-cpp-')) return 'cpp-beginner';
+  if (value.startsWith('lp-')) return 'python-beginner';
   return null;
 };
 
@@ -129,57 +129,57 @@ const isSharedPreChoiceLearningNodeId = (nodeId) => {
 };
 
 const LEARNING_TRIAL_CANONICAL_BY_PATH = Object.freeze({
-  'python-path': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS,
-  'javascript-path': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JS,
-  'java-path': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JAVA,
-  'cpp-path': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_CPP,
+  'python-beginner': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS,
+  'javascript-beginner': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JS,
+  'java-beginner': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JAVA,
+  'cpp-beginner': GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_CPP,
 });
 
 const LEARNING_TRIAL_CANONICAL_SET_BY_PATH = Object.freeze({
-  'python-path': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS),
-  'javascript-path': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JS),
-  'java-path': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JAVA),
-  'cpp-path': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_CPP),
+  'python-beginner': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS),
+  'javascript-beginner': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JS),
+  'java-beginner': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_JAVA),
+  'cpp-beginner': new Set(GUEST_LEARNING_TRIAL_CANONICAL_SLUGS_CPP),
 });
 
 // Map slug prefix to the correct ordered canonical list for that language.
 const LANGUAGE_CANONICAL_LISTS = [
-  { prefix: 'lp-js-', pathId: 'javascript-path' },
-  { prefix: 'lp-java-', pathId: 'java-path' },
-  { prefix: 'lp-cpp-', pathId: 'cpp-path' },
+  { prefix: 'lp-js-', pathId: 'javascript-beginner' },
+  { prefix: 'lp-java-', pathId: 'java-beginner' },
+  { prefix: 'lp-cpp-', pathId: 'cpp-beginner' },
 ];
 
 const getLearningPathIdForTrialSlug = (slug) => {
-  if (!slug) return 'python-path';
+  if (!slug) return 'python-beginner';
   for (const { prefix, pathId } of LANGUAGE_CANONICAL_LISTS) {
     if (slug.startsWith(prefix)) return pathId;
   }
-  return 'python-path';
+  return 'python-beginner';
 };
 
-const getCanonicalListForPath = (pathId = 'python-path') =>
-  LEARNING_TRIAL_CANONICAL_BY_PATH[pathId] || LEARNING_TRIAL_CANONICAL_BY_PATH['python-path'];
+const getCanonicalListForPath = (pathId = 'python-beginner') =>
+  LEARNING_TRIAL_CANONICAL_BY_PATH[pathId] || LEARNING_TRIAL_CANONICAL_BY_PATH['python-beginner'];
 
-const getCanonicalSetForPath = (pathId = 'python-path') =>
+const getCanonicalSetForPath = (pathId = 'python-beginner') =>
   LEARNING_TRIAL_CANONICAL_SET_BY_PATH[pathId] ||
-  LEARNING_TRIAL_CANONICAL_SET_BY_PATH['python-path'];
+  LEARNING_TRIAL_CANONICAL_SET_BY_PATH['python-beginner'];
 
-const normalizeLearningTrialCanonicalSlug = (slug, pathId = 'python-path') => {
+const normalizeLearningTrialCanonicalSlug = (slug, pathId = 'python-beginner') => {
   if (!slug) return null;
   const normalizedSlug = String(slug).trim().toLowerCase();
 
-  if (pathId === 'python-path') {
+  if (pathId === 'python-beginner') {
     // hello-world is the home-page demo that stands in for the first
     // python learning trial mission (py-m0-tower-hello redirects to home).
     if (normalizedSlug === 'hello-world') return 'lp-m0-td-hello-print';
     const canonical = GUEST_LEARNING_TRIAL_CANONICAL_BY_SLUG.get(normalizedSlug) || normalizedSlug;
-    return getCanonicalSetForPath('python-path').has(canonical) ? canonical : null;
+    return getCanonicalSetForPath('python-beginner').has(canonical) ? canonical : null;
   }
 
   return getCanonicalSetForPath(pathId).has(normalizedSlug) ? normalizedSlug : null;
 };
 
-const getSolvedLearningTrialCanonicalSlugs = (solvedSlugs, pathId = 'python-path') => {
+const getSolvedLearningTrialCanonicalSlugs = (solvedSlugs, pathId = 'python-beginner') => {
   if (!Array.isArray(solvedSlugs) || solvedSlugs.length === 0) return [];
   const solvedCanonical = new Set();
   const canonicalSet = getCanonicalSetForPath(pathId);
@@ -235,7 +235,7 @@ export const isGuestClusterTrialProblemUnlocked = (slug, solvedSlugs) => {
 
 export const getGuestLearningTrialUnlockedCanonicalSlugs = (
   solvedSlugs,
-  pathId = 'python-path'
+  pathId = 'python-beginner'
 ) => {
   const solvedCanonical = getSolvedLearningTrialCanonicalSlugs(solvedSlugs, pathId);
   return getUnlockedOrderedSlugs(getCanonicalListForPath(pathId), solvedCanonical);
@@ -253,7 +253,7 @@ export const isGuestLearningTrialProblemUnlocked = (slug, solvedSlugs) => {
   return unlockedCanonical.includes(canonical);
 };
 
-const countSolvedLearningTrialProblems = (solvedSlugs, pathId = 'python-path') => {
+const countSolvedLearningTrialProblems = (solvedSlugs, pathId = 'python-beginner') => {
   return getSolvedLearningTrialCanonicalSlugs(solvedSlugs, pathId).length;
 };
 
@@ -468,7 +468,7 @@ const getCanonicalGuestTrialSlug = (slug) => {
   const clusterCanonical = normalizeClusterTrialCanonicalSlug(slug);
   if (clusterCanonical) return clusterCanonical;
 
-  const learningPathId = getLearningPathIdForSlug(slug) || 'python-path';
+  const learningPathId = getLearningPathIdForSlug(slug) || 'python-beginner';
   return normalizeLearningTrialCanonicalSlug(slug, learningPathId);
 };
 
@@ -1587,7 +1587,7 @@ export default function useGuestProgress({ isAuthenticated = false } = {}) {
 
   const hasReachedClusterProblemWall = clusterFreeProblemsRemaining === 0;
 
-  const activeTrialLearningPath = progress.trialLearningPath || 'python-path';
+  const activeTrialLearningPath = progress.trialLearningPath || 'python-beginner';
 
   const learningTrialSolvedCount = useMemo(
     () => countSolvedLearningTrialProblems(progress.problemsSolved, activeTrialLearningPath),

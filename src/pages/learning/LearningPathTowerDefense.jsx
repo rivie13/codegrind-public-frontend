@@ -414,7 +414,7 @@ export default function LearningPathTowerDefense({ pathSlug: pathSlugProp, nodeI
         title="Tower Defense Node Not Found"
         description="This tower-defense lesson is not available yet for the selected learning path."
         actionLabel="Back To Map"
-        onAction={() => navigate('/learning/python-path')}
+        onAction={() => navigate('/learning/python-beginner')}
       />
     );
   }

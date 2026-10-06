@@ -137,10 +137,10 @@ const TRACK_LABELS = {
 
 const LEARNING_PATH_LABELS = {
   'csharp-path': 'C# path',
-  'cpp-path': 'C++ path',
+  'cpp-beginner': 'C++ path',
   'go-path': 'Go path',
-  'javascript-path': 'JavaScript path',
-  'python-path': 'Python path',
+  'javascript-beginner': 'JavaScript path',
+  'python-beginner': 'Python path',
 };
 
 const formatCountLabel = (count, singular, plural = `${singular}s`) => {

@@ -12,10 +12,10 @@ const TRACK_LABELS = {
   pro: 'Pro track',
 };
 const LEARNING_PATH_LABELS = {
-  'cpp-path': 'C++ path',
-  'java-path': 'Java path',
-  'javascript-path': 'JavaScript path',
-  'python-path': 'Python path',
+  'cpp-beginner': 'C++ path',
+  'java-beginner': 'Java path',
+  'javascript-beginner': 'JavaScript path',
+  'python-beginner': 'Python path',
 };
 
 const isIntroTunnelLocked = (snapshot) => {

@@ -10,7 +10,7 @@ const normalizeSlug = (slug) => {
   if (!slug) return null;
   const trimmed = String(slug).trim();
   if (!trimmed) return null;
-  return trimmed.endsWith('-path') ? trimmed : `${trimmed}-path`;
+  return trimmed;
 };
 
 const fetchPathData = async (pathId) => {
@@ -91,6 +91,6 @@ export default function useLearningPathData(pathSlug) {
     loading,
     error,
     refresh,
-    pathId
+    pathId,
   };
 }

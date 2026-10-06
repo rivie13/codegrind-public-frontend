@@ -6,13 +6,6 @@ const basePath = {
   pathId: 'python',
   title: 'Python Path',
   summary: 'Learn Python',
-  capstone: {
-    moduleId: 'capstone-module',
-    title: 'Capstone',
-    summary: 'Final project',
-    prereqs: [],
-    nodes: [],
-  },
 };
 
 describe('learningPathRegistry.normalizeLearningPath', () => {
@@ -31,18 +24,13 @@ describe('learningPathRegistry.normalizeLearningPath', () => {
         title: `Module ${index + 1}`,
         summary: 'module',
         prereqs: [],
-        nodes: [],
+        tasks: [],
       }));
 
       const normalized = normalizeLearningPath({
         ...basePath,
         pathId: `path-${count}`,
         modules,
-        capstone: {
-          ...basePath.capstone,
-          moduleId: `capstone-${count}`,
-          prereqs: modules.map((module) => module.moduleId),
-        },
       });
 
       const moduleNodes = normalized.nodes
@@ -52,7 +40,7 @@ describe('learningPathRegistry.normalizeLearningPath', () => {
       expect(moduleNodes.map((node) => node.position.col)).toEqual(columns);
       expect(moduleNodes.every((node) => node.position.row === 1)).toBe(true);
       expect(normalized.rootId).toBe(`path-${count}-root`);
-      expect(normalized.moduleNodeIds).toContain(`capstone-${count}`);
+      expect(normalized.courseNodeIds).toEqual([]);
     }
   });
 
@@ -61,16 +49,11 @@ describe('learningPathRegistry.normalizeLearningPath', () => {
       ...basePath,
       pathId: 'dependency',
       modules: [
-        { moduleId: 'm1', title: 'M1', summary: '', prereqs: [], nodes: [] },
-        { moduleId: 'm2', title: 'M2', summary: '', prereqs: ['m1'], nodes: [] },
-        { moduleId: 'm3', title: 'M3', summary: '', prereqs: ['m1'], nodes: [] },
-        { moduleId: 'm4', title: 'M4', summary: '', prereqs: ['m2', 'm3'], nodes: [] },
+        { moduleId: 'm1', title: 'M1', summary: '', prereqs: [], tasks: [] },
+        { moduleId: 'm2', title: 'M2', summary: '', prereqs: ['m1'], tasks: [] },
+        { moduleId: 'm3', title: 'M3', summary: '', prereqs: ['m1'], tasks: [] },
+        { moduleId: 'm4', title: 'M4', summary: '', prereqs: ['m2', 'm3'], tasks: [] },
       ],
-      capstone: {
-        ...basePath.capstone,
-        moduleId: 'cap',
-        prereqs: ['m4'],
-      },
     });
 
     const byId = new Map(normalized.nodes.map((node) => [node.id, node]));
@@ -79,10 +62,9 @@ describe('learningPathRegistry.normalizeLearningPath', () => {
     expect(byId.get('m2').position.row).toBe(2);
     expect(byId.get('m3').position.row).toBe(2);
     expect(byId.get('m4').position.row).toBe(3);
-    expect(byId.get('cap').position.row).toBe(4);
   });
 
-  it('builds activity node prerequisites from unlock rules and sequence', () => {
+  it('builds activity task prerequisites from unlock rules and sequence', () => {
     const normalized = normalizeLearningPath({
       ...basePath,
       pathId: 'nodes',
@@ -92,31 +74,26 @@ describe('learningPathRegistry.normalizeLearningPath', () => {
           title: 'Core',
           summary: '',
           prereqs: [],
-          nodes: [
-            { nodeId: 'n1', title: 'N1', summary: '', type: LEARNING_NODE_TYPES.LEARN },
-            { nodeId: 'n2', title: 'N2', summary: '', type: LEARNING_NODE_TYPES.WORKSPACE },
+          tasks: [
+            { taskId: 'n1', title: 'N1', summary: '', kind: LEARNING_NODE_TYPES.LEARN },
+            { taskId: 'n2', title: 'N2', summary: '', kind: LEARNING_NODE_TYPES.WORKSPACE },
             {
-              nodeId: 'n3',
+              taskId: 'n3',
               title: 'N3',
               summary: '',
-              type: LEARNING_NODE_TYPES.TOWER,
+              kind: LEARNING_NODE_TYPES.TOWER,
               unlockRule: { type: 'node_complete', nodeId: 'checkpoint' },
             },
             {
-              nodeId: 'n4',
+              taskId: 'n4',
               title: 'N4',
               summary: '',
-              type: LEARNING_NODE_TYPES.FINAL,
+              kind: LEARNING_NODE_TYPES.FINAL,
               unlockRule: { type: 'module_started' },
             },
           ],
         },
       ],
-      capstone: {
-        ...basePath.capstone,
-        moduleId: 'cap-final',
-        prereqs: ['core'],
-      },
     });
 
     const rootId = normalized.rootId;
