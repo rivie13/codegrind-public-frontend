@@ -450,7 +450,7 @@ describe('useGuestProgress', () => {
     expect(result.current.xpSummary.xp).toBe(startingXp + 12);
   });
 
-  it.each(['javascript-path', 'java-path'])(
+  it.each(['javascript-beginner', 'java-beginner'])(
     'awards the shared homepage demo node after choosing %s',
     async (trialLearningPath) => {
       localStorage.setItem(
@@ -473,7 +473,7 @@ describe('useGuestProgress', () => {
 
       act(() => {
         result.current.recordLpNodeCompleted('py-m0-tower-hello', {
-          pathId: 'python-path',
+          pathId: 'python-beginner',
           nodeType: 'tower',
           nodeTitle: 'Mission 1: Hello Print',
           moduleId: 'py-m0-hello',
@@ -490,7 +490,7 @@ describe('useGuestProgress', () => {
             reason: 'learning_path_node_complete',
             amount: 60,
             context: expect.objectContaining({
-              pathId: 'python-path',
+              pathId: 'python-beginner',
               nodeId: 'py-m0-tower-hello',
               nodeType: 'tower',
             }),
@@ -531,14 +531,14 @@ describe('useGuestProgress', () => {
     const { result } = renderHook(() => useGuestProgress({ isAuthenticated: true }));
 
     act(() => {
-      result.current.recordTrialLearningPath('javascript-path');
-      result.current.recordTrialLearningPath('python-path');
+      result.current.recordTrialLearningPath('javascript-beginner');
+      result.current.recordTrialLearningPath('python-beginner');
     });
 
     expect(result.current.selectedTrialTrack).toBe('beginner');
-    expect(result.current.selectedTrialLearningPath).toBe('javascript-path');
-    expect(result.current.isTrialLearningPathLocked('python-path')).toBe(true);
-    expect(result.current.isTrialLearningPathLocked('javascript-path')).toBe(false);
+    expect(result.current.selectedTrialLearningPath).toBe('javascript-beginner');
+    expect(result.current.isTrialLearningPathLocked('python-beginner')).toBe(true);
+    expect(result.current.isTrialLearningPathLocked('javascript-beginner')).toBe(false);
   });
 
   it('computes cluster trial unlocks from contiguous solves only', () => {
@@ -658,6 +658,6 @@ describe('useGuestProgress', () => {
     });
 
     expect(result.current.selectedTrialTrack).toBe('beginner');
-    expect(result.current.selectedTrialLearningPath).toBe('javascript-path');
+    expect(result.current.selectedTrialLearningPath).toBe('javascript-beginner');
   });
 });

@@ -92,6 +92,7 @@ function RetroPageShell({
   heroTitle,
   heroSubtitle,
   heroPanelProps,
+  hideHero = false,
   mainMaxW = 'container.xl',
   children,
 }) {
@@ -115,29 +116,31 @@ function RetroPageShell({
         <Box flex="1" width="100%">
           <Container maxW={mainMaxW} width="100%" px={{ base: 4, md: 6 }} pb={{ base: 12, md: 20 }}>
             <VStack spacing={{ base: 6, md: 8 }} align="stretch">
-              <RetroPanel
-                fileLabel={heroFileLabel}
-                title={heroTitle}
-                subtitle={heroSubtitle}
-                titlebarActions={
-                  heroMeta ? (
-                    <Text
-                      fontSize="var(--cg-font-size-meta)"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                    >
-                      {heroMeta}
-                    </Text>
-                  ) : null
-                }
-                {...heroPanelProps}
-              >
-                {heroActions ? (
-                  <Flex wrap="wrap" gap={3} align="center">
-                    {heroActions}
-                  </Flex>
-                ) : null}
-              </RetroPanel>
+              {hideHero ? null : (
+                <RetroPanel
+                  fileLabel={heroFileLabel}
+                  title={heroTitle}
+                  subtitle={heroSubtitle}
+                  titlebarActions={
+                    heroMeta ? (
+                      <Text
+                        fontSize="var(--cg-font-size-meta)"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                      >
+                        {heroMeta}
+                      </Text>
+                    ) : null
+                  }
+                  {...heroPanelProps}
+                >
+                  {heroActions ? (
+                    <Flex wrap="wrap" gap={3} align="center">
+                      {heroActions}
+                    </Flex>
+                  ) : null}
+                </RetroPanel>
+              )}
 
               {children}
             </VStack>

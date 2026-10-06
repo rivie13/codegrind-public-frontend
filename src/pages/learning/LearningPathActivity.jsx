@@ -556,7 +556,7 @@ export default function LearningPathActivity() {
     showLearningFetchToast,
   ]);
 
-  const learningPathSlug = pathSlug || pathData?.pathId || 'python-path';
+  const learningPathSlug = pathSlug || pathData?.pathId || 'python-beginner';
 
   const getReturnPath = useCallback(() => {
     if (!node?.moduleId) return `/learning/${learningPathSlug}`;
@@ -960,7 +960,7 @@ export default function LearningPathActivity() {
         title="Learning Path Not Found"
         description="This learning-path activity is not available yet."
         actionLabel="Back to map"
-        onAction={() => navigate('/learning/python-path')}
+        onAction={() => navigate('/learning/python-beginner')}
       />
     );
   }
@@ -1169,11 +1169,11 @@ export default function LearningPathActivity() {
                         color="var(--cg-accent-blue)"
                         onClick={() =>
                           navigate(
-                            `/learning/${pathSlug || pathData?.pathId || 'python-path'}/problems/${node.content.learningProblemSlug}`,
+                            `/learning/${pathSlug || pathData?.pathId || 'python-beginner'}/problems/${node.content.learningProblemSlug}`,
                             {
                               state: {
                                 learningMode: true,
-                                learningLanguage: pathSlug || pathData?.pathId || 'python-path',
+                                learningLanguage: pathSlug || pathData?.pathId || 'python-beginner',
                                 learningPath: {
                                   pathId: pathData.pathId,
                                   nodeId: node.id,
@@ -1192,7 +1192,7 @@ export default function LearningPathActivity() {
                       color="var(--cg-accent-blue)"
                       onClick={() =>
                         navigate(
-                          `/learning/${pathSlug || pathData?.pathId || 'python-path'}/tower/${node.id}`
+                          `/learning/${pathSlug || pathData?.pathId || 'python-beginner'}/tower/${node.id}`
                         )
                       }
                     >

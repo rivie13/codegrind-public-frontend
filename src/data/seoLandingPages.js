@@ -405,7 +405,7 @@ export const SEO_LANDING_PAGES = [
         'Why Python Developers Benefit from a Web-Canvas Game Loop over Traditional Text Boxes',
       body: 'Learning Python through standard static text editors can feel dry and abstract. CodeGrind replaces traditional text boxes with an interactive web-canvas game loop that visualizes program execution in real-time. By writing Python solutions that control a live tower defense simulation, you see how variables, loops, and lists translate directly into visual state changes. This interactive feedback loop keeps you motivated, making it easier to bridge the gap from basic syntax to algorithm practice.',
     },
-    primaryCta: { label: 'Start Python Path', path: '/learning/python-path' },
+    primaryCta: { label: 'Start Python Path', path: '/learning/python-beginner' },
     secondaryCta: { label: 'Browse Problems', path: '/problems' },
     searchIntents: [
       'python coding practice for beginners',
@@ -463,7 +463,7 @@ export const SEO_LANDING_PAGES = [
         'Why a Web-Canvas Game Loop is Better for JavaScript Practice than Static Text Boxes',
       body: "Standard JavaScript tutorials rely on static input boxes that mask dynamic execution state. CodeGrind replaces traditional text boxes with an interactive web-canvas game loop that fits JavaScript's event-driven nature. Solving coding challenges runs code directly within a live visual tower defense game on a canvas, translating logical state updates into real-time animations. This visual reinforcement makes debugging intuitive and helps developers master array manipulation, object structures, and game loop patterns.",
     },
-    primaryCta: { label: 'Start JavaScript Path', path: '/learning/javascript-path' },
+    primaryCta: { label: 'Start JavaScript Path', path: '/learning/javascript-beginner' },
     secondaryCta: { label: 'Try Coding Games', path: '/games' },
     searchIntents: [
       'JavaScript coding challenges beginner',
@@ -520,7 +520,7 @@ export const SEO_LANDING_PAGES = [
       heading: "How CodeGrind's Web-Canvas Game Loop Replaces Dry Java Text Boxes",
       body: 'Java developers often practice algorithms using traditional, static console windows or basic text inputs. CodeGrind replaces these traditional text boxes with a real-time, interactive web-canvas game loop. In this environment, your Java solutions are executed against tests and immediately visualized on a dynamic tower defense battlefield. This visual execution feedback loop makes learning Java data structures less abstract, helping candidates build the intuitive understanding required for coding screens.',
     },
-    primaryCta: { label: 'Start Java Path', path: '/learning/java-path' },
+    primaryCta: { label: 'Start Java Path', path: '/learning/java-beginner' },
     secondaryCta: { label: 'Explore Interview Prep', path: '/coding-interview-practice' },
     searchIntents: [
       'Java DSA practice',

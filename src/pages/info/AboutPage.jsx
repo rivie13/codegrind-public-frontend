@@ -455,7 +455,7 @@ const AboutPage = () => {
                     </Button>
                     <Button
                       as={RouterLink}
-                      to="/learning/python-path"
+                      to="/learning/python-beginner"
                       {...getActionButtonProps('var(--cg-accent-amber)')}
                     >
                       Start Learning

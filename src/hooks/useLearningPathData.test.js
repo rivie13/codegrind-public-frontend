@@ -48,18 +48,18 @@ describe('useLearningPathData', () => {
     const first = renderHook(() => useLearningPathData('python'));
 
     await waitFor(() => expect(first.result.current.loading).toBe(false));
-    expect(first.result.current.pathId).toBe('python-path');
+    expect(first.result.current.pathId).toBe('python');
     expect(first.result.current.pathData).toEqual({
-      pathId: 'python-path',
+      pathId: 'python',
       title: 'Python',
       normalized: true,
     });
     expect(getPath).toHaveBeenCalledTimes(1);
-    expect(getPath).toHaveBeenCalledWith('python-path');
+    expect(getPath).toHaveBeenCalledWith('python');
 
-    const second = renderHook(() => useLearningPathData('python-path'));
+    const second = renderHook(() => useLearningPathData('python'));
     expect(second.result.current.loading).toBe(false);
-    expect(second.result.current.pathData?.pathId).toBe('python-path');
+    expect(second.result.current.pathData?.pathId).toBe('python');
     expect(getPath).toHaveBeenCalledTimes(1);
   });
 

@@ -68,108 +68,53 @@ const buildModulePositions = (modules) => {
   return positions;
 };
 
-const buildCoursePositions = (courses) => {
-  const courseById = new Map(courses.map((c) => [c.courseId, c]));
-  const levelCache = new Map();
-
-  const getLevel = (courseId) => {
-    if (levelCache.has(courseId)) return levelCache.get(courseId);
-    const course = courseById.get(courseId);
-    if (!course || !course.prereqs?.length) {
-      levelCache.set(courseId, 1);
-      return 1;
-    }
-    const prereqLevels = course.prereqs
-      .map((pid) => getLevel(pid))
-      .filter((l) => Number.isFinite(l));
-    const level = prereqLevels.length ? Math.max(...prereqLevels) + 1 : 1;
-    levelCache.set(courseId, level);
-    return level;
-  };
-
-  const levelMap = new Map();
-  courses.forEach((c) => {
-    const level = getLevel(c.courseId);
-    if (!levelMap.has(level)) levelMap.set(level, []);
-    levelMap.get(level).push(c);
-  });
-
-  const positions = new Map();
-  Array.from(levelMap.entries())
-    .sort((a, b) => a[0] - b[0])
-    .forEach(([level, levelCourses]) => {
-      const columns = resolveColumns(levelCourses.length);
-      levelCourses.forEach((c, i) => {
-        positions.set(c.courseId, { col: columns[i] ?? COLUMN_CENTER, row: level });
-      });
-    });
-
-  return positions;
-};
-
-const normalizeModulesIntoCourse = (
-  course,
-  coursePrereqs,
-  nodes,
-  moduleActivityMap,
-  moduleNodeIds
-) => {
-  const modules = [
-    ...(course.modules || []),
-    course.capstone ? { ...course.capstone, isCapstone: true } : null,
-  ].filter(Boolean);
-
+const normalizeModules = (modules, rootPrereqs, nodes, moduleActivityMap, moduleNodeIds) => {
   const modulePositions = buildModulePositions(modules);
 
   modules.forEach((module) => {
-    const modulePrereqs = module.prereqs?.length ? module.prereqs : coursePrereqs;
-    const moduleType = module.isCapstone
-      ? LEARNING_NODE_TYPES.CAPSTONE
-      : LEARNING_NODE_TYPES.MODULE;
+    const modulePrereqs = module.prereqs?.length ? module.prereqs : rootPrereqs;
 
     nodes.push({
       id: module.moduleId,
-      type: moduleType,
+      type: LEARNING_NODE_TYPES.MODULE,
       label: module.title,
       description: module.summary,
       prereqs: modulePrereqs,
       position: modulePositions.get(module.moduleId),
       moduleId: module.moduleId,
-      courseId: course.courseId,
     });
 
     moduleNodeIds.push(module.moduleId);
     moduleActivityMap.set(module.moduleId, []);
 
-    (module.nodes || []).forEach((node, index, arr) => {
-      const previousNodeId = arr[index - 1]?.nodeId;
-      const unlockRule = node.unlockRule || null;
+    (module.tasks || []).forEach((task, index, arr) => {
+      const previousTaskId = arr[index - 1]?.taskId;
+      const unlockRule = task.unlockRule || null;
       let prereqs = [];
 
       if (unlockRule?.type === 'node_complete') {
         prereqs = [unlockRule.nodeId];
       } else if (unlockRule?.type === 'module_started') {
         prereqs = modulePrereqs;
-      } else if (previousNodeId) {
-        prereqs = [previousNodeId];
+      } else if (previousTaskId) {
+        prereqs = [previousTaskId];
       } else {
         prereqs = modulePrereqs;
       }
 
       nodes.push({
-        id: node.nodeId,
-        type: node.type,
-        label: node.title,
-        description: node.summary,
+        id: task.taskId,
+        type: task.kind,
+        label: task.title,
+        description: task.summary,
         prereqs,
         unlockRule,
-        completionCriteria: node.completionCriteria || null,
-        content: node.content || null,
+        completionCriteria: task.completionCriteria || null,
+        content: task.content || null,
         moduleId: module.moduleId,
-        courseId: course.courseId,
       });
 
-      moduleActivityMap.get(module.moduleId).push(node.nodeId);
+      moduleActivityMap.get(module.moduleId).push(task.taskId);
     });
   });
 };
@@ -179,9 +124,6 @@ export const normalizeLearningPath = (pathData) => {
   const nodes = [];
   const moduleActivityMap = new Map();
   const moduleNodeIds = [];
-  const courseNodeIds = [];
-  const courseModuleMap = new Map();
-  const hasCourses = Array.isArray(pathData.courses) && pathData.courses.length > 0;
 
   nodes.push({
     id: rootId,
@@ -192,44 +134,7 @@ export const normalizeLearningPath = (pathData) => {
     position: { col: COLUMN_CENTER, row: 0 },
   });
 
-  if (hasCourses) {
-    const coursePositions = buildCoursePositions(pathData.courses);
-
-    pathData.courses.forEach((course) => {
-      const coursePrereqs = course.prereqs?.length ? course.prereqs : [rootId];
-
-      nodes.push({
-        id: course.courseId,
-        type: LEARNING_NODE_TYPES.COURSE,
-        label: course.title,
-        description: course.summary,
-        prereqs: coursePrereqs,
-        position: coursePositions.get(course.courseId),
-        courseId: course.courseId,
-        isTrial: Boolean(course.isTrial),
-        version: course.version,
-      });
-
-      courseNodeIds.push(course.courseId);
-      courseModuleMap.set(course.courseId, []);
-
-      const modules = [
-        ...(course.modules || []),
-        course.capstone ? { ...course.capstone, isCapstone: true } : null,
-      ].filter(Boolean);
-      modules.forEach((m) => courseModuleMap.get(course.courseId).push(m.moduleId));
-
-      normalizeModulesIntoCourse(course, coursePrereqs, nodes, moduleActivityMap, moduleNodeIds);
-    });
-  } else {
-    /* Legacy single-course format: modules + capstone at top level */
-    const legacyCourse = {
-      courseId: `${pathData.pathId}-default`,
-      modules: pathData.modules || [],
-      capstone: pathData.capstone || null,
-    };
-    normalizeModulesIntoCourse(legacyCourse, [rootId], nodes, moduleActivityMap, moduleNodeIds);
-  }
+  normalizeModules(pathData.modules || [], [rootId], nodes, moduleActivityMap, moduleNodeIds);
 
   const seedCompletedNodeIds = [];
 
@@ -239,8 +144,8 @@ export const normalizeLearningPath = (pathData) => {
     nodes,
     moduleNodeIds,
     moduleActivityMap,
-    courseNodeIds,
-    courseModuleMap,
+    courseNodeIds: [],
+    courseModuleMap: new Map(),
     seedCompletedNodeIds,
   };
 };

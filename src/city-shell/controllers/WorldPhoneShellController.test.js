@@ -48,7 +48,7 @@ describe('WorldPhoneShellController', () => {
     const controller = new WorldPhoneShellController({
       guestPhoneContext: {
         isAuthenticated: true,
-        selectedTrialLearningPath: 'javascript-path',
+        selectedTrialLearningPath: 'javascript-beginner',
       },
       onLaunchProgram,
     });
@@ -105,7 +105,7 @@ describe('WorldPhoneShellController', () => {
     expect(snapshot.phoneApps.find((app) => app.id === 'learning')?.actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          targetPath: '/learning/javascript-path',
+          targetPath: '/learning/javascript-beginner',
           type: 'launch-program',
         }),
       ])
@@ -152,7 +152,7 @@ describe('WorldPhoneShellController', () => {
           problemsAttemptedCount: 5,
           problemsSolvedCount: 3,
         },
-        selectedTrialLearningPath: 'python-path',
+        selectedTrialLearningPath: 'python-beginner',
         selectedTrialTrack: 'pro',
       },
       previewWorldState: {
