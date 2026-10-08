@@ -277,8 +277,8 @@ export function drawProfileCard(ctx, canvasW, _canvasH, user, time, options = {}
   const displayName = username.length > 14 ? username.slice(0, 13) + '…' : username;
   ctx.fillText(displayName, textX, cy + 5);
 
-  // Role title + level badge
-  ctx.fillStyle = role.color;
+  // Role title + level badge, darkened for readability on the cream card
+  ctx.fillStyle = rgbStr(Math.round(rr * 0.42), Math.round(rg * 0.42), Math.round(rb * 0.42), 1);
   ctx.font = '11px Tahoma, sans-serif';
   const roleLabel = `${role.name}  LV.${level}`;
   ctx.fillText(roleLabel, textX, cy + 31);
