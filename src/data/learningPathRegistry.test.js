@@ -9,59 +9,105 @@ const basePath = {
 };
 
 describe('learningPathRegistry.normalizeLearningPath', () => {
-  it('places same-level modules across expected columns for different counts', () => {
-    const expectedColumns = new Map([
-      [1, [2]],
-      [2, [1, 3]],
-      [3, [1, 2, 3]],
-      [4, [0, 1, 3, 4]],
-      [5, [0, 1, 2, 3, 4]],
-    ]);
+  it('places modules in heap order regardless of count', () => {
+    const modules = Array.from({ length: 7 }, (_, index) => ({
+      moduleId: `m-${index + 1}`,
+      title: `Module ${index + 1}`,
+      summary: 'module',
+      prereqs: [],
+      tasks: [],
+    }));
 
-    for (const [count, columns] of expectedColumns.entries()) {
-      const modules = Array.from({ length: count }, (_, index) => ({
-        moduleId: `m-${count}-${index + 1}`,
-        title: `Module ${index + 1}`,
-        summary: 'module',
-        prereqs: [],
-        tasks: [],
-      }));
-
-      const normalized = normalizeLearningPath({
-        ...basePath,
-        pathId: `path-${count}`,
-        modules,
-      });
-
-      const moduleNodes = normalized.nodes
-        .filter((node) => node.type === LEARNING_NODE_TYPES.MODULE)
-        .sort((a, b) => a.id.localeCompare(b.id));
-
-      expect(moduleNodes.map((node) => node.position.col)).toEqual(columns);
-      expect(moduleNodes.every((node) => node.position.row === 1)).toBe(true);
-      expect(normalized.rootId).toBe(`path-${count}-root`);
-      expect(normalized.courseNodeIds).toEqual([]);
-    }
-  });
-
-  it('derives module depth from prerequisites recursively', () => {
     const normalized = normalizeLearningPath({
       ...basePath,
-      pathId: 'dependency',
+      pathId: 'heap',
+      modules,
+    });
+
+    const byId = new Map(normalized.nodes.map((node) => [node.id, node]));
+    expect(byId.get('m-1').position).toEqual({ col: 2, row: 1 });
+    expect(byId.get('m-2').position).toEqual({ col: 1.5, row: 2 });
+    expect(byId.get('m-3').position).toEqual({ col: 2.5, row: 2 });
+    expect([
+      byId.get('m-4').position,
+      byId.get('m-5').position,
+      byId.get('m-6').position,
+      byId.get('m-7').position,
+    ]).toEqual([
+      { col: 0.5, row: 3 },
+      { col: 1.5, row: 3 },
+      { col: 2.5, row: 3 },
+      { col: 3.5, row: 3 },
+    ]);
+    expect(normalized.rootId).toBe('heap-root');
+  });
+
+  it('stacks finale modules on rows beneath the tree', () => {
+    const normalized = normalizeLearningPath({
+      ...basePath,
+      pathId: 'finale',
       modules: [
         { moduleId: 'm1', title: 'M1', summary: '', prereqs: [], tasks: [] },
         { moduleId: 'm2', title: 'M2', summary: '', prereqs: ['m1'], tasks: [] },
         { moduleId: 'm3', title: 'M3', summary: '', prereqs: ['m1'], tasks: [] },
-        { moduleId: 'm4', title: 'M4', summary: '', prereqs: ['m2', 'm3'], tasks: [] },
+        {
+          moduleId: 'fin1',
+          title: 'F1',
+          summary: '',
+          prereqs: ['m2', 'm3'],
+          tasks: [],
+          finale: true,
+        },
+        {
+          moduleId: 'fin2',
+          title: 'F2',
+          summary: '',
+          prereqs: ['m2', 'm3', 'fin1'],
+          tasks: [],
+          finale: true,
+        },
       ],
     });
 
     const byId = new Map(normalized.nodes.map((node) => [node.id, node]));
 
-    expect(byId.get('m1').position.row).toBe(1);
-    expect(byId.get('m2').position.row).toBe(2);
-    expect(byId.get('m3').position.row).toBe(2);
-    expect(byId.get('m4').position.row).toBe(3);
+    expect(byId.get('m1').position).toEqual({ col: 2, row: 1 });
+    expect(byId.get('m2').position).toEqual({ col: 1.5, row: 2 });
+    expect(byId.get('m3').position).toEqual({ col: 2.5, row: 2 });
+    expect(byId.get('fin1').position).toEqual({ col: 2, row: 3 });
+    expect(byId.get('fin2').position).toEqual({ col: 2, row: 4 });
+  });
+
+  it('centers incomplete levels and tags heap indexes', () => {
+    const modules = Array.from({ length: 6 }, (_, index) => ({
+      moduleId: `l3-${index + 1}`,
+      title: `L3 ${index + 1}`,
+      summary: '',
+      prereqs: [],
+      tasks: [],
+    }));
+    // Pad to reach a 6-filled level-3: root + L1 pair + L2 quartet first.
+    const prefix = Array.from({ length: 7 }, (_, index) => ({
+      moduleId: `pre-${index + 1}`,
+      title: `Pre ${index + 1}`,
+      summary: '',
+      prereqs: [],
+      tasks: [],
+    }));
+
+    const normalized = normalizeLearningPath({
+      ...basePath,
+      pathId: 'partial',
+      modules: [...prefix, ...modules],
+    });
+
+    const byId = new Map(normalized.nodes.map((node) => [node.id, node]));
+    const cols = modules.map((module) => byId.get(module.moduleId).position.col);
+    expect(cols).toEqual([-0.5, 0.5, 1.5, 2.5, 3.5, 4.5]);
+    expect(modules.every((module) => byId.get(module.moduleId).position.row === 4)).toBe(true);
+    expect(modules.map((module, index) => byId.get(module.moduleId).heapIndex)).toEqual([
+      7, 8, 9, 10, 11, 12,
+    ]);
   });
 
   it('builds activity task prerequisites from unlock rules and sequence', () => {
