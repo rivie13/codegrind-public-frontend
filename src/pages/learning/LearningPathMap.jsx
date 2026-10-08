@@ -59,8 +59,8 @@ import {
 } from '../../utils/navigation/cityStoryState';
 
 const NODE_SIZE = 40;
-const COLUMN_WIDTH = 240;
-const ROW_HEIGHT = 110;
+const COLUMN_WIDTH = 170;
+const ROW_HEIGHT = 100;
 const MICRO_COLUMN_WIDTH = 180;
 const MICRO_ROW_HEIGHT = 90;
 const LABEL_WIDTH = 170;
@@ -163,6 +163,14 @@ const nodeEntrance = keyframes`
   100% { opacity: 1; transform: scale(1); }
 `;
 
+/* One-shot retro flash when a node unlocks: transparent pop to fully lit. */
+const unlockFlash = keyframes`
+  0% { opacity: 0.2; transform: scale(0.65); filter: brightness(2.2); }
+  35% { opacity: 1; transform: scale(1.14); filter: brightness(1.7); }
+  65% { opacity: 0.85; transform: scale(0.97); filter: brightness(1.25); }
+  100% { opacity: 1; transform: scale(1); filter: none; }
+`;
+
 /* ── Cyber-static transition keyframes ── */
 const cyberStaticNoise = keyframes`
   0%, 100% { background-position: 0 0, 0 0, 0 0; }
@@ -229,7 +237,14 @@ function LearningPathMap() {
   const profileCardUser = useMemo(() => {
     if (isAuthenticated) return user;
     const summary = guestCtx?.xpSummary;
-    if (!summary) return null;
+    if (!summary) {
+      return {
+        username: 'Guest',
+        xp: 0,
+        progress: { xp: 0, level: 1 },
+        roleName: null,
+      };
+    }
     return {
       username: 'Guest',
       xp: summary.xp,
@@ -278,6 +293,8 @@ function LearningPathMap() {
   const [isApplyingLearningAdCredit, setIsApplyingLearningAdCredit] = useState(false);
   const [pendingNode, setPendingNode] = useState(null);
   const [isGuestSignupWallOpen, setIsGuestSignupWallOpen] = useState(false);
+  const [justUnlockedIds, setJustUnlockedIds] = useState([]);
+  const prevNodeStatusesRef = useRef(null);
   const isMobileMapLayout = useBreakpointValue({ base: true, md: false }) ?? false;
   const macroColumnWidth = isMobileMapLayout ? MOBILE_COLUMN_WIDTH : COLUMN_WIDTH;
   const macroRowHeight = isMobileMapLayout ? MOBILE_ROW_HEIGHT : ROW_HEIGHT;
@@ -641,6 +658,36 @@ function LearningPathMap() {
     microRowHeight,
   ]);
 
+  const nodeStatusById = useMemo(() => {
+    const map = new Map();
+    layoutNodes.forEach((node) => {
+      const isRoot =
+        node.type === LEARNING_NODE_TYPES.ROOT ||
+        (viewLevel === 'activity' && node.type === LEARNING_NODE_TYPES.MODULE);
+      map.set(
+        node.id,
+        isRoot ? 'completed' : getNodeStatus(node, computedCompletion, moduleAvailability)
+      );
+    });
+    return map;
+  }, [layoutNodes, computedCompletion, moduleAvailability, viewLevel]);
+
+  /* Flash nodes the moment they unlock (locked -> anything else). Skips the
+     first paint so navigation never flashes; clears itself after one play. */
+  useEffect(() => {
+    const prev = prevNodeStatusesRef.current;
+    prevNodeStatusesRef.current = nodeStatusById;
+    if (!prev) return undefined;
+    const fresh = [];
+    nodeStatusById.forEach((status, id) => {
+      if (prev.get(id) === 'locked' && status !== 'locked') fresh.push(id);
+    });
+    if (!fresh.length) return undefined;
+    setJustUnlockedIds(fresh);
+    const timer = window.setTimeout(() => setJustUnlockedIds([]), 1200);
+    return () => window.clearTimeout(timer);
+  }, [nodeStatusById]);
+
   const edges = useMemo(() => {
     const byId = new Map(layoutNodes.map((node) => [node.id, node]));
     const viewIdSet = new Set(layoutNodes.map((node) => node.id));
@@ -689,21 +736,61 @@ function LearningPathMap() {
       return null;
     };
 
+    /* Module view — one edge per node: heap parent for tree modules so the map
+       reads as a binary tree; finale nodes fan in (Practice from everything,
+       Quiz from Practice) as the convergence focal point. */
+    const heapIndexToId = new Map();
+    layoutNodes.forEach((node) => {
+      if (typeof node.heapIndex === 'number') heapIndexToId.set(node.heapIndex, node.id);
+    });
+
+    const pushEdge = (sourceId, targetId) => {
+      if (!sourceId || !viewIdSet.has(sourceId)) return;
+      const edgeKey = `${sourceId}__${targetId}`;
+      if (visitedEdges.has(edgeKey)) return;
+      visitedEdges.add(edgeKey);
+      results.push({
+        from: byId.get(sourceId),
+        to: byId.get(targetId),
+      });
+    };
+
     const results = [];
     layoutNodes.forEach((node) => {
-      node.prereqs?.forEach((prereqId) => {
+      if (node.type !== LEARNING_NODE_TYPES.MODULE && node.type !== LEARNING_NODE_TYPES.CAPSTONE) {
+        return;
+      }
+      if (node.finale) {
+        const inViewPrereqs = (node.prereqs || []).filter((prereqId) => viewIdSet.has(prereqId));
+        const deepestRow = Math.max(
+          0,
+          ...inViewPrereqs.map((prereqId) => byId.get(prereqId)?.position?.row ?? 0)
+        );
+        const sources = inViewPrereqs.filter(
+          (prereqId) => (byId.get(prereqId)?.position?.row ?? 0) >= deepestRow
+        );
+        (sources.length ? sources : node.prereqs || []).forEach((prereqId) => {
+          let sourceId = prereqId;
+          if (!viewIdSet.has(prereqId)) {
+            sourceId = findViewAncestor(prereqId);
+          }
+          pushEdge(sourceId, node.id);
+        });
+        return;
+      }
+      if (typeof node.heapIndex === 'number' && node.heapIndex > 0) {
+        const parentId = heapIndexToId.get(Math.floor((node.heapIndex - 1) / 2));
+        if (parentId) {
+          pushEdge(parentId, node.id);
+          return;
+        }
+      }
+      (node.prereqs || []).forEach((prereqId) => {
         let sourceId = prereqId;
         if (!viewIdSet.has(prereqId)) {
           sourceId = findViewAncestor(prereqId);
         }
-        if (!sourceId || !viewIdSet.has(sourceId)) return;
-        const edgeKey = `${sourceId}__${node.id}`;
-        if (visitedEdges.has(edgeKey)) return;
-        visitedEdges.add(edgeKey);
-        results.push({
-          from: byId.get(sourceId),
-          to: byId.get(node.id),
-        });
+        pushEdge(sourceId, node.id);
       });
     });
     return results;
@@ -713,19 +800,19 @@ function LearningPathMap() {
     if (!layoutNodes.length) return { width: 0, height: 0 };
     const maxX = Math.max(...layoutNodes.map((node) => node.x));
     const maxY = Math.max(...layoutNodes.map((node) => node.y));
-    const colWidth = viewLevel === 'activity' ? microColumnWidth : macroColumnWidth;
     const rowHt = viewLevel === 'activity' ? microRowHeight : macroRowHeight;
-    return { width: maxX + colWidth, height: maxY + rowHt };
-  }, [layoutNodes, macroColumnWidth, macroRowHeight, microColumnWidth, microRowHeight, viewLevel]);
+    return { width: maxX + NODE_SIZE, height: maxY + rowHt };
+  }, [layoutNodes, microRowHeight, macroRowHeight, viewLevel]);
 
   const gridRowHeight = viewLevel === 'activity' ? microRowHeight : macroRowHeight;
 
-  // Scale the map canvas down on mobile so it fits without horizontal scroll.
-  // Uses the measured width of the flex container that wraps the map.
+  // Scale the map canvas down whenever it is wider than its container so the
+  // tree always fits without horizontal scroll. Uses the measured width of
+  // the flex container that wraps the map.
   const mapScale = useMemo(() => {
-    if (!isMobileMapLayout || !mapFlexWidth || !mapSize.width) return 1;
+    if (!mapFlexWidth || !mapSize.width) return 1;
     return Math.min(1, Math.max(0.3, mapFlexWidth / mapSize.width));
-  }, [isMobileMapLayout, mapFlexWidth, mapSize.width]);
+  }, [mapFlexWidth, mapSize.width]);
 
   const getGuestTrialProblemSlug = useCallback((node) => {
     if (!node) return null;
@@ -1266,30 +1353,6 @@ function LearningPathMap() {
             overflow={viewTransition ? 'hidden' : 'auto'}
             p={{ base: 3, md: 6, lg: 10 }}
             sx={{ WebkitOverflowScrolling: 'touch' }}
-            _before={{
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              opacity: 0.88,
-              backgroundImage: RETRO_MAP_SURFACE,
-              backgroundSize: 'auto',
-              backgroundPosition: 'center',
-              pointerEvents: 'none',
-            }}
-            _after={
-              motionEnabled
-                ? {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(50, 58, 53, 0.08) 3px, rgba(50, 58, 53, 0.08) 4px)',
-                    pointerEvents: 'none',
-                    zIndex: 1,
-                    borderRadius: 0,
-                  }
-                : undefined
-            }
           >
             <Flex
               align="center"
@@ -1402,6 +1465,30 @@ function LearningPathMap() {
                   height: `${mapSize.height * mapScale}px`,
                 }}
                 mx="auto"
+                _before={{
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+                  opacity: 0.88,
+                  backgroundImage: RETRO_MAP_SURFACE,
+                  backgroundSize: 'auto',
+                  backgroundPosition: 'center',
+                  pointerEvents: 'none',
+                }}
+                _after={
+                  motionEnabled
+                    ? {
+                        content: '""',
+                        position: 'absolute',
+                        inset: 0,
+                        background:
+                          'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(50, 58, 53, 0.08) 3px, rgba(50, 58, 53, 0.08) 4px)',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                        borderRadius: 0,
+                      }
+                    : undefined
+                }
               >
                 <Box
                   position="absolute"
@@ -1471,6 +1558,8 @@ function LearningPathMap() {
                       const y2 = edge.to.y + NODE_SIZE / 2;
                       const midY = (y1 + y2) / 2;
                       const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+                      const targetLocked = nodeStatusById.get(edge.to.id) === 'locked';
+                      const edgeFlowOn = motionEnabled && !targetLocked;
                       return (
                         <g key={`edge-${edge.from.id}-${edge.to.id}-${index}`}>
                           {/* Soft glow underlayer */}
@@ -1481,6 +1570,7 @@ function LearningPathMap() {
                             strokeWidth="8"
                             strokeLinecap="round"
                             filter="url(#lpEdgeGlow)"
+                            opacity={targetLocked ? 0.2 : 1}
                           />
                           {/* Main path with animated dash flow */}
                           <path
@@ -1489,9 +1579,10 @@ function LearningPathMap() {
                             stroke="rgba(70, 96, 53, 0.42)"
                             strokeWidth="2"
                             strokeLinecap="round"
-                            strokeDasharray={motionEnabled ? '6 10' : undefined}
+                            opacity={targetLocked ? 0.25 : 1}
+                            strokeDasharray={edgeFlowOn ? '6 10' : undefined}
                           >
-                            {motionEnabled && (
+                            {edgeFlowOn && (
                               <animate
                                 attributeName="stroke-dashoffset"
                                 from="0"
@@ -1502,7 +1593,7 @@ function LearningPathMap() {
                             )}
                           </path>
                           {/* Travelling particle dots */}
-                          {motionEnabled &&
+                          {edgeFlowOn &&
                             [0, 1].map((pIdx) => (
                               <circle
                                 key={pIdx}
@@ -1552,6 +1643,7 @@ function LearningPathMap() {
                         ? 'completed'
                         : getNodeStatus(node, computedCompletion, moduleAvailability);
                       const styles = statusStyles[status];
+                      const justUnlocked = justUnlockedIds.includes(node.id);
                       const Icon = nodeTypeIcons[node.type] || FiMap;
                       const nodeLabel = nodeTypeLabels[node.type] || 'Node';
                       const tooltipLabel = (() => {
@@ -1609,6 +1701,7 @@ function LearningPathMap() {
                             alignItems="center"
                             justifyContent="center"
                             boxShadow="var(--cg-window-outset), 3px 3px 0 rgba(0, 0, 0, 0.14)"
+                            opacity={status === 'locked' ? 0.45 : 1}
                             cursor={
                               status === 'locked'
                                 ? 'not-allowed'
@@ -1616,7 +1709,7 @@ function LearningPathMap() {
                                   ? 'default'
                                   : 'pointer'
                             }
-                            transition="transform 0.25s ease, box-shadow 0.25s ease"
+                            transition="transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease"
                             animation={glowAnim || entranceAnim}
                             _hover={
                               status === 'locked' || isViewRoot
@@ -1631,6 +1724,18 @@ function LearningPathMap() {
                             onClick={isViewRoot ? undefined : () => handleNodeClick(node, status)}
                           >
                             <Icon color={styles.text} size={18} />
+
+                            {/* One-shot retro flash on unlock */}
+                            {justUnlocked && motionEnabled && (
+                              <Box
+                                position="absolute"
+                                inset={0}
+                                borderRadius="4px"
+                                bg="rgba(255, 253, 240, 0.9)"
+                                pointerEvents="none"
+                                sx={{ animation: `${unlockFlash} 0.9s ease-out forwards` }}
+                              />
+                            )}
 
                             {/* Orbiting particles for active nodes */}
                             {motionEnabled &&
@@ -1819,21 +1924,26 @@ function LearningPathMap() {
             p={{ base: 4, md: 6 }}
           >
             <Flex flexWrap="wrap" gap={{ base: 3, md: 4 }}>
-              {Object.entries(nodeTypeLabels).map(([type, label]) => {
-                const Icon = nodeTypeIcons[type] || FiMap;
-                return (
-                  <HStack
-                    key={type}
-                    spacing={2}
-                    fontFamily="var(--cg-font-retro-display)"
-                    color="var(--cg-text)"
-                    flexShrink={0}
-                  >
-                    <Icon size={14} />
-                    <Text fontSize={{ base: 'xs', md: 'sm' }}>{label}</Text>
-                  </HStack>
-                );
-              })}
+              {Object.entries(nodeTypeLabels)
+                .filter(
+                  ([type]) =>
+                    type !== LEARNING_NODE_TYPES.COURSE && type !== LEARNING_NODE_TYPES.FINAL
+                )
+                .map(([type, label]) => {
+                  const Icon = nodeTypeIcons[type] || FiMap;
+                  return (
+                    <HStack
+                      key={type}
+                      spacing={2}
+                      fontFamily="var(--cg-font-retro-display)"
+                      color="var(--cg-text)"
+                      flexShrink={0}
+                    >
+                      <Icon size={14} />
+                      <Text fontSize={{ base: 'xs', md: 'sm' }}>{label}</Text>
+                    </HStack>
+                  );
+                })}
             </Flex>
             <Text
               mt={3}

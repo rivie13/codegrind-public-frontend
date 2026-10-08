@@ -11,65 +11,48 @@ export const LEARNING_NODE_TYPES = {
 
 const COLUMN_CENTER = 2;
 
-const buildModuleLevels = (modules) => {
-  const moduleById = new Map(modules.map((module) => [module.moduleId, module]));
-  const levelCache = new Map();
-
-  const getLevel = (moduleId) => {
-    if (levelCache.has(moduleId)) return levelCache.get(moduleId);
-    const module = moduleById.get(moduleId);
-    if (!module || !module.prereqs?.length) {
-      levelCache.set(moduleId, 1);
-      return 1;
-    }
-    const prereqLevels = module.prereqs
-      .map((prereqId) => getLevel(prereqId))
-      .filter((level) => Number.isFinite(level));
-    const level = prereqLevels.length ? Math.max(...prereqLevels) + 1 : 1;
-    levelCache.set(moduleId, level);
-    return level;
-  };
-
-  return { moduleById, getLevel };
-};
-
-const resolveColumns = (count) => {
-  if (count === 1) return [COLUMN_CENTER];
-  if (count === 2) return [COLUMN_CENTER - 1, COLUMN_CENTER + 1];
-  if (count === 3) return [COLUMN_CENTER - 1, COLUMN_CENTER, COLUMN_CENTER + 1];
-  if (count === 4)
-    return [COLUMN_CENTER - 2, COLUMN_CENTER - 1, COLUMN_CENTER + 1, COLUMN_CENTER + 2];
-  return Array.from({ length: count }, (_, index) => index);
-};
-
+/* Complete binary tree positions (heap indexing): level L holds up to 2^L nodes.
+   Incomplete levels center their run within the level. Finale modules stack on
+   rows beneath the tree. */
 const buildModulePositions = (modules) => {
-  const { getLevel } = buildModuleLevels(modules);
-  const levelMap = new Map();
+  const positions = new Map();
+  const heapIndexes = new Map();
+  const treeModules = modules.filter((module) => !module.finale);
+  const finaleModules = modules.filter((module) => module.finale);
 
-  modules.forEach((module) => {
-    const level = getLevel(module.moduleId);
-    if (!levelMap.has(level)) levelMap.set(level, []);
-    levelMap.get(level).push(module);
+  const byLevel = new Map();
+  treeModules.forEach((module, index) => {
+    heapIndexes.set(module.moduleId, index);
+    const level = Math.floor(Math.log2(index + 1));
+    if (!byLevel.has(level)) byLevel.set(level, []);
+    byLevel.get(level).push(module);
   });
 
-  const positions = new Map();
-  Array.from(levelMap.entries())
-    .sort((a, b) => a[0] - b[0])
-    .forEach(([level, levelModules]) => {
-      const columns = resolveColumns(levelModules.length);
-      levelModules.forEach((module, index) => {
-        positions.set(module.moduleId, {
-          col: columns[index] ?? COLUMN_CENTER,
-          row: level,
-        });
+  byLevel.forEach((levelModules, level) => {
+    const capacity = 2 ** level;
+    const offset = (capacity - levelModules.length) / 2;
+    levelModules.forEach((module, positionInLevel) => {
+      const slot = positionInLevel + offset;
+      positions.set(module.moduleId, {
+        col: COLUMN_CENTER + (slot - (capacity - 1) / 2),
+        row: level + 1,
       });
     });
+  });
 
-  return positions;
+  const treeRows = treeModules.length ? Math.floor(Math.log2(treeModules.length)) + 1 : 0;
+  finaleModules.forEach((module, index) => {
+    positions.set(module.moduleId, {
+      col: COLUMN_CENTER,
+      row: treeRows + index + 1,
+    });
+  });
+
+  return { positions, heapIndexes };
 };
 
 const normalizeModules = (modules, rootPrereqs, nodes, moduleActivityMap, moduleNodeIds) => {
-  const modulePositions = buildModulePositions(modules);
+  const { positions: modulePositions, heapIndexes } = buildModulePositions(modules);
 
   modules.forEach((module) => {
     const modulePrereqs = module.prereqs?.length ? module.prereqs : rootPrereqs;
@@ -82,6 +65,8 @@ const normalizeModules = (modules, rootPrereqs, nodes, moduleActivityMap, module
       prereqs: modulePrereqs,
       position: modulePositions.get(module.moduleId),
       moduleId: module.moduleId,
+      heapIndex: heapIndexes.has(module.moduleId) ? heapIndexes.get(module.moduleId) : null,
+      finale: Boolean(module.finale),
     });
 
     moduleNodeIds.push(module.moduleId);
