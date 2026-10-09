@@ -283,6 +283,63 @@ const LearningSection = ({ section }) => {
   );
 };
 
+const QuizBlock = ({ quiz }) => {
+  const questions = Array.isArray(quiz?.questions) ? quiz.questions : [];
+  const [picked, setPicked] = useState({});
+  if (!questions.length) return null;
+
+  const pick = (qIndex, oIndex) => {
+    setPicked((prev) => (prev[qIndex] === undefined ? { ...prev, [qIndex]: oIndex } : prev));
+  };
+
+  return (
+    <Box mt={5}>
+      {questions.map((question, qIndex) => {
+        const options = Array.isArray(question?.options) ? question.options : [];
+        const answered = picked[qIndex] !== undefined;
+        return (
+          <Box key={question.id || qIndex} mb={4}>
+            <Text
+              color="var(--cg-text)"
+              fontFamily="var(--cg-font-retro-display)"
+              fontSize="sm"
+              lineHeight="1.7"
+              mb={2}
+            >
+              {question.prompt}
+            </Text>
+            <Stack spacing={2}>
+              {options.map((option, oIndex) => {
+                const isAnswer = oIndex === question.answerIndex;
+                const isPicked = picked[qIndex] === oIndex;
+                return (
+                  <Button
+                    key={oIndex}
+                    onClick={() => pick(qIndex, oIndex)}
+                    isDisabled={answered}
+                    justifyContent="flex-start"
+                    whiteSpace="normal"
+                    textAlign="left"
+                    color={
+                      answered && isAnswer
+                        ? 'var(--cg-accent-green)'
+                        : answered && isPicked
+                          ? 'var(--cg-accent-red)'
+                          : 'var(--cg-text)'
+                    }
+                  >
+                    {option}
+                  </Button>
+                );
+              })}
+            </Stack>
+          </Box>
+        );
+      })}
+    </Box>
+  );
+};
+
 function LearningActivityStatusShell({
   actionLabel = null,
   children = null,
@@ -1086,6 +1143,9 @@ export default function LearningPathActivity() {
                       </AnimatedIn>
                     </>
                   )}
+                  {node.content?.quiz?.questions?.length ? (
+                    <QuizBlock quiz={node.content.quiz} />
+                  ) : null}
                 </RetroPanel>
               </AnimatedIn>
             )}
