@@ -17,17 +17,7 @@ import {
 import { keyframes } from '@emotion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import {
-  FiBook,
-  FiBookOpen,
-  FiCode,
-  FiFlag,
-  FiGitBranch,
-  FiLayers,
-  FiMap,
-  FiShield,
-  FiStar,
-} from 'react-icons/fi';
+import { FiBookOpen, FiCode, FiFlag, FiGitBranch, FiLayers, FiMap, FiShield } from 'react-icons/fi';
 import PageTemplate from '../../components/layout/PageTemplate';
 import { RetroPanel } from '../../components/retro/RetroPageShell';
 import AdModal from '../../components/towerDefense/AdModal';
@@ -41,6 +31,7 @@ import { useGuestProgressCtx } from '../../contexts/GuestProgressProvider';
 import { LEARNING_NODE_TYPES } from '../../data/learningPathRegistry';
 import useCityMissionSync from '../../hooks/city/useCityMissionSync';
 import useLearningPathData from '../../hooks/useLearningPathData';
+import logger from '../../utils/core/logger';
 import { api } from '../../services/api';
 import {
   buildGuestLearningCompletedNodes,
@@ -61,15 +52,11 @@ import {
 const NODE_SIZE = 40;
 const COLUMN_WIDTH = 170;
 const ROW_HEIGHT = 100;
-const MICRO_COLUMN_WIDTH = 180;
-const MICRO_ROW_HEIGHT = 90;
 const LABEL_WIDTH = 170;
 const PROFILE_CARD_CANVAS_WIDTH = 350;
 const PROFILE_CARD_CANVAS_HEIGHT = 120;
 const MOBILE_COLUMN_WIDTH = 180;
 const MOBILE_ROW_HEIGHT = 96;
-const MOBILE_MICRO_COLUMN_WIDTH = 150;
-const MOBILE_MICRO_ROW_HEIGHT = 82;
 const MOBILE_LABEL_WIDTH = 120;
 const RETRO_PANEL_SHADOW = 'var(--cg-window-outset), 14px 14px 0 rgba(0, 0, 0, 0.12)';
 const RETRO_BUTTON_OUTSET =
@@ -86,24 +73,20 @@ const RETRO_MAP_SURFACE = `
 
 const nodeTypeIcons = {
   [LEARNING_NODE_TYPES.ROOT]: FiMap,
-  [LEARNING_NODE_TYPES.COURSE]: FiBook,
   [LEARNING_NODE_TYPES.MODULE]: FiLayers,
   [LEARNING_NODE_TYPES.LEARN]: FiBookOpen,
   [LEARNING_NODE_TYPES.WORKSPACE]: FiCode,
   [LEARNING_NODE_TYPES.TOWER]: FiShield,
   [LEARNING_NODE_TYPES.FINAL]: FiFlag,
-  [LEARNING_NODE_TYPES.CAPSTONE]: FiStar,
 };
 
 const nodeTypeLabels = {
   [LEARNING_NODE_TYPES.ROOT]: 'Path Root',
-  [LEARNING_NODE_TYPES.COURSE]: 'Course',
   [LEARNING_NODE_TYPES.MODULE]: 'Module',
   [LEARNING_NODE_TYPES.LEARN]: 'Learning',
   [LEARNING_NODE_TYPES.WORKSPACE]: 'Workspace',
   [LEARNING_NODE_TYPES.TOWER]: 'Tower Defense',
   [LEARNING_NODE_TYPES.FINAL]: 'Final Challenge',
-  [LEARNING_NODE_TYPES.CAPSTONE]: 'Capstone',
 };
 
 const statusStyles = {
@@ -202,8 +185,6 @@ const staticFlicker = keyframes`
 const TRANS_ZOOM_MS = 340;
 const TRANS_STATIC_MS = 200;
 const TRANS_REVEAL_MS = 280;
-const TRANS_TOTAL_FWD = TRANS_ZOOM_MS + TRANS_STATIC_MS + TRANS_REVEAL_MS;
-const TRANS_TOTAL_BWD = 250 + 180 + 250;
 
 const PATH_M0_PREFIXES = {
   'python-beginner': 'py-m01',
@@ -298,8 +279,6 @@ function LearningPathMap() {
   const isMobileMapLayout = useBreakpointValue({ base: true, md: false }) ?? false;
   const macroColumnWidth = isMobileMapLayout ? MOBILE_COLUMN_WIDTH : COLUMN_WIDTH;
   const macroRowHeight = isMobileMapLayout ? MOBILE_ROW_HEIGHT : ROW_HEIGHT;
-  const microColumnWidth = isMobileMapLayout ? MOBILE_MICRO_COLUMN_WIDTH : MICRO_COLUMN_WIDTH;
-  const microRowHeight = isMobileMapLayout ? MOBILE_MICRO_ROW_HEIGHT : MICRO_ROW_HEIGHT;
 
   const showLearningFetchToast = useCallback(
     (kind) => {
@@ -491,19 +470,46 @@ function LearningPathMap() {
 
     let animId = null;
     let running = true;
+    let fallbackPainted = false;
+
+    const paintFallback = () => {
+      if (fallbackPainted) return;
+      fallbackPainted = true;
+      try {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = '#f4efe7';
+        ctx.fillRect(0, 0, cssWidth, cssHeight);
+        ctx.fillStyle = '#335fae';
+        ctx.fillRect(0, 0, cssWidth, 14);
+        ctx.strokeStyle = '#2b2926';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0.5, 0.5, cssWidth - 1, cssHeight - 1);
+      } catch {
+        /* canvas unavailable — leave blank */
+      }
+    };
 
     const drawFrame = (ts) => {
       if (!running) return;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawProfileCard(ctx, cssWidth, cssHeight, profileCardUser, ts / 1000, {
-        isGuest: !isAuthenticated,
-        guestLabel: 'Guest',
-        guestCta: 'Sign up to save learning path progress',
-      });
+      try {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawProfileCard(ctx, cssWidth, cssHeight, profileCardUser, ts / 1000, {
+          isGuest: !isAuthenticated,
+          guestLabel: 'Guest',
+          guestCta: 'Sign up to save learning path progress',
+        });
+      } catch (error) {
+        paintFallback();
+        logger.debug('Profile card draw failed, showing fallback.', error);
+      }
       animId = window.requestAnimationFrame(drawFrame);
     };
+
+    paintFallback();
 
     animId = window.requestAnimationFrame(drawFrame);
     return () => {
@@ -585,78 +591,10 @@ function LearningPathMap() {
       }));
     }
 
-    const typeOrder = [
-      LEARNING_NODE_TYPES.MODULE,
-      LEARNING_NODE_TYPES.LEARN,
-      LEARNING_NODE_TYPES.WORKSPACE,
-      LEARNING_NODE_TYPES.TOWER,
-      LEARNING_NODE_TYPES.FINAL,
-      LEARNING_NODE_TYPES.CAPSTONE,
-    ];
-
-    const moduleNode = viewNodes.find((node) => node.type === LEARNING_NODE_TYPES.MODULE) || null;
-    const finalNode = viewNodes.find((node) => node.type === LEARNING_NODE_TYPES.FINAL) || null;
-    const activityNodes = viewNodes.filter((node) =>
-      [
-        LEARNING_NODE_TYPES.LEARN,
-        LEARNING_NODE_TYPES.WORKSPACE,
-        LEARNING_NODE_TYPES.TOWER,
-      ].includes(node.type)
-    );
-
-    const sortedActivities = [...activityNodes].sort((a, b) => {
-      const typeDiff = typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type);
-      if (typeDiff !== 0) return typeDiff;
-      return a.label.localeCompare(b.label);
-    });
-
-    const positioned = [];
-    const activityCount = sortedActivities.length;
-    const centerOffset = activityCount ? (activityCount - 1) / 2 : 0;
-    const activityRowY = microRowHeight;
-    const finalRowY = microRowHeight * 2;
-
-    if (moduleNode) {
-      positioned.push({
-        ...moduleNode,
-        x: 0,
-        y: 0,
-      });
-    }
-
-    sortedActivities.forEach((node, index) => {
-      positioned.push({
-        ...node,
-        x: (index - centerOffset) * microColumnWidth,
-        y: activityRowY,
-      });
-    });
-
-    if (finalNode) {
-      positioned.push({
-        ...finalNode,
-        x: 0,
-        y: finalRowY,
-      });
-    }
-
-    if (!positioned.length) return [];
-    const minX = Math.min(...positioned.map((node) => node.x));
-    const minY = Math.min(...positioned.map((node) => node.y));
-    return positioned.map((node) => ({
-      ...node,
-      x: node.x - minX,
-      y: node.y - minY,
-    }));
-  }, [
-    viewLevel,
-    macroNodes,
-    microNodes,
-    macroColumnWidth,
-    macroRowHeight,
-    microColumnWidth,
-    microRowHeight,
-  ]);
+    // Activity view renders a vertical stepper from microNodes and never reads
+    // positioned layout — no x/y synthesis here.
+    return [];
+  }, [viewLevel, macroNodes, macroColumnWidth, macroRowHeight]);
 
   const nodeStatusById = useMemo(() => {
     const map = new Map();
@@ -693,33 +631,8 @@ function LearningPathMap() {
     const viewIdSet = new Set(layoutNodes.map((node) => node.id));
     const visitedEdges = new Set();
 
-    if (viewLevel === 'activity') {
-      const moduleNode =
-        layoutNodes.find((node) => node.type === LEARNING_NODE_TYPES.MODULE) || null;
-      const finalNode = layoutNodes.find((node) => node.type === LEARNING_NODE_TYPES.FINAL) || null;
-      const activityNodes = layoutNodes.filter((node) =>
-        [
-          LEARNING_NODE_TYPES.LEARN,
-          LEARNING_NODE_TYPES.WORKSPACE,
-          LEARNING_NODE_TYPES.TOWER,
-        ].includes(node.type)
-      );
-
-      const results = [];
-      if (moduleNode && activityNodes.length) {
-        activityNodes.forEach((activity) => {
-          results.push({ from: moduleNode, to: activity });
-        });
-      }
-      if (finalNode && activityNodes.length) {
-        activityNodes.forEach((activity) => {
-          results.push({ from: activity, to: finalNode });
-        });
-      } else if (moduleNode && finalNode) {
-        results.push({ from: moduleNode, to: finalNode });
-      }
-      return results;
-    }
+    // Activity view renders the vertical stepper — no SVG edges exist there.
+    if (viewLevel === 'activity') return [];
 
     /* Module view — prereq-based edges */
     const findViewAncestor = (nodeId, visited = new Set()) => {
@@ -797,14 +710,14 @@ function LearningPathMap() {
   }, [layoutNodes, nodesById, viewLevel]);
 
   const mapSize = useMemo(() => {
+    if (viewLevel === 'activity') return { width: 0, height: 0 };
     if (!layoutNodes.length) return { width: 0, height: 0 };
     const maxX = Math.max(...layoutNodes.map((node) => node.x));
     const maxY = Math.max(...layoutNodes.map((node) => node.y));
-    const rowHt = viewLevel === 'activity' ? microRowHeight : macroRowHeight;
-    return { width: maxX + NODE_SIZE, height: maxY + rowHt };
-  }, [layoutNodes, microRowHeight, macroRowHeight, viewLevel]);
+    return { width: maxX + NODE_SIZE, height: maxY + macroRowHeight };
+  }, [layoutNodes, macroRowHeight, viewLevel]);
 
-  const gridRowHeight = viewLevel === 'activity' ? microRowHeight : macroRowHeight;
+  const gridRowHeight = macroRowHeight;
 
   // Scale the map canvas down whenever it is wider than its container so the
   // tree always fits without horizontal scroll. Uses the measured width of
@@ -1460,10 +1373,14 @@ function LearningPathMap() {
                   and is scaled down via CSS transform. On desktop mapScale is always 1. */}
               <Box
                 position="relative"
-                style={{
-                  width: `${mapSize.width * mapScale}px`,
-                  height: `${mapSize.height * mapScale}px`,
-                }}
+                style={
+                  viewLevel === 'activity'
+                    ? { width: '100%', height: 'auto' }
+                    : {
+                        width: `${mapSize.width * mapScale}px`,
+                        height: `${mapSize.height * mapScale}px`,
+                      }
+                }
                 mx="auto"
                 _before={{
                   content: '""',
@@ -1490,326 +1407,404 @@ function LearningPathMap() {
                     : undefined
                 }
               >
-                <Box
-                  position="absolute"
-                  top={0}
-                  left={0}
-                  width={`${mapSize.width}px`}
-                  height={`${mapSize.height}px`}
-                  style={
-                    mapScale < 1
-                      ? { transform: `scale(${mapScale})`, transformOrigin: 'top left' }
-                      : undefined
-                  }
-                >
+                {viewLevel === 'activity' ? (
+                  <VStack spacing={4} align="stretch" width="100%" maxW="600px" mx="auto" py={2}>
+                    {(() => {
+                      const taskIds = microNodes
+                        .filter((node) => node.type !== LEARNING_NODE_TYPES.MODULE)
+                        .map((node) => node.id);
+                      let nextFound = false;
+                      return taskIds.map((taskId, index) => {
+                        const node = nodesById.get(taskId);
+                        if (!node) return null;
+                        const status =
+                          node.type === LEARNING_NODE_TYPES.MODULE
+                            ? 'completed'
+                            : getNodeStatus(node, computedCompletion, moduleAvailability);
+                        const styles = statusStyles[status] || statusStyles.locked;
+                        const Icon = nodeTypeIcons[node.type] || FiMap;
+                        const done = status === 'completed';
+                        const isNext = !done && status === 'available' && !nextFound;
+                        if (isNext) nextFound = true;
+                        return (
+                          <Box
+                            key={node.id}
+                            as="button"
+                            type="button"
+                            onClick={() => handleNodeClick(node, status)}
+                            display="flex"
+                            alignItems="center"
+                            gap={3}
+                            width="100%"
+                            textAlign="left"
+                            px={5}
+                            py={done ? 2 : 4}
+                            fontSize={done ? 'sm' : 'md'}
+                            border="2px solid var(--cg-window-shadow)"
+                            borderRadius="0"
+                            bg={styles.bg}
+                            color={styles.text}
+                            boxShadow="var(--cg-window-outset)"
+                            opacity={status === 'locked' ? 0.55 : done ? 0.8 : 1}
+                            cursor={status === 'locked' ? 'not-allowed' : 'pointer'}
+                            fontFamily="var(--cg-font-retro-display)"
+                            _hover={
+                              status === 'locked' ? {} : { transform: 'translate(-1px, -1px)' }
+                            }
+                          >
+                            <Text fontWeight="700" fontSize="lg" minW="40px">
+                              {String(index + 1).padStart(2, '0')}
+                            </Text>
+                            <Icon size={22} />
+                            <Box flex="1" minW={0}>
+                              <Text fontWeight={isNext ? '700' : '400'} fontSize="lg" noOfLines={1}>
+                                {node.label || node.id}
+                              </Text>
+                              {!done && node.description ? (
+                                <Text fontSize="md" color="var(--cg-muted)" noOfLines={2}>
+                                  {node.description}
+                                </Text>
+                              ) : null}
+                            </Box>
+                            {done ? <Text fontWeight="700">✓</Text> : null}
+                            {isNext ? (
+                              <Box
+                                w="10px"
+                                h="10px"
+                                borderRadius="full"
+                                bg="var(--cg-link)"
+                                flexShrink={0}
+                              />
+                            ) : null}
+                          </Box>
+                        );
+                      });
+                    })()}
+                  </VStack>
+                ) : (
                   <Box
-                    as="svg"
                     position="absolute"
                     top={0}
                     left={0}
                     width={`${mapSize.width}px`}
                     height={`${mapSize.height}px`}
-                    pointerEvents="none"
-                    overflow="visible"
+                    style={
+                      mapScale < 1
+                        ? { transform: `scale(${mapScale})`, transformOrigin: 'top left' }
+                        : undefined
+                    }
                   >
-                    <defs>
-                      <filter id="lpEdgeGlow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="3" result="blur" />
-                        <feMerge>
-                          <feMergeNode in="blur" />
-                          <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                      </filter>
-                      <filter id="lpParticleGlow" x="-100%" y="-100%" width="300%" height="300%">
-                        <feGaussianBlur stdDeviation="2" result="blur" />
-                        <feMerge>
-                          <feMergeNode in="blur" />
-                          <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    {Array.from({
-                      length: Math.max(0, Math.floor(mapSize.height / gridRowHeight) + 1),
-                    }).map((_, index) => (
-                      <line
-                        key={`level-${index}`}
-                        x1={0}
-                        y1={index * gridRowHeight + NODE_SIZE / 2}
-                        x2={mapSize.width}
-                        y2={index * gridRowHeight + NODE_SIZE / 2}
-                        stroke="rgb(35, 73, 120)"
-                        strokeOpacity="0.11"
-                        strokeWidth="1"
-                      >
-                        {motionEnabled && (
-                          <animate
-                            attributeName="stroke-opacity"
-                            values="0.08;0.18;0.08"
-                            dur={`${4 + index * 0.4}s`}
-                            repeatCount="indefinite"
-                          />
-                        )}
-                      </line>
-                    ))}
-                    {edges.map((edge, index) => {
-                      const x1 = edge.from.x + NODE_SIZE / 2;
-                      const y1 = edge.from.y + NODE_SIZE / 2;
-                      const x2 = edge.to.x + NODE_SIZE / 2;
-                      const y2 = edge.to.y + NODE_SIZE / 2;
-                      const midY = (y1 + y2) / 2;
-                      const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
-                      const targetLocked = nodeStatusById.get(edge.to.id) === 'locked';
-                      const edgeFlowOn = motionEnabled && !targetLocked;
-                      return (
-                        <g key={`edge-${edge.from.id}-${edge.to.id}-${index}`}>
-                          {/* Soft glow underlayer */}
-                          <path
-                            d={d}
-                            fill="none"
-                            stroke="rgba(28, 56, 94, 0.14)"
-                            strokeWidth="8"
-                            strokeLinecap="round"
-                            filter="url(#lpEdgeGlow)"
-                            opacity={targetLocked ? 0.2 : 1}
-                          />
-                          {/* Main path with animated dash flow */}
-                          <path
-                            d={d}
-                            fill="none"
-                            stroke="rgba(70, 96, 53, 0.42)"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            opacity={targetLocked ? 0.25 : 1}
-                            strokeDasharray={edgeFlowOn ? '6 10' : undefined}
-                          >
-                            {edgeFlowOn && (
-                              <animate
-                                attributeName="stroke-dashoffset"
-                                from="0"
-                                to="-32"
-                                dur={`${2 + index * 0.15}s`}
-                                repeatCount="indefinite"
-                              />
-                            )}
-                          </path>
-                          {/* Travelling particle dots */}
-                          {edgeFlowOn &&
-                            [0, 1].map((pIdx) => (
-                              <circle
-                                key={pIdx}
-                                r={pIdx === 0 ? '3' : '2'}
-                                fill={
-                                  pIdx === 0
-                                    ? 'rgba(232, 212, 156, 0.8)'
-                                    : 'rgba(255, 255, 255, 0.55)'
-                                }
-                                filter="url(#lpParticleGlow)"
-                              >
-                                <animateMotion
-                                  dur={`${3 + pIdx * 1.5}s`}
-                                  begin={`${pIdx * 1.4}s`}
-                                  repeatCount="indefinite"
-                                  path={d}
-                                />
-                              </circle>
-                            ))}
-                        </g>
-                      );
-                    })}
-                  </Box>
-
-                  {/* Compute net objective — first available node in layout order */}
-                  {(() => {
-                    /* In module view, MODULE/CAPSTONE nodes ARE valid objectives.
-                     In activity view, skip MODULE (it's the view root) and ROOT. */
-                    const nextId =
-                      layoutNodes.find((n) => {
-                        const s = getNodeStatus(n, computedCompletion, moduleAvailability);
-                        if (s !== 'available') return false;
-                        if (n.type === LEARNING_NODE_TYPES.ROOT) return false;
-                        if (viewLevel === 'activity' && n.type === LEARNING_NODE_TYPES.MODULE)
-                          return false;
-                        return true;
-                      })?.id ?? null;
-
-                    return layoutNodes.map((node, nodeIndex) => {
-                      const isNextObjective = node.id === nextId;
-                      /* Root nodes (path root in module view, module header in activity view)
-                       are always shown as completed and are never interactive. */
-                      const isViewRoot =
-                        node.type === LEARNING_NODE_TYPES.ROOT ||
-                        (viewLevel === 'activity' && node.type === LEARNING_NODE_TYPES.MODULE);
-                      const status = isViewRoot
-                        ? 'completed'
-                        : getNodeStatus(node, computedCompletion, moduleAvailability);
-                      const styles = statusStyles[status];
-                      const justUnlocked = justUnlockedIds.includes(node.id);
-                      const Icon = nodeTypeIcons[node.type] || FiMap;
-                      const nodeLabel = nodeTypeLabels[node.type] || 'Node';
-                      const tooltipLabel = (() => {
-                        if (
-                          node.type === LEARNING_NODE_TYPES.FINAL &&
-                          node.content?.isTowerDefense
-                        ) {
-                          const towerConfig = node.content?.towerConfig || null;
-                          const waves = towerConfig?.waves ? `${towerConfig.waves} waves` : null;
-                          const problems = towerConfig?.problems
-                            ? `${towerConfig.problems} problems`
-                            : null;
-                          const detail = [waves, problems].filter(Boolean).join(' · ');
-                          return detail ? `Tower Defense Final · ${detail}` : 'Tower Defense Final';
-                        }
-                        return node.description || node.label || nodeLabel;
-                      })();
-
-                      const glowAnim = motionEnabled
-                        ? status === 'completed'
-                          ? `${pulseGlowGreen} 3s ease-in-out infinite`
-                          : isNextObjective
-                            ? `${pulseNextObjective} 1.6s ease-in-out infinite`
-                            : status === 'available'
-                              ? `${pulseGlowCyan} 2.8s ease-in-out infinite`
-                              : undefined
-                        : undefined;
-
-                      const entranceAnim = motionEnabled
-                        ? `${nodeEntrance} 0.5s ease-out ${nodeIndex * 0.07}s both`
-                        : undefined;
-
-                      return (
-                        <Tooltip
-                          key={node.id}
-                          label={tooltipLabel}
-                          bg="linear-gradient(180deg, rgba(244, 239, 231, 0.98), rgba(213, 206, 197, 0.96))"
-                          color="var(--cg-text)"
-                          border="1px solid var(--cg-window-shadow)"
-                          borderRadius="0"
-                          fontSize="sm"
-                          maxW="240px"
-                          hasArrow
+                    <Box
+                      as="svg"
+                      position="absolute"
+                      top={0}
+                      left={0}
+                      width={`${mapSize.width}px`}
+                      height={`${mapSize.height}px`}
+                      pointerEvents="none"
+                      overflow="visible"
+                    >
+                      <defs>
+                        <filter id="lpEdgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                          <feGaussianBlur stdDeviation="3" result="blur" />
+                          <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                          </feMerge>
+                        </filter>
+                        <filter id="lpParticleGlow" x="-100%" y="-100%" width="300%" height="300%">
+                          <feGaussianBlur stdDeviation="2" result="blur" />
+                          <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                          </feMerge>
+                        </filter>
+                      </defs>
+                      {Array.from({
+                        length: Math.max(0, Math.floor(mapSize.height / gridRowHeight) + 1),
+                      }).map((_, index) => (
+                        <line
+                          key={`level-${index}`}
+                          x1={0}
+                          y1={index * gridRowHeight + NODE_SIZE / 2}
+                          x2={mapSize.width}
+                          y2={index * gridRowHeight + NODE_SIZE / 2}
+                          stroke="rgb(35, 73, 120)"
+                          strokeOpacity="0.11"
+                          strokeWidth="1"
                         >
-                          <Box
-                            position="absolute"
-                            top={`${node.y}px`}
-                            left={`${node.x}px`}
-                            width={`${NODE_SIZE}px`}
-                            height={`${NODE_SIZE}px`}
-                            borderRadius="4px"
-                            border={`2px solid ${styles.border}`}
-                            bg={styles.bg}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            boxShadow="var(--cg-window-outset), 3px 3px 0 rgba(0, 0, 0, 0.14)"
-                            opacity={status === 'locked' ? 0.45 : 1}
-                            cursor={
-                              status === 'locked'
-                                ? 'not-allowed'
-                                : isViewRoot
-                                  ? 'default'
-                                  : 'pointer'
-                            }
-                            transition="transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease"
-                            animation={glowAnim || entranceAnim}
-                            _hover={
-                              status === 'locked' || isViewRoot
-                                ? {}
-                                : {
-                                    transform: 'translate(-1px, -1px) scale(1.08)',
-                                    boxShadow:
-                                      'var(--cg-window-outset), 5px 5px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px ' +
-                                      styles.glow,
-                                  }
-                            }
-                            onClick={isViewRoot ? undefined : () => handleNodeClick(node, status)}
-                          >
-                            <Icon color={styles.text} size={18} />
-
-                            {/* One-shot retro flash on unlock */}
-                            {justUnlocked && motionEnabled && (
-                              <Box
-                                position="absolute"
-                                inset={0}
-                                borderRadius="4px"
-                                bg="rgba(255, 253, 240, 0.9)"
-                                pointerEvents="none"
-                                sx={{ animation: `${unlockFlash} 0.9s ease-out forwards` }}
-                              />
-                            )}
-
-                            {/* Orbiting particles for active nodes */}
-                            {motionEnabled &&
-                              status !== 'locked' &&
-                              [0, 1, 2].map((i) => (
-                                <Box
-                                  key={`orbit-${i}`}
-                                  position="absolute"
-                                  w="4px"
-                                  h="4px"
-                                  borderRadius="full"
-                                  bg={
-                                    status === 'completed'
-                                      ? i % 2 === 0
-                                        ? '#2f6d34'
-                                        : '#d0a03b'
-                                      : '#1e4f8f'
-                                  }
-                                  top="50%"
-                                  left="50%"
-                                  pointerEvents="none"
-                                  sx={{
-                                    animation: `lpOrbit${nodeIndex}_${i} ${3.5 + i * 1.1}s linear ${i * 0.8}s infinite`,
-                                    [`@keyframes lpOrbit${nodeIndex}_${i}`]: {
-                                      '0%': {
-                                        transform: `rotate(${i * 120}deg) translateX(${24 + i * 3}px) rotate(-${i * 120}deg)`,
-                                        opacity: 0.7,
-                                      },
-                                      '50%': { opacity: 0.25 },
-                                      '100%': {
-                                        transform: `rotate(${i * 120 + 360}deg) translateX(${24 + i * 3}px) rotate(-${i * 120 + 360}deg)`,
-                                        opacity: 0.7,
-                                      },
-                                    },
-                                  }}
+                          {motionEnabled && (
+                            <animate
+                              attributeName="stroke-opacity"
+                              values="0.08;0.18;0.08"
+                              dur={`${4 + index * 0.4}s`}
+                              repeatCount="indefinite"
+                            />
+                          )}
+                        </line>
+                      ))}
+                      {edges.map((edge, index) => {
+                        const x1 = edge.from.x + NODE_SIZE / 2;
+                        const y1 = edge.from.y + NODE_SIZE / 2;
+                        const x2 = edge.to.x + NODE_SIZE / 2;
+                        const y2 = edge.to.y + NODE_SIZE / 2;
+                        const midY = (y1 + y2) / 2;
+                        const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+                        const targetLocked = nodeStatusById.get(edge.to.id) === 'locked';
+                        const edgeFlowOn = motionEnabled && !targetLocked;
+                        return (
+                          <g key={`edge-${edge.from.id}-${edge.to.id}-${index}`}>
+                            {/* Soft glow underlayer */}
+                            <path
+                              d={d}
+                              fill="none"
+                              stroke="rgba(28, 56, 94, 0.14)"
+                              strokeWidth="8"
+                              strokeLinecap="round"
+                              filter="url(#lpEdgeGlow)"
+                              opacity={targetLocked ? 0.2 : 1}
+                            />
+                            {/* Main path with animated dash flow */}
+                            <path
+                              d={d}
+                              fill="none"
+                              stroke="rgba(70, 96, 53, 0.42)"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              opacity={targetLocked ? 0.25 : 1}
+                              strokeDasharray={edgeFlowOn ? '6 10' : undefined}
+                            >
+                              {edgeFlowOn && (
+                                <animate
+                                  attributeName="stroke-dashoffset"
+                                  from="0"
+                                  to="-32"
+                                  dur={`${2 + index * 0.15}s`}
+                                  repeatCount="indefinite"
                                 />
+                              )}
+                            </path>
+                            {/* Travelling particle dots */}
+                            {edgeFlowOn &&
+                              [0, 1].map((pIdx) => (
+                                <circle
+                                  key={pIdx}
+                                  r={pIdx === 0 ? '3' : '2'}
+                                  fill={
+                                    pIdx === 0
+                                      ? 'rgba(232, 212, 156, 0.8)'
+                                      : 'rgba(255, 255, 255, 0.55)'
+                                  }
+                                  filter="url(#lpParticleGlow)"
+                                >
+                                  <animateMotion
+                                    dur={`${3 + pIdx * 1.5}s`}
+                                    begin={`${pIdx * 1.4}s`}
+                                    repeatCount="indefinite"
+                                    path={d}
+                                  />
+                                </circle>
                               ))}
+                          </g>
+                        );
+                      })}
+                    </Box>
 
+                    {/* Compute net objective — first available node in layout order */}
+                    {(() => {
+                      /* In module view, MODULE/CAPSTONE nodes ARE valid objectives.
+                     In activity view, skip MODULE (it's the view root) and ROOT. */
+                      const nextId =
+                        layoutNodes.find((n) => {
+                          const s = getNodeStatus(n, computedCompletion, moduleAvailability);
+                          if (s !== 'available') return false;
+                          if (n.type === LEARNING_NODE_TYPES.ROOT) return false;
+                          if (viewLevel === 'activity' && n.type === LEARNING_NODE_TYPES.MODULE)
+                            return false;
+                          return true;
+                        })?.id ?? null;
+
+                      return layoutNodes.map((node, nodeIndex) => {
+                        const isNextObjective = node.id === nextId;
+                        /* Root nodes (path root in module view, module header in activity view)
+                       are always shown as completed and are never interactive. */
+                        const isViewRoot =
+                          node.type === LEARNING_NODE_TYPES.ROOT ||
+                          (viewLevel === 'activity' && node.type === LEARNING_NODE_TYPES.MODULE);
+                        const status = isViewRoot
+                          ? 'completed'
+                          : getNodeStatus(node, computedCompletion, moduleAvailability);
+                        const styles = statusStyles[status];
+                        const justUnlocked = justUnlockedIds.includes(node.id);
+                        const Icon = nodeTypeIcons[node.type] || FiMap;
+                        const nodeLabel = nodeTypeLabels[node.type] || 'Node';
+                        const tooltipLabel = (() => {
+                          if (
+                            node.type === LEARNING_NODE_TYPES.FINAL &&
+                            node.content?.isTowerDefense
+                          ) {
+                            const towerConfig = node.content?.towerConfig || null;
+                            const waves = towerConfig?.waves ? `${towerConfig.waves} waves` : null;
+                            const problems = towerConfig?.problems
+                              ? `${towerConfig.problems} problems`
+                              : null;
+                            const detail = [waves, problems].filter(Boolean).join(' · ');
+                            return detail
+                              ? `Tower Defense Final · ${detail}`
+                              : 'Tower Defense Final';
+                          }
+                          return node.description || node.label || nodeLabel;
+                        })();
+
+                        const glowAnim = motionEnabled
+                          ? status === 'completed'
+                            ? `${pulseGlowGreen} 3s ease-in-out infinite`
+                            : isNextObjective
+                              ? `${pulseNextObjective} 1.6s ease-in-out infinite`
+                              : status === 'available'
+                                ? `${pulseGlowCyan} 2.8s ease-in-out infinite`
+                                : undefined
+                          : undefined;
+
+                        const entranceAnim = motionEnabled
+                          ? `${nodeEntrance} 0.5s ease-out ${nodeIndex * 0.07}s both`
+                          : undefined;
+
+                        return (
+                          <Tooltip
+                            key={node.id}
+                            label={tooltipLabel}
+                            bg="linear-gradient(180deg, rgba(244, 239, 231, 0.98), rgba(213, 206, 197, 0.96))"
+                            color="var(--cg-text)"
+                            border="1px solid var(--cg-window-shadow)"
+                            borderRadius="0"
+                            fontSize="sm"
+                            maxW="240px"
+                            hasArrow
+                          >
                             <Box
                               position="absolute"
-                              top="calc(100% + 6px)"
-                              left="50%"
-                              transform="translateX(-50%)"
-                              minW={{
-                                base: `${MOBILE_LABEL_WIDTH}px`,
-                                md: `${LABEL_WIDTH}px`,
-                              }}
-                              maxW={{ base: '140px', md: '220px' }}
-                              textAlign="center"
+                              top={`${node.y}px`}
+                              left={`${node.x}px`}
+                              width={`${NODE_SIZE}px`}
+                              height={`${NODE_SIZE}px`}
+                              borderRadius="4px"
+                              border={`2px solid ${styles.border}`}
+                              bg={styles.bg}
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              boxShadow="var(--cg-window-outset), 3px 3px 0 rgba(0, 0, 0, 0.14)"
+                              opacity={status === 'locked' ? 0.45 : 1}
+                              cursor={
+                                status === 'locked'
+                                  ? 'not-allowed'
+                                  : isViewRoot
+                                    ? 'default'
+                                    : 'pointer'
+                              }
+                              transition="transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease"
+                              animation={glowAnim || entranceAnim}
+                              _hover={
+                                status === 'locked' || isViewRoot
+                                  ? {}
+                                  : {
+                                      transform: 'translate(-1px, -1px) scale(1.08)',
+                                      boxShadow:
+                                        'var(--cg-window-outset), 5px 5px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px ' +
+                                        styles.glow,
+                                    }
+                              }
+                              onClick={isViewRoot ? undefined : () => handleNodeClick(node, status)}
                             >
-                              <Text
-                                fontSize="xs"
-                                color={styles.text}
-                                fontFamily="var(--cg-font-retro-display)"
-                                textTransform="uppercase"
-                                noOfLines={1}
+                              <Icon color={styles.text} size={18} />
+
+                              {/* One-shot retro flash on unlock */}
+                              {justUnlocked && motionEnabled && (
+                                <Box
+                                  position="absolute"
+                                  inset={0}
+                                  borderRadius="4px"
+                                  bg="rgba(255, 253, 240, 0.9)"
+                                  pointerEvents="none"
+                                  sx={{ animation: `${unlockFlash} 0.9s ease-out forwards` }}
+                                />
+                              )}
+
+                              {/* Orbiting particles for active nodes */}
+                              {motionEnabled &&
+                                status !== 'locked' &&
+                                [0, 1, 2].map((i) => (
+                                  <Box
+                                    key={`orbit-${i}`}
+                                    position="absolute"
+                                    w="4px"
+                                    h="4px"
+                                    borderRadius="full"
+                                    bg={
+                                      status === 'completed'
+                                        ? i % 2 === 0
+                                          ? '#2f6d34'
+                                          : '#d0a03b'
+                                        : '#1e4f8f'
+                                    }
+                                    top="50%"
+                                    left="50%"
+                                    pointerEvents="none"
+                                    sx={{
+                                      animation: `lpOrbit${nodeIndex}_${i} ${3.5 + i * 1.1}s linear ${i * 0.8}s infinite`,
+                                      [`@keyframes lpOrbit${nodeIndex}_${i}`]: {
+                                        '0%': {
+                                          transform: `rotate(${i * 120}deg) translateX(${24 + i * 3}px) rotate(-${i * 120}deg)`,
+                                          opacity: 0.7,
+                                        },
+                                        '50%': { opacity: 0.25 },
+                                        '100%': {
+                                          transform: `rotate(${i * 120 + 360}deg) translateX(${24 + i * 3}px) rotate(-${i * 120 + 360}deg)`,
+                                          opacity: 0.7,
+                                        },
+                                      },
+                                    }}
+                                  />
+                                ))}
+
+                              <Box
+                                position="absolute"
+                                top="calc(100% + 6px)"
+                                left="50%"
+                                transform="translateX(-50%)"
+                                minW={{
+                                  base: `${MOBILE_LABEL_WIDTH}px`,
+                                  md: `${LABEL_WIDTH}px`,
+                                }}
+                                maxW={{ base: '140px', md: '220px' }}
+                                textAlign="center"
                               >
-                                {nodeLabel}
-                              </Text>
-                              <Text
-                                fontSize="xs"
-                                color="var(--cg-text)"
-                                fontFamily="var(--cg-font-retro-display)"
-                                noOfLines={2}
-                              >
-                                {node.label}
-                              </Text>
+                                <Text
+                                  fontSize="xs"
+                                  color={styles.text}
+                                  fontFamily="var(--cg-font-retro-display)"
+                                  textTransform="uppercase"
+                                  noOfLines={1}
+                                >
+                                  {nodeLabel}
+                                </Text>
+                                <Text
+                                  fontSize="xs"
+                                  color="var(--cg-text)"
+                                  fontFamily="var(--cg-font-retro-display)"
+                                  noOfLines={2}
+                                >
+                                  {node.label}
+                                </Text>
+                              </Box>
                             </Box>
-                          </Box>
-                        </Tooltip>
-                      );
-                    });
-                  })()}
-                </Box>
+                          </Tooltip>
+                        );
+                      });
+                    })()}
+                  </Box>
+                )}
               </Box>
             </Flex>
 
@@ -1925,10 +1920,7 @@ function LearningPathMap() {
           >
             <Flex flexWrap="wrap" gap={{ base: 3, md: 4 }}>
               {Object.entries(nodeTypeLabels)
-                .filter(
-                  ([type]) =>
-                    type !== LEARNING_NODE_TYPES.COURSE && type !== LEARNING_NODE_TYPES.FINAL
-                )
+                .filter(([type]) => type !== LEARNING_NODE_TYPES.FINAL)
                 .map(([type, label]) => {
                   const Icon = nodeTypeIcons[type] || FiMap;
                   return (
