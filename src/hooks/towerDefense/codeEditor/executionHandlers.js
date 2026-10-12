@@ -86,6 +86,7 @@ const fetchAndFormatTestCases = async (problem, titleSlug) => {
       name: data?.functionName,
       params: data?.functionParams,
       returnType: data?.evaluationMode === 'output' ? 'void' : null,
+      outputOnly: data?.evaluationMode === 'output',
     };
   } else if (isAIProblem) {
     const data = await api.aiProblems.getById(titleSlug);

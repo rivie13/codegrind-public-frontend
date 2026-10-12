@@ -104,6 +104,7 @@ const useCodeExecution = ({
           name: data?.functionName,
           params: data?.functionParams,
           returnType: data?.evaluationMode === 'output' ? 'void' : null,
+          outputOnly: data?.evaluationMode === 'output',
         };
       } else if (isAIProblem) {
         const data = await api.aiProblems.getById(titleSlug);
@@ -132,7 +133,9 @@ const useCodeExecution = ({
       const formattedTestCases = testCases.map((tc, index) => {
         return {
           input: tc,
-          expected: expectedOutputs ? expectedOutputs[index] : (tc.expected ?? tc.expectedOutput ?? null),
+          expected: expectedOutputs
+            ? expectedOutputs[index]
+            : (tc.expected ?? tc.expectedOutput ?? null),
           metadata,
         };
       });
@@ -192,6 +195,7 @@ const useCodeExecution = ({
           name: data?.functionName,
           params: data?.functionParams,
           returnType: data?.evaluationMode === 'output' ? 'void' : null,
+          outputOnly: data?.evaluationMode === 'output',
         };
       } else if (isAIProblem) {
         const data = await api.aiProblems.getById(titleSlug);
@@ -220,7 +224,9 @@ const useCodeExecution = ({
       const formattedTestCases = testCases.map((tc, index) => {
         return {
           input: tc,
-          expected: expectedOutputs ? expectedOutputs[index] : (tc.expected ?? tc.expectedOutput ?? null),
+          expected: expectedOutputs
+            ? expectedOutputs[index]
+            : (tc.expected ?? tc.expectedOutput ?? null),
           metadata,
         };
       });
@@ -238,7 +244,8 @@ const useCodeExecution = ({
       setExecutionResult(sanitizeExecutionDisplayText(output));
     } catch (error) {
       logger.error('Run output error:', error);
-      const message = error?.message || 'We could not capture program output right now. Please try again.';
+      const message =
+        error?.message || 'We could not capture program output right now. Please try again.';
       setExecutionResult(`❌ ${message}\n`);
       onExecutionError?.({ type: 'output', error });
     } finally {
@@ -257,4 +264,3 @@ const useCodeExecution = ({
 };
 
 export default useCodeExecution;
-
