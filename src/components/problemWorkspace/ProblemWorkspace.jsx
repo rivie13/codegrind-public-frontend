@@ -195,8 +195,6 @@ const ProblemWorkspace = () => {
     window.dispatchEvent(new Event('learning-workspace-tutorial-reset'));
   }, []);
 
-
-
   useEffect(() => {
     if (!isLearningPathMode || !user?.id || !learningPathData?.pathId) {
       setLearningGateActive(false);
@@ -833,6 +831,7 @@ const ProblemWorkspace = () => {
           name: data?.functionName,
           params: data?.functionParams,
           returnType: data?.evaluationMode === 'output' ? 'void' : null,
+          outputOnly: data?.evaluationMode === 'output',
         };
       } else if (isAIProblem) {
         const data = await api.aiProblems.getById(titleSlug);
@@ -861,7 +860,9 @@ const ProblemWorkspace = () => {
       const formattedTestCases = testCasesData.map((tc, index) => {
         return {
           input: tc,
-          expected: expectedOutputs ? expectedOutputs[index] : (tc.expected ?? tc.expectedOutput ?? null),
+          expected: expectedOutputs
+            ? expectedOutputs[index]
+            : (tc.expected ?? tc.expectedOutput ?? null),
           metadata,
         };
       });
@@ -882,7 +883,7 @@ const ProblemWorkspace = () => {
         difficulty: problemData?.difficulty || 'easy',
         mode: mode || 'practice',
         newTime: timer,
-        aiUsageCount
+        aiUsageCount,
       };
 
       const submitResponse = isAuthenticated
@@ -1562,4 +1563,3 @@ const ProblemWorkspace = () => {
 };
 
 export default ProblemWorkspace;
-
