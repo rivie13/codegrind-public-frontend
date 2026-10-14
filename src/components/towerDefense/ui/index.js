@@ -14,6 +14,5 @@ export { default as TowerDefenseProblemPanel } from './panels/TowerDefenseProble
 export { default as TowerUpgradePanel } from './panels/TowerUpgradePanel';
 export { default as DeployableSelector } from './DeployableSelector';
 
-// V2 Slottable Layout
-export { default as SlottableLayout } from './layout/SlottableLayout';
+// V2 panel types (slot system deleted; constants remain for onboarding surfaces)
 export { PANEL_TYPES } from './layout/panelTypes';

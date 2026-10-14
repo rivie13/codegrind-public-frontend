@@ -15,6 +15,7 @@ const mockState = vi.hoisted(() => ({
 const mockEnemyRevealOverlay = vi.hoisted(() => vi.fn(() => null));
 const mockUseTowerDefenseV2PageState = vi.hoisted(() => vi.fn());
 const mockUseCompactLandscapeShellMode = vi.hoisted(() => vi.fn(() => false));
+const mockUseIsMobileDevice = vi.hoisted(() => vi.fn(() => false));
 
 vi.mock('react-router-dom', () => ({
   useLocation: () => mockState.location,
@@ -107,12 +108,8 @@ vi.mock('../../../hooks/useCompactLandscapeShellMode', () => ({
   default: (...args) => mockUseCompactLandscapeShellMode(...args),
 }));
 
-vi.mock('../../../components/towerDefense/ui/layout/panelTypes', () => ({
-  PANEL_TYPES: {
-    GAME: 'game',
-    PROBLEM: 'problem',
-    EDITOR: 'editor',
-  },
+vi.mock('../../../hooks/useIsMobileDevice', () => ({
+  default: (...args) => mockUseIsMobileDevice(...args),
 }));
 
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -141,10 +138,8 @@ const buildPageState = (overrides = {}) => ({
   isMultiProblemTower: false,
   problemTabs: [],
   activeProblemIndex: 0,
-  leftPanel: 'game',
-  rightPanel: 'problem',
-  setLeftPanel: vi.fn(),
-  setRightPanel: vi.fn(),
+  chatOpen: false,
+  problemOpen: true,
   lastTerminalCommand: '',
   learningPathOnboardingActive: false,
   setLearningPathOnboardingActive: vi.fn(),
@@ -186,6 +181,7 @@ describe('TowerDefenseV2Page guest solve tracking', () => {
     vi.clearAllMocks();
     mockEnemyRevealOverlay.mockClear();
     mockUseCompactLandscapeShellMode.mockReturnValue(false);
+    mockUseIsMobileDevice.mockReturnValue(false);
     mockState.location = { pathname: '/games/tower-defense/two-sum', search: '', state: null };
     mockState.navigate = vi.fn();
     mockState.useAuth.mockReturnValue({ isAuthenticated: false });
@@ -348,10 +344,9 @@ describe('TowerDefenseV2Page guest solve tracking', () => {
     });
   });
 
-  it('reports non-game embedded focus for single-panel problem slot states', async () => {
+  it('reports embedded chat focus from the chat collapsible state', async () => {
     mockState.pageState = buildPageState({
-      leftPanel: 'problem',
-      rightPanel: null,
+      chatOpen: true,
     });
 
     const onEmbeddedChatFocusChange = vi.fn();
@@ -363,11 +358,23 @@ describe('TowerDefenseV2Page guest solve tracking', () => {
     });
   });
 
-  it('forces the mobile enemy reveal layout when tower defense is in single-panel mobile mode', async () => {
+  it('reports no embedded chat focus when the chat collapsible is closed', async () => {
     mockState.pageState = buildPageState({
-      leftPanel: 'game',
-      rightPanel: null,
+      chatOpen: false,
     });
+
+    const onEmbeddedChatFocusChange = vi.fn();
+
+    render(<TowerDefenseV2Page embedded onEmbeddedChatFocusChange={onEmbeddedChatFocusChange} />);
+
+    await waitFor(() => {
+      expect(onEmbeddedChatFocusChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it('forces the mobile enemy reveal layout on handheld viewports', async () => {
+    mockUseIsMobileDevice.mockReturnValue(true);
+    mockState.pageState = buildPageState();
 
     render(<TowerDefenseV2Page />);
 

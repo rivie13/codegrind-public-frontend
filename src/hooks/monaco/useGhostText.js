@@ -50,9 +50,8 @@ export default function useGhostText({ enabled = true, solution = '', language =
       if (!monaco || !editor) return false;
 
       /* Guard: editor must be in a visible, properly-sized panel.
-       * The SlottableLayout portals off-screen panels into a hidden 1×1px
-       * fixed box.  Returning false lets the retry interval re-try once
-       * React has re-rendered the panel switch. */
+       * Collapsed panels render display:none, so retry until the editor
+       * container has real dimensions. */
       const containerDom = editor.getContainerDomNode?.() || editor.getDomNode?.();
       if (containerDom) {
         const { width, height } = containerDom.getBoundingClientRect();

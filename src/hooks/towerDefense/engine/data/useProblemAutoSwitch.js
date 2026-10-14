@@ -2,16 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function useProblemAutoSwitch({
   activeTitleSlug,
-  rightPanel,
-  setLeftPanel,
-  setRightPanel,
   problemDescription,
   problem,
-  defaultLeftPanel,
-  defaultRightPanel,
   autoSwitchSeconds = 90,
   onAutoSwitch,
-  preservePanelsOnSlugChange = false
 }) {
   const [problemAutoSwitchRemaining, setProblemAutoSwitchRemaining] = useState(null);
   const [problemAutoSwitchActive, setProblemAutoSwitchActive] = useState(false);
@@ -66,38 +60,32 @@ export default function useProblemAutoSwitch({
   }, [autoSwitchSeconds, clearProblemAutoSwitchTimers, onAutoSwitch]);
 
   useEffect(() => {
-    if (!preservePanelsOnSlugChange) {
-      if (setLeftPanel) {
-        setLeftPanel(defaultLeftPanel);
-      }
-      if (setRightPanel) {
-        setRightPanel(defaultRightPanel);
-      }
-    }
     problemAutoSwitchCancelledRef.current = false;
     problemAutoSwitchStartedRef.current = false;
     setProblemAutoSwitchActive(false);
     setProblemAutoSwitchRemaining(null);
     setShowProblemIntroNote(true);
     clearProblemAutoSwitchTimers();
-  }, [activeTitleSlug, clearProblemAutoSwitchTimers, defaultLeftPanel, defaultRightPanel, preservePanelsOnSlugChange, setLeftPanel, setRightPanel]);
+  }, [activeTitleSlug, clearProblemAutoSwitchTimers]);
 
-  useEffect(() => () => {
-    clearProblemAutoSwitchTimers();
-  }, [clearProblemAutoSwitchTimers]);
+  useEffect(
+    () => () => {
+      clearProblemAutoSwitchTimers();
+    },
+    [clearProblemAutoSwitchTimers]
+  );
 
   useEffect(() => {
     if (problemAutoSwitchCancelledRef.current || problemAutoSwitchStartedRef.current) return;
-    if (rightPanel !== defaultRightPanel) return;
     if (!problemDescription && !problem) return;
     startProblemAutoSwitch();
-  }, [defaultRightPanel, problemDescription, problem, rightPanel, startProblemAutoSwitch]);
+  }, [problemDescription, problem, startProblemAutoSwitch]);
 
   return {
     problemAutoSwitchRemaining,
     problemAutoSwitchActive,
     showProblemIntroNote,
     setShowProblemIntroNote,
-    cancelProblemAutoSwitch
+    cancelProblemAutoSwitch,
   };
 }

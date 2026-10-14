@@ -1,8 +1,8 @@
 /**
- * Tower Defense Game V2 - With Slottable UI Layout
+ * Tower Defense Game V2 - Fixed Mission Workspace
  *
- * Uses the new canvas-based GameEngine with a flexible UI layout system.
- * REUSES: All existing UI components (CodeEditorPanel, TowerSelector, etc.)
+ * Canvas-based GameEngine with a fixed single-screen layout: Game left,
+ * Editor right, Problem and Chat as collapsible panels. No slot switching.
  *
  * Access at: /games/tower-defense
  */
@@ -35,7 +35,7 @@ import audioManager from '../../../utils/audio/AudioManager';
 import AudioService from '../../../utils/audio/AudioService';
 import TowerDefenseV2Modals from './TowerDefenseV2Modals';
 import useTowerDefenseV2PageState from './useTowerDefenseV2PageState';
-import { PANEL_TYPES } from '../../../components/towerDefense/ui/layout/panelTypes';
+import useIsMobileDevice from '../../../hooks/useIsMobileDevice';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useGuestProgressCtx } from '../../../contexts/GuestProgressProvider';
 import { trackUserContentEvent } from '../../../services/userContentEventService';
@@ -305,12 +305,7 @@ export default function TowerDefenseV2Test({
     functionTowerPlaced,
     objectTowerPlaced,
     isMultiProblemTower,
-    problemTabs,
-    activeProblemIndex,
-    leftPanel,
-    rightPanel,
-    setLeftPanel,
-    setRightPanel,
+    chatOpen,
     lastTerminalCommand,
     learningPathOnboardingActive,
     setLearningPathOnboardingActive,
@@ -377,7 +372,8 @@ export default function TowerDefenseV2Test({
         gameState,
         codeSubmitted: Boolean(codeSubmitted),
         verifyAttemptInProgress: Boolean(verifyAttemptInProgress),
-        rightPanel,
+        // Fixed layout: the Editor is always visible, so report it as shown.
+        rightPanel: 'editor',
         editorShownAt: simpleDemoEditorShownAt,
         submitReady: simpleDemoSubmitReady,
         codeLingerDone: simpleDemoCodeLingerDone,
@@ -434,8 +430,11 @@ export default function TowerDefenseV2Test({
     if (typeof window === 'undefined') return undefined;
 
     const nextStepId = liteActiveStep ? String(liteActiveStep.id || '') : '';
+    // Fixed layout: every surface is always visible, so resolve against the
+    // static panel assignment. Surface resolution falls back to the step's
+    // desired panels regardless.
     const inlineSurface = liteActiveStep
-      ? resolveInlineOnboardingSurface(liteActiveStep, { leftPanel, rightPanel })
+      ? resolveInlineOnboardingSurface(liteActiveStep, { leftPanel: 'game', rightPanel: 'editor' })
       : null;
 
     if (typeof document !== 'undefined') {
@@ -463,8 +462,8 @@ export default function TowerDefenseV2Test({
     );
 
     return undefined;
-  }, [liteActiveStep, leftPanel, rightPanel]);
-  const isSinglePanelMobileLayout = !rightPanel;
+  }, [liteActiveStep]);
+  const isMobileViewport = useIsMobileDevice();
   const pageShellLayout = useMemo(
     () => resolveTowerDefensePageShellLayout({ isCompactLandscapeShellMode }),
     [isCompactLandscapeShellMode]
@@ -473,10 +472,8 @@ export default function TowerDefenseV2Test({
   useEffect(() => {
     if (!embedded || typeof onEmbeddedChatFocusChange !== 'function') return;
 
-    const isNonGameSinglePanelFocus =
-      isSinglePanelMobileLayout && Boolean(leftPanel) && leftPanel !== PANEL_TYPES.GAME;
-    onEmbeddedChatFocusChange(isNonGameSinglePanelFocus);
-  }, [embedded, isSinglePanelMobileLayout, leftPanel, onEmbeddedChatFocusChange]);
+    onEmbeddedChatFocusChange(Boolean(chatOpen));
+  }, [embedded, chatOpen, onEmbeddedChatFocusChange]);
 
   useEffect(() => {
     if (!embedded || typeof onEmbeddedChatFocusChange !== 'function') return undefined;
@@ -779,7 +776,6 @@ export default function TowerDefenseV2Test({
     });
 
     const focusAndQueueCallouts = () => {
-      setLeftPanel?.(PANEL_TYPES.GAME);
       setTowerUnlockCalloutQueue((currentQueue) => [...currentQueue, ...nextCallouts]);
     };
 
@@ -799,7 +795,6 @@ export default function TowerDefenseV2Test({
     learningNodeId,
     learningTowerConfig?.allowedTowers,
     learningTowerConfig?.onboardingId,
-    setLeftPanel,
   ]);
 
   useEffect(() => {
@@ -847,41 +842,7 @@ export default function TowerDefenseV2Test({
     };
   }, [activeTowerUnlockCallout]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
-    const handleSnippetEvent = (event) => {
-      const detail = event?.detail || {};
-      if (detail.status === 'cleared') {
-        toast.close('td-mobile-snippet-ready');
-        return;
-      }
-      if (detail.status !== 'pending') return;
-
-      const editorVisible = leftPanel === PANEL_TYPES.EDITOR || rightPanel === PANEL_TYPES.EDITOR;
-      if (editorVisible) return;
-      if (typeof toast.isActive === 'function' && toast.isActive('td-mobile-snippet-ready')) {
-        return;
-      }
-
-      const tabLabel =
-        problemTabs?.[activeProblemIndex]?.title || `Problem ${activeProblemIndex + 1}`;
-      toast({
-        id: 'td-mobile-snippet-ready',
-        title: 'Snippet generated',
-        description: `Snippet added to ${tabLabel}. Open the Editor to review.`,
-        status: 'info',
-        duration: 4000,
-        isClosable: true,
-        position: 'top',
-      });
-    };
-
-    window.addEventListener('td-snippet-review', handleSnippetEvent);
-    return () => {
-      window.removeEventListener('td-snippet-review', handleSnippetEvent);
-    };
-  }, [activeProblemIndex, leftPanel, problemTabs, rightPanel, toast]);
+  // Fixed layout: the Editor is always visible, so snippet-review toasts are obsolete.
 
   // console.log(
   //   `[TowerDefenseV2Page] RENDER TICK. isDemo=${isDemo}, problem=${!!problem}, problemError=${!!problemError}, problemLoading=${!problem && !problemError}`
@@ -958,7 +919,7 @@ export default function TowerDefenseV2Test({
       <EnemyRevealOverlay
         reveal={activeEnemyReveal}
         onDismiss={dismissEnemyReveal}
-        preferMobileLayout={isSinglePanelMobileLayout}
+        preferMobileLayout={isMobileViewport}
       />
 
       <InvalidPlacementOverlay />

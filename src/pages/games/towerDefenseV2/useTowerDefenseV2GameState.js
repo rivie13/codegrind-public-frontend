@@ -12,7 +12,6 @@ import useGuestFunnel from '../../../hooks/guest/useGuestFunnel';
 import { api } from '../../../services/api';
 
 // REUSE: Existing UI Components
-import { PANEL_TYPES } from '../../../components/towerDefense/ui/layout/panelTypes';
 
 // REUSE: Existing Hooks
 import useCodeEditor from '../../../hooks/towerDefense/codeEditor/useCodeEditor';
@@ -31,14 +30,12 @@ import useTowerDefenseV2InitialCodeEffects from './hooks/effects/useTowerDefense
 import useTowerDefenseV2LanguageLock, {
   resolveLearningLanguageLock,
 } from './hooks/learning/useTowerDefenseV2LanguageLock';
-import useTowerDefenseV2PanelInteractions from './hooks/ui/useTowerDefenseV2PanelInteractions';
 import useTowerDefenseV2LearningState from './hooks/learning/useTowerDefenseV2LearningState';
 import useLearningUnlockCodeRestore from './hooks/learning/useLearningUnlockCodeRestore';
 import useTowerDefenseV2MapState from './hooks/state/useTowerDefenseV2MapState';
 import useTowerDefenseV2MultiProblemState from './hooks/state/useTowerDefenseV2MultiProblemState';
 import useTowerDefenseV2PanelActions from './hooks/ui/useTowerDefenseV2PanelActions';
 import useTowerDefenseV2PanelLayoutProps from './hooks/ui/useTowerDefenseV2PanelLayoutProps';
-import useTowerDefenseV2PanelState from './hooks/state/useTowerDefenseV2PanelState';
 import useTowerDefenseV2PlacementState from './hooks/ui/useTowerDefenseV2PlacementState';
 import useTowerDefenseV2ProblemState from './hooks/state/useTowerDefenseV2ProblemState';
 import useTowerDefenseV2RefineAvailability from './hooks/effects/useTowerDefenseV2RefineAvailability';
@@ -53,7 +50,6 @@ import useTDUnlockState from './hooks/state/useTDUnlockState';
 import useTowerDefenseV2TerminalState from './hooks/state/useTowerDefenseV2TerminalState';
 import useTowerDefenseV2TimerState from './hooks/state/useTowerDefenseV2TimerState';
 import useTowerDefenseV2UiState from './hooks/state/useTowerDefenseV2UiState';
-import useIsMobileDevice from '../../../hooks/useIsMobileDevice';
 
 // REUSE: Existing Utilities
 import {
@@ -340,24 +336,15 @@ export default function useTowerDefenseV2GameState({
     }
   }, [problem, demoLaunchStartTime, funnel, isDemo]);
 
-  const isMobileDevice = useIsMobileDevice();
-  const dynamicDefaultLeftPanel =
-    isMobileDevice && isHomepageDemo ? PANEL_TYPES.PROBLEM : PANEL_TYPES.GAME;
-  const dynamicDefaultRightPanel =
-    isMobileDevice && isHomepageDemo ? PANEL_TYPES.GAME : PANEL_TYPES.PROBLEM;
+  const [learningPathOnboardingActive, setLearningPathOnboardingActive] =
+    useState(learningPathOnboarding);
 
-  const {
-    leftPanel,
-    rightPanel,
-    setLeftPanel,
-    setRightPanel,
-    learningPathOnboardingActive,
-    setLearningPathOnboardingActive,
-  } = useTowerDefenseV2PanelState({
-    learningPathOnboarding,
-    defaultLeftPanel: dynamicDefaultLeftPanel,
-    defaultRightPanel: dynamicDefaultRightPanel,
-  });
+  useEffect(() => {
+    setLearningPathOnboardingActive(learningPathOnboarding);
+  }, [learningPathOnboarding]);
+
+  const [problemOpen, setProblemOpenState] = useState(true);
+  const [chatOpen, setChatOpenState] = useState(false);
 
   const {
     problemAutoSwitchRemaining,
@@ -367,17 +354,25 @@ export default function useTowerDefenseV2GameState({
     cancelProblemAutoSwitch,
   } = useProblemAutoSwitch({
     activeTitleSlug,
-    rightPanel,
-    setLeftPanel,
-    setRightPanel,
     problemDescription,
     problem,
-    defaultLeftPanel: dynamicDefaultLeftPanel,
-    defaultRightPanel: dynamicDefaultRightPanel,
     autoSwitchSeconds: PROBLEM_AUTO_SWITCH_SECONDS,
-    onAutoSwitch: () => setRightPanel(PANEL_TYPES.EDITOR),
-    preservePanelsOnSlugChange: isMultiProblemTower,
   });
+
+  const handleProblemOpenChange = useCallback(
+    (nextOpen) => {
+      setProblemOpenState(nextOpen);
+      if (!nextOpen) {
+        cancelProblemAutoSwitch();
+        setShowProblemIntroNote(false);
+      }
+    },
+    [cancelProblemAutoSwitch, setShowProblemIntroNote]
+  );
+
+  const handleChatOpenChange = useCallback((nextOpen) => {
+    setChatOpenState(nextOpen);
+  }, []);
 
   // Simple demo: no auto-switch countdown — the player reads the brief,
   // then presses START WAVE and SUBMIT themselves.
@@ -1225,9 +1220,9 @@ export default function useTowerDefenseV2GameState({
     };
   }, [isSimpleDemo, gameState.status]);
   // Simple demo: once wave 1 starts, let the game play for a beat so the
-  // player watches the towers defend, then show the Editor (solved code) on
-  // the right for the WRITE CODE callout. Taskbar stays locked; this is a
-  // programmatic switch, not user rearrangement.
+  // player watches the towers defend, then stamp the Editor-shown time for
+  // the WRITE CODE callout. The Editor is always visible in the fixed layout;
+  // this is a timing signal, not a panel switch.
   const [simpleDemoEditorShownAt, setSimpleDemoEditorShownAt] = useState(null);
   useEffect(() => {
     if (!isSimpleDemo) return undefined;
@@ -1236,17 +1231,11 @@ export default function useTowerDefenseV2GameState({
       setSimpleDemoEditorShownAt((prev) => (prev === null ? prev : null));
       return undefined;
     }
-    if (rightPanel === PANEL_TYPES.EDITOR) {
-      // Already looking at code (e.g. replay): start the wait from now.
-      setSimpleDemoEditorShownAt((prev) => (prev === null ? Date.now() : prev));
-      return undefined;
-    }
     const timerId = window.setTimeout(() => {
-      setRightPanel(PANEL_TYPES.EDITOR);
       setSimpleDemoEditorShownAt(Date.now());
     }, 2500);
     return () => window.clearTimeout(timerId);
-  }, [isSimpleDemo, gameState.status, gameState.wave, rightPanel, setRightPanel]);
+  }, [isSimpleDemo, gameState.status, gameState.wave]);
 
   const { handleTerminalCommandTracked, handleCodeLineCommitted, clearSuggestionQueueForTower } =
     useTowerDefenseV2TerminalHandlers({
@@ -1293,14 +1282,6 @@ export default function useTowerDefenseV2GameState({
   // Canvas dimensions
   const canvasWidth = gridCols * cellSize;
   const canvasHeight = gridRows * cellSize;
-
-  const { handlePanelChange } = useTowerDefenseV2PanelInteractions({
-    setLeftPanel,
-    setRightPanel,
-    cancelProblemAutoSwitch,
-    setShowProblemIntroNote,
-    isHomepageDemo,
-  });
 
   useTowerDefenseV2InitialCodeEffects({ initialCodeGenerated });
 
@@ -1426,9 +1407,10 @@ export default function useTowerDefenseV2GameState({
     activeProblemIndex,
     setActiveProblemIndex,
     problemError,
-    leftPanel,
-    rightPanel,
-    handlePanelChange,
+    problemOpen,
+    chatOpen,
+    onProblemOpenChange: handleProblemOpenChange,
+    onChatOpenChange: handleChatOpenChange,
     panelActionsProps,
   });
 
@@ -1448,10 +1430,8 @@ export default function useTowerDefenseV2GameState({
     code,
     gridCols,
     gridRows,
-    leftPanel,
-    rightPanel,
-    setLeftPanel,
-    setRightPanel,
+    problemOpen,
+    chatOpen,
     lastTerminalCommand,
     learningPathOnboardingActive,
     setLearningPathOnboardingActive,

@@ -1,10 +1,9 @@
 /**
- * Tower Defense V2 - Panel/Layout Builder
+ * Tower Defense V2 - Panel/Layout Builder (fixed layout, no slots)
  */
 
 import React from 'react';
 
-import { PANEL_TYPES } from '../../../components/towerDefense/ui/layout/panelTypes';
 import {
   GamePanelContent,
   EditorPanelContent,
@@ -13,7 +12,6 @@ import {
 } from './TowerDefenseV2Panels';
 import TowerDefenseV2Layout from './TowerDefenseV2Layout';
 import { GAME_STATUS } from '../../../game-engine-v2';
-import useIsMobileDevice from '../../../hooks/useIsMobileDevice';
 
 export default function useTowerDefenseV2PanelLayout({
   isLearningMode,
@@ -92,9 +90,10 @@ export default function useTowerDefenseV2PanelLayout({
   activeProblemIndex,
   onProblemTabChange,
   problemError,
-  leftPanel,
-  rightPanel,
-  handlePanelChange,
+  problemOpen,
+  chatOpen,
+  onProblemOpenChange,
+  onChatOpenChange,
   panelActionsProps,
   lockedLearningLanguage,
   shellTheme = 'default',
@@ -266,12 +265,6 @@ export default function useTowerDefenseV2PanelLayout({
     shellTheme,
   });
 
-  const isWaveActive = gameState.status === GAME_STATUS.PLAYING;
-  const lockedSlots = {
-    left: isWaveActive && leftPanel === PANEL_TYPES.GAME,
-    right: isWaveActive && rightPanel === PANEL_TYPES.GAME,
-  };
-
   const [activeStepId, setActiveStepId] = React.useState(() => {
     if (typeof window === 'undefined') return null;
     return (
@@ -297,25 +290,16 @@ export default function useTowerDefenseV2PanelLayout({
 
   const isGamePanelBlurred = Boolean(isHomepageDemo && activeStepId === 'mission-objective');
 
-  const isMobileDevice = useIsMobileDevice();
-  const dynamicDefaultLeftPanel =
-    isMobileDevice && isHomepageDemo ? PANEL_TYPES.PROBLEM : PANEL_TYPES.GAME;
-  const dynamicDefaultRightPanel =
-    isMobileDevice && isHomepageDemo ? PANEL_TYPES.GAME : PANEL_TYPES.PROBLEM;
-
   return React.createElement(TowerDefenseV2Layout, {
     gameContent,
     editorContent,
     chatContent,
     problemContent,
-    hiddenPanels: validatedGameSettings.aiChatEnabled ? [] : [PANEL_TYPES.CHAT],
-    leftPanel,
-    rightPanel,
-    onPanelChange: handlePanelChange,
     panelActionsProps,
-    defaultLeftPanel: dynamicDefaultLeftPanel,
-    defaultRightPanel: dynamicDefaultRightPanel,
-    lockedSlots,
+    problemOpen,
+    chatOpen,
+    onProblemOpenChange,
+    onChatOpenChange,
     shellTheme,
     allowEmbeddedHandheldPageScroll,
     desktopShellSizingMode,
