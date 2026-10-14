@@ -6,7 +6,6 @@ import DeployableSelector from '../../../../components/towerDefense/ui/Deployabl
 import useGuestFunnel from '../../../../hooks/guest/useGuestFunnel';
 import { TowerUpgradePanel } from '../../../../components/towerDefense/ui';
 import GameBoard from '../../../../components/towerDefense/ui/board/GameBoard';
-import CodeExecutionRateLimitBadge from '../../../../components/limits/CodeExecutionRateLimitBadge';
 import MobileTowerDefenseDock from './MobileTowerDefenseDock';
 import { resolveCanvasFitScale, resolveMobileCanvasViewportHeight } from './gamePanelSizing';
 import visualSettingsManager from '../../../../utils/game/VisualSettingsManager';
@@ -929,7 +928,6 @@ export default function GamePanelContent({
         >
           Verify before final wave
         </Text>
-        <CodeExecutionRateLimitBadge label="Exec" />
       </Flex>
     );
   };

@@ -23,7 +23,6 @@ export default function EditorPanelContent({
   codeSubmissionSuccess,
   selectedTowerType,
   isTowerPlacementMode,
-  onLanguageChange,
   onCodeChange,
   onCodeLineCommitted,
   onStartWave,
@@ -36,8 +35,6 @@ export default function EditorPanelContent({
   terminalInputEnabled,
   terminalInputPlaceholder,
   terminalInputDisabledReason,
-  isLearningMode = false,
-  lockedLearningLanguage = null,
   problemTabs = [],
   activeProblemIndex = 0,
   onProblemTabChange = null,
@@ -247,11 +244,8 @@ export default function EditorPanelContent({
           lives={gameState.lives}
           selectedTowerType={selectedTowerType}
           isTowerPlacementMode={isTowerPlacementMode}
-          onLanguageChange={onLanguageChange}
           onCodeChange={handleCodeChange}
           onCodeLineCommitted={onCodeLineCommitted}
-          isLearningMode={isLearningMode}
-          lockedLearningLanguage={lockedLearningLanguage}
           onStartWave={onStartWave}
           onResetGame={onResetGame}
           onCancelTowerPlacement={onCancelPlacement}

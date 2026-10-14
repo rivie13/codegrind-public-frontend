@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Flex, Select, Text, useToast } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react';
 import React from 'react';
 import { FaCode, FaKeyboard } from 'react-icons/fa';
 
@@ -17,40 +17,17 @@ const getBadgeText = (codeSubmitted, codeSubmissionSuccess, canSubmitSolution) =
 };
 
 const CodeEditorHeader = ({
-  language,
-  onLanguageChange,
   codeSubmitted,
   codeSubmissionSuccess,
   canSubmitSolution,
-  isLearningMode = false,
-  lockedLearningLanguage = null,
   compactMobileLandscape = false,
   showMobileKeyboardButton = false,
   leftAddon = null,
   rightAddon = null,
   shellTheme = 'default',
 }) => {
-  const toast = useToast();
   const isPortraitMobileMode = showMobileKeyboardButton && !compactMobileLandscape;
   const isRetroDesktopTheme = shellTheme === 'retro-desktop';
-
-  const handleLanguageSelect = (event) => {
-    const nextLanguage = event?.target?.value;
-    const normalizedLocked = lockedLearningLanguage?.toLowerCase();
-    if (isLearningMode && normalizedLocked && nextLanguage?.toLowerCase() !== normalizedLocked) {
-      toast({
-        title: 'Language locked',
-        description: 'You cannot change your language in learning mode.',
-        status: 'warning',
-        duration: 2200,
-        isClosable: true,
-        position: 'top',
-      });
-      return;
-    }
-
-    onLanguageChange(event);
-  };
 
   const blurActiveElement = () => {
     if (typeof document === 'undefined') return;
@@ -107,7 +84,6 @@ const CodeEditorHeader = ({
   const accentSoftColor = isRetroDesktopTheme ? '#4b5563' : '#88ccee';
   const iconBackground = isRetroDesktopTheme ? '#efede6' : 'rgba(0, 204, 255, 0.1)';
   const iconBorder = isRetroDesktopTheme ? '1px solid #7d828a' : '1px solid rgba(0, 204, 255, 0.3)';
-  const controlFont = isRetroDesktopTheme ? "'Tahoma', 'MS Sans Serif', sans-serif" : 'monospace';
   const titleFont = isRetroDesktopTheme
     ? "'Tahoma', 'MS Sans Serif', sans-serif"
     : "'Orbitron', sans-serif";
@@ -135,32 +111,6 @@ const CodeEditorHeader = ({
       {rightAddon}
     </Box>
   ) : null;
-
-  const languageSelectControl = (
-    <Select
-      size={compactMobileLandscape ? 'xs' : 'sm'}
-      width={compactMobileLandscape ? '104px' : '120px'}
-      value={language}
-      onChange={handleLanguageSelect}
-      bg={isRetroDesktopTheme ? '#ffffff' : '#0a0a1a'}
-      color={isRetroDesktopTheme ? '#1f2430' : '#00ccff'}
-      borderColor={isRetroDesktopTheme ? '#7d828a' : '#0f4667'}
-      _hover={{ borderColor: isRetroDesktopTheme ? '#000080' : '#00ccff' }}
-      fontFamily={controlFont}
-      fontSize="xs"
-      sx={{
-        '& option': {
-          bg: isRetroDesktopTheme ? '#ffffff' : '#0a0a1a',
-          color: isRetroDesktopTheme ? '#1f2430' : '#00ccff',
-        },
-      }}
-    >
-      <option value="javascript">JavaScript</option>
-      <option value="python">Python</option>
-      <option value="java">Java</option>
-      <option value="cpp">C++</option>
-    </Select>
-  );
 
   const statusBadgeControl = (
     <Badge
@@ -208,7 +158,6 @@ const CodeEditorHeader = ({
       justify="flex-end"
       flexShrink={0}
     >
-      {languageSelectControl}
       {statusBadgeControl}
     </Flex>
   );
@@ -351,7 +300,6 @@ const CodeEditorHeader = ({
               flexWrap="nowrap"
               justify="flex-start"
             >
-              {languageSelectControl}
               {statusBadgeControl}
             </Flex>
             <Flex

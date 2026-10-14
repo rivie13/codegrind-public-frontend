@@ -14,10 +14,6 @@ vi.mock('../../../../components/towerDefense/ui/overlays/RateLimitIndicator', ()
   default: () => <div>Rate limit</div>,
 }));
 
-vi.mock('../../../../components/towerDefense/ui/overlays/AIGenerationProgress', () => ({
-  default: () => <div>AI progress</div>,
-}));
-
 vi.mock('../../../../components/towerDefense/ui', () => ({
   SettingsButton: () => <button>Settings</button>,
 }));
@@ -64,7 +60,7 @@ function renderGameSlotChrome(props = {}) {
 function renderEditorSlotChrome(props = {}) {
   return render(
     <ChakraProvider>
-      <EditorPanelSlotChrome isAnyActionInProgress={false} currentActionType="READY" {...props} />
+      <EditorPanelSlotChrome {...props} />
     </ChakraProvider>
   );
 }
@@ -93,35 +89,23 @@ describe('PanelActions', () => {
     expect(screen.getByRole('button', { name: /Reset/i })).toBeInTheDocument();
   });
 
-  it('shows the synthesis strip on desktop editor chrome', () => {
-    renderEditorSlotChrome({ isAnyActionInProgress: true, currentActionType: 'BUILDING' });
+  it('shows no synthesis strip in editor chrome while keeping rate limit visible', () => {
+    renderEditorSlotChrome();
 
-    expect(screen.getByText(/NEURAL SYNTHESIS: BUILDING/i)).toBeInTheDocument();
-    expect(screen.getByText(/AI progress/i)).toBeInTheDocument();
+    expect(screen.queryByText(/NEURAL SYNTHESIS/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/BUILD QUEUE/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Rate limit/i)).toBeInTheDocument();
   });
 
-  it('hides the synthesis strip on mobile editor chrome while keeping rate limit visible', () => {
+  it('keeps rate limit visible on mobile editor chrome', () => {
     buildResponsiveProfileMock.mockReturnValue({
       isHandheldCompactLandscape: false,
       isHandheldSinglePanelLayout: true,
     });
 
-    renderEditorSlotChrome({ isAnyActionInProgress: true, currentActionType: 'BUILDING' });
+    renderEditorSlotChrome();
 
     expect(screen.queryByText(/NEURAL SYNTHESIS/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/AI progress/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Rate limit/i)).toBeInTheDocument();
-  });
-
-  it('keeps the synthesis strip visible when the editor stays in two-slot layout', () => {
-    buildResponsiveProfileMock.mockReturnValue({
-      isHandheldCompactLandscape: true,
-      isHandheldSinglePanelLayout: false,
-    });
-
-    renderEditorSlotChrome({ isAnyActionInProgress: true, currentActionType: 'BUILDING' });
-
-    expect(screen.getByText(/NEURAL SYNTHESIS: BUILDING/i)).toBeInTheDocument();
-    expect(screen.getByText(/AI progress/i)).toBeInTheDocument();
   });
 });

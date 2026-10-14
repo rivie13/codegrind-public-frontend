@@ -65,7 +65,6 @@ const CodeEditorPanel = ({
   adSlotId,
   selectedTowerType,
   isTowerPlacementMode,
-  onLanguageChange,
   onCodeChange,
   onStartWave,
   onResetGame,
@@ -80,8 +79,6 @@ const CodeEditorPanel = ({
   terminalInputPlaceholder = 'Type /tower help',
   terminalInputDisabledReason = 'Commands are locked during active waves.',
   onCodeLineCommitted = null,
-  isLearningMode = false,
-  lockedLearningLanguage = null,
   isMobileSlotLayout = false,
   slotSwitcherControl = null,
   slotChrome = null,
@@ -647,13 +644,9 @@ const CodeEditorPanel = ({
       }
     >
       <CodeEditorHeader
-        language={language}
-        onLanguageChange={onLanguageChange}
         codeSubmitted={codeSubmitted}
         codeSubmissionSuccess={codeSubmissionSuccess}
         canSubmitSolution={canSubmitSolution}
-        isLearningMode={isLearningMode}
-        lockedLearningLanguage={lockedLearningLanguage}
         compactMobileLandscape={isMobileSlotLayout && isLandscapeViewport}
         showMobileKeyboardButton={effectivePhoneEditorMode}
         leftAddon={slotSwitcherControl}

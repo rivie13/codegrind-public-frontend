@@ -1,5 +1,4 @@
 export { default as AIChatDrawer } from './overlays/AIChatDrawer';
-export { default as AIGenerationProgress } from './overlays/AIGenerationProgress';
 export { default as CodeEditorPanel } from './editor/CodeEditorPanel';
 export { default as CorporateDossier } from './CorporateDossier';
 export { default as GameBoard } from './board/GameBoard';

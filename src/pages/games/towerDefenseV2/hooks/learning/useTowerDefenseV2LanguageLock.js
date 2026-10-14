@@ -72,21 +72,6 @@ export default function useTowerDefenseV2LanguageLock({
     [handleLanguageChange]
   );
 
-  const handleUserLanguageChange = useCallback(
-    (event) => {
-      const nextLanguage = event?.target?.value;
-      if (
-        isLearningMode &&
-        lockedLearningLanguage &&
-        nextLanguage?.toLowerCase() !== lockedLearningLanguage
-      ) {
-        return;
-      }
-      handleLanguageChange(event);
-    },
-    [handleLanguageChange, isLearningMode, lockedLearningLanguage]
-  );
-
   useEffect(() => {
     if (!isLearningMode || !lockedLearningLanguage) return;
     if (language !== lockedLearningLanguage) {
@@ -96,6 +81,5 @@ export default function useTowerDefenseV2LanguageLock({
 
   return {
     lockedLearningLanguage,
-    handleUserLanguageChange,
   };
 }

@@ -4,7 +4,6 @@ import { FaClock } from 'react-icons/fa';
 
 import BugReportButton from '../../../../components/feedback/BugReportButton';
 import RateLimitIndicator from '../../../../components/towerDefense/ui/overlays/RateLimitIndicator';
-import AIGenerationProgress from '../../../../components/towerDefense/ui/overlays/AIGenerationProgress';
 import { SettingsButton } from '../../../../components/towerDefense/ui';
 import {
   RETRO_PANEL_ICON_ASSETS,
@@ -69,12 +68,6 @@ const detectCompactLandscapeViewport = () => {
   return buildResponsiveProfile().isHandheldCompactLandscape;
 };
 
-const detectMobileEditorViewport = () => {
-  if (typeof window === 'undefined') return false;
-
-  return buildResponsiveProfile().isHandheldSinglePanelLayout;
-};
-
 const useCompactLandscapeViewport = () => {
   const [isCompactLandscape, setIsCompactLandscape] = useState(() =>
     detectCompactLandscapeViewport()
@@ -96,29 +89,6 @@ const useCompactLandscapeViewport = () => {
   }, []);
 
   return isCompactLandscape;
-};
-
-const useMobileEditorViewport = () => {
-  const [isMobileEditorViewport, setIsMobileEditorViewport] = useState(() =>
-    detectMobileEditorViewport()
-  );
-
-  useEffect(() => {
-    const handleViewportChange = () => {
-      setIsMobileEditorViewport(detectMobileEditorViewport());
-    };
-
-    handleViewportChange();
-    window.addEventListener('resize', handleViewportChange);
-    window.addEventListener('orientationchange', handleViewportChange);
-
-    return () => {
-      window.removeEventListener('resize', handleViewportChange);
-      window.removeEventListener('orientationchange', handleViewportChange);
-    };
-  }, []);
-
-  return isMobileEditorViewport;
 };
 
 export function GamePanelSlotChrome({
@@ -182,13 +152,8 @@ export function GamePanelSlotChrome({
   );
 }
 
-export function EditorPanelSlotChrome({
-  isAnyActionInProgress,
-  currentActionType,
-  shellTheme = 'default',
-}) {
+export function EditorPanelSlotChrome({ shellTheme = 'default' }) {
   const isCompactLandscape = useCompactLandscapeViewport();
-  const isMobileEditorViewport = useMobileEditorViewport();
   const isRetroDesktopTheme = shellTheme === 'retro-desktop';
   const rateLimitChipStyles = isRetroDesktopTheme
     ? {
@@ -218,47 +183,6 @@ export function EditorPanelSlotChrome({
       <Box sx={rateLimitChipStyles}>
         <RateLimitIndicator shellTheme={shellTheme} />
       </Box>
-
-      {!isMobileEditorViewport && (
-        <Box
-          bg={isRetroDesktopTheme ? '#d4d0c8' : 'rgba(0, 20, 40, 0.78)'}
-          px={isCompactLandscape ? 2 : 3}
-          py={isCompactLandscape ? 1.5 : 2}
-          borderRadius={isRetroDesktopTheme ? '0' : 'md'}
-          border={isRetroDesktopTheme ? '2px solid #5d636e' : '1px solid rgba(0, 255, 255, 0.4)'}
-          boxShadow={
-            isRetroDesktopTheme
-              ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.62), inset -1px -1px 0 rgba(66, 72, 82, 0.28)'
-              : isAnyActionInProgress
-                ? '0 0 10px rgba(0, 255, 255, 0.45)'
-                : '0 0 5px rgba(0, 255, 255, 0.18)'
-          }
-          transition="box-shadow 0.3s ease"
-          minW={isCompactLandscape ? '0' : '180px'}
-          flex={isCompactLandscape ? '1 1 220px' : undefined}
-        >
-          <Text
-            color={isRetroDesktopTheme ? '#1f2430' : '#0ff'}
-            fontFamily={
-              isRetroDesktopTheme
-                ? "'Tahoma', 'MS Sans Serif', sans-serif"
-                : "'Orbitron', sans-serif"
-            }
-            fontWeight="bold"
-            fontSize={isCompactLandscape ? '0.66rem' : '0.72rem'}
-            letterSpacing="0.1em"
-          >
-            {isRetroDesktopTheme ? 'BUILD QUEUE' : 'NEURAL SYNTHESIS'}:{' '}
-            {isAnyActionInProgress ? currentActionType : 'READY'}
-          </Text>
-          <AIGenerationProgress
-            isGenerating={isAnyActionInProgress}
-            towerType={currentActionType}
-            compact={true}
-            shellTheme={shellTheme}
-          />
-        </Box>
-      )}
     </HStack>
   );
 }

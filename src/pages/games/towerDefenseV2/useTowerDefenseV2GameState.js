@@ -530,7 +530,7 @@ export default function useTowerDefenseV2GameState({
     isHomepageDemo,
   });
 
-  const { lockedLearningLanguage, handleUserLanguageChange } = useTowerDefenseV2LanguageLock({
+  const { lockedLearningLanguage } = useTowerDefenseV2LanguageLock({
     isLearningMode,
     learningPathSlug: learningPathMeta?.pathId || learningPathSlug,
     learningPathTitleSlug,
@@ -1389,7 +1389,6 @@ export default function useTowerDefenseV2GameState({
     codeSubmitted,
     towerPlacementLocked,
     shouldShowVerificationControls,
-    handleUserLanguageChange,
     setCode,
     handleCodeLineCommitted,
     lockedLearningLanguage,

@@ -54,10 +54,6 @@ vi.mock('../../../../components/towerDefense/ui/board/GameBoard', () => ({
   default: ({ children }) => <div data-testid="game-board">{children}</div>,
 }));
 
-vi.mock('../../../../components/limits/CodeExecutionRateLimitBadge', () => ({
-  default: () => null,
-}));
-
 vi.mock('../../../../components/auth/AuthForms', () => ({
   default: () => <div data-testid="auth-forms">Auth Forms</div>,
 }));

@@ -9,8 +9,6 @@ const renderHeader = (props = {}) =>
   render(
     <ChakraProvider>
       <CodeEditorHeader
-        language="python"
-        onLanguageChange={vi.fn()}
         codeSubmitted={false}
         codeSubmissionSuccess={null}
         canSubmitSolution={true}
@@ -60,7 +58,7 @@ describe('CodeEditorHeader mobile keyboard control', () => {
     expect(blurSpy).toHaveBeenCalled();
   });
 
-  it('renders a stable desktop header layout for two-slot editor chrome', () => {
+  it('renders a stable desktop header layout for fixed editor chrome', () => {
     renderHeader({
       leftAddon: <div data-testid="left-addon">RIGHT: EDITOR</div>,
       rightAddon: <div data-testid="right-addon">NEURAL SYNTHESIS</div>,
@@ -73,7 +71,7 @@ describe('CodeEditorHeader mobile keyboard control', () => {
     expect(within(topRow).getByText(/CODE_MATRIX/i)).toBeInTheDocument();
     expect(within(topRow).queryByTestId('right-addon')).not.toBeInTheDocument();
     expect(within(controlRow).getByTestId('right-addon')).toBeInTheDocument();
-    expect(within(controlRow).getByRole('combobox')).toHaveValue('python');
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     expect(within(controlRow).getByText(/READY_FOR_VERIFY/i)).toBeInTheDocument();
   });
 
@@ -92,7 +90,7 @@ describe('CodeEditorHeader mobile keyboard control', () => {
     );
 
     expect(screen.queryByTestId('left-addon')).not.toBeInTheDocument();
-    expect(within(primaryControls).getByRole('combobox')).toHaveValue('python');
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     expect(within(primaryControls).getByText(/READY_FOR_VERIFY/i)).toBeInTheDocument();
     expect(within(secondaryControls).getByTestId('right-addon')).toBeInTheDocument();
     expect(
