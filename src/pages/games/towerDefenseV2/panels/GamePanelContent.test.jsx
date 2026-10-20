@@ -47,6 +47,7 @@ vi.mock('../../../../components/towerDefense/ui/DeployableSelector', () => ({
 }));
 
 vi.mock('../../../../components/towerDefense/ui', () => ({
+  SettingsButton: () => <button>Settings</button>,
   TowerUpgradePanel: () => <div data-testid="tower-upgrade-panel">Tower Upgrade</div>,
 }));
 
@@ -201,6 +202,93 @@ const openMobileQuickActions = async () => {
   fireEvent.click(screen.getByRole('button', { name: /open tower defense quick actions/i }));
   return within(await screen.findByTestId('mobile-tower-dock'));
 };
+
+describe('GamePanelContent desktop HUD', () => {
+  beforeEach(() => {
+    vi.useRealTimers();
+    writeTowerDefenseShellVisibleMock.mockReset();
+    useAuthMock.mockReset();
+    useAuthMock.mockReturnValue({ isAuthenticated: true });
+  });
+
+  it('consolidates timer, controls, status, and path actions in one desktop bar', () => {
+    render(
+      <ChakraProvider>
+        <GamePanelContent {...createProps({ isMobileSlotLayout: false })} />
+      </ChakraProvider>
+    );
+
+    const hudBar = screen.getByTestId('game-hud-bar');
+
+    expect(within(hudBar).getByText('01:12')).toBeInTheDocument();
+    expect(within(hudBar).getByRole('button', { name: /reset/i })).toBeInTheDocument();
+    expect(within(hudBar).getByRole('button', { name: /settings/i })).toBeInTheDocument();
+    expect(within(hudBar).getByText(/bits:/i)).toBeInTheDocument();
+    expect(within(hudBar).getByText(/lives:/i)).toBeInTheDocument();
+    expect(within(hudBar).getByText(/wave:/i)).toBeInTheDocument();
+    expect(within(hudBar).getByText(/enemies:/i)).toBeInTheDocument();
+    expect(within(hudBar).getByText(/path ctrl/i)).toBeInTheDocument();
+    expect(within(hudBar).getByText(/lvl 1/i)).toBeInTheDocument();
+  });
+
+  it('toggles the desktop loadout drawer from the hud bar', () => {
+    render(
+      <ChakraProvider>
+        <GamePanelContent {...createProps({ isMobileSlotLayout: false })} />
+      </ChakraProvider>
+    );
+
+    expect(screen.getByTestId('desktop-loadout-drawer')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /hide loadout/i }));
+
+    expect(screen.queryByTestId('desktop-loadout-drawer')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^loadout$/i }));
+
+    expect(screen.getByTestId('desktop-loadout-drawer')).toBeInTheDocument();
+  });
+
+  it('opens the desktop drawer when a placed tower gets selected, without trapping manual close', () => {
+    const { rerender } = render(
+      <ChakraProvider>
+        <GamePanelContent {...createProps({ isMobileSlotLayout: false })} />
+      </ChakraProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /hide loadout/i }));
+    expect(screen.queryByTestId('desktop-loadout-drawer')).not.toBeInTheDocument();
+
+    rerender(
+      <ChakraProvider>
+        <GamePanelContent
+          {...createProps({ isMobileSlotLayout: false, selectedTower: { id: 't1' } })}
+        />
+      </ChakraProvider>
+    );
+    expect(screen.getByTestId('desktop-loadout-drawer')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /hide loadout/i }));
+    expect(screen.queryByTestId('desktop-loadout-drawer')).not.toBeInTheDocument();
+  });
+
+  it('shows xp progress in the desktop hud bar', () => {
+    render(
+      <ChakraProvider>
+        <GamePanelContent
+          {...createProps({
+            isMobileSlotLayout: false,
+            xpProgress: { level: 3, into: 120, toNext: 200 },
+          })}
+        />
+      </ChakraProvider>
+    );
+
+    const hudBar = screen.getByTestId('game-hud-bar');
+
+    expect(within(hudBar).getByText(/lvl 3/i)).toBeInTheDocument();
+  });
+});
 
 describe('GamePanelContent mobile loadout behavior', () => {
   beforeEach(() => {
@@ -746,6 +834,18 @@ describe('GamePanelContent sizing helpers', () => {
         isMobileCanvasMode: true,
       })
     ).toBeCloseTo(0.802, 3);
+  });
+
+  it('upscales the desktop grid past native resolution to fill the panel', () => {
+    expect(
+      resolveCanvasFitScale({
+        availableCanvasWidth: 980,
+        availableCanvasHeight: 550,
+        canvasWidth: 560,
+        canvasHeight: 480,
+        isMobileCanvasMode: false,
+      })
+    ).toBeCloseTo(1.146, 3);
   });
 
   it('locks the mobile canvas viewport height to the measured slot height when available', () => {

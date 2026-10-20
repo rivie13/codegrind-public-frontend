@@ -14,7 +14,6 @@ import PageContainer from './layout/PageContainer';
 import RecaptchaRetroNotice from './layout/RecaptchaRetroNotice';
 import SiteRouteTransitionOverlay from './layout/SiteRouteTransitionOverlay';
 import StructuredData from './seo/StructuredData';
-import useCompactLandscapeShellMode from '../hooks/useCompactLandscapeShellMode';
 import useIsMobileDevice from '../hooks/useIsMobileDevice';
 import {
   WORKSPACE_SHELL_VISIBILITY_EVENT,
@@ -69,7 +68,6 @@ const Root = () => {
   const isMobileDevice = useIsMobileDevice();
   const requestedCompactMobileShell = hasCompactMobileShellQuery(location.search);
   const shouldUseMobileClusterImmersiveLayout = isMobileDevice && isClusterRoute;
-  const isCompactLandscapeShellMode = useCompactLandscapeShellMode();
   const [isTowerDefenseShellVisible, setIsTowerDefenseShellVisible] = useState(() =>
     readTowerDefenseShellVisible()
   );
@@ -116,11 +114,6 @@ const Root = () => {
     pathname: location.pathname,
     isGlobalShellVisible: shouldRenderGlobalShell,
   });
-  const shouldDisableFooterOffset =
-    isCityRoute ||
-    shouldHideGlobalShell ||
-    shouldUseMobileClusterImmersiveLayout ||
-    (isHomeRoute && !isCompactLandscapeShellMode);
   const shouldRenderRecaptchaNotice =
     recaptchaConfigured &&
     !isCityRoute &&
@@ -561,10 +554,7 @@ const Root = () => {
         </Helmet>
         <StructuredData />
         {shouldRenderNavigation && <Navigation />}
-        <PageContainer
-          disableFooterOffset={shouldDisableFooterOffset}
-          disableTopOffset={shouldHideGlobalShell || isCityRoute}
-        >
+        <PageContainer disableTopOffset={shouldHideGlobalShell || isCityRoute}>
           <Outlet />
         </PageContainer>
         {shouldRenderMobileActionDock && (

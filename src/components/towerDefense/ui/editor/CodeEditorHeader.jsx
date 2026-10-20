@@ -1,25 +1,9 @@
-import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import React from 'react';
 import { FaCode, FaKeyboard } from 'react-icons/fa';
-
-const getBadgeColor = (codeSubmitted, codeSubmissionSuccess, canSubmitSolution) => {
-  if (codeSubmitted) {
-    return codeSubmissionSuccess ? 'green.500' : '#ff3366';
-  }
-  return canSubmitSolution ? '#ffcc00' : '#444444';
-};
-
-const getBadgeText = (codeSubmitted, codeSubmissionSuccess, canSubmitSolution) => {
-  if (codeSubmitted) {
-    return codeSubmissionSuccess ? 'VERIFY_SUCCESS' : 'VERIFY_FAILED';
-  }
-  return canSubmitSolution ? 'READY_FOR_VERIFY' : 'BUILDING_SOLUTION';
-};
+import RateLimitIndicator from '../overlays/RateLimitIndicator';
 
 const CodeEditorHeader = ({
-  codeSubmitted,
-  codeSubmissionSuccess,
-  canSubmitSolution,
   compactMobileLandscape = false,
   showMobileKeyboardButton = false,
   leftAddon = null,
@@ -54,30 +38,10 @@ const CodeEditorHeader = ({
 
   const titleLabel = isRetroDesktopTheme ? 'CODE WORKSPACE' : 'CODE_MATRIX';
   const titleAccent = isRetroDesktopTheme
-    ? compactMobileLandscape
-      ? 'desktop editor'
-      : 'desktop editor // slot synced'
+    ? 'desktop editor'
     : compactMobileLandscape
       ? '// tower-synced'
       : '// tower-synced neural interface';
-  const badgeBackground = isRetroDesktopTheme
-    ? codeSubmitted
-      ? codeSubmissionSuccess
-        ? '#2f6d2f'
-        : '#8a1d1d'
-      : canSubmitSolution
-        ? '#000080'
-        : '#7a7a7a'
-    : getBadgeColor(codeSubmitted, codeSubmissionSuccess, canSubmitSolution);
-  const badgeText = isRetroDesktopTheme
-    ? codeSubmitted
-      ? codeSubmissionSuccess
-        ? 'VERIFIED'
-        : 'ERROR'
-      : canSubmitSolution
-        ? 'READY'
-        : 'BUILDING'
-    : getBadgeText(codeSubmitted, codeSubmissionSuccess, canSubmitSolution);
   const headerBg = isRetroDesktopTheme ? '#d4d0c8' : '#0c1220';
   const headerBorderColor = isRetroDesktopTheme ? '#6d747d' : '#0f4667';
   const accentColor = isRetroDesktopTheme ? '#000080' : '#00ccff';
@@ -112,44 +76,6 @@ const CodeEditorHeader = ({
     </Box>
   ) : null;
 
-  const statusBadgeControl = (
-    <Badge
-      bg={badgeBackground}
-      color="white"
-      borderRadius={isRetroDesktopTheme ? '0' : 'sm'}
-      px={compactMobileLandscape ? 1.5 : 2}
-      py={1}
-      fontSize={compactMobileLandscape ? '0.65rem' : 'xs'}
-      fontFamily={titleFont}
-      letterSpacing="0.5px"
-      textShadow={
-        isRetroDesktopTheme
-          ? 'none'
-          : codeSubmitted && codeSubmissionSuccess
-            ? '0 0 5px rgba(0, 255, 0, 0.5)'
-            : 'none'
-      }
-      boxShadow={
-        isRetroDesktopTheme
-          ? 'none'
-          : codeSubmitted && codeSubmissionSuccess
-            ? '0 0 10px rgba(0, 255, 0, 0.3)'
-            : 'none'
-      }
-      sx={
-        isRetroDesktopTheme
-          ? {
-              border: '1px solid rgba(0, 0, 0, 0.28)',
-              boxShadow:
-                'inset 1px 1px 0 rgba(255, 255, 255, 0.26), inset -1px -1px 0 rgba(0, 0, 0, 0.12)',
-            }
-          : undefined
-      }
-    >
-      {badgeText}
-    </Badge>
-  );
-
   const controlCluster = (
     <Flex
       gap={compactMobileLandscape ? 1.5 : 2}
@@ -158,7 +84,7 @@ const CodeEditorHeader = ({
       justify="flex-end"
       flexShrink={0}
     >
-      {statusBadgeControl}
+      <RateLimitIndicator shellTheme={shellTheme} />
     </Flex>
   );
 
@@ -300,7 +226,7 @@ const CodeEditorHeader = ({
               flexWrap="nowrap"
               justify="flex-start"
             >
-              {statusBadgeControl}
+              {controlCluster}
             </Flex>
             <Flex
               data-testid="code-editor-header-mobile-portrait-secondary-controls"

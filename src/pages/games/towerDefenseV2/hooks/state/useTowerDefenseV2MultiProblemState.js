@@ -40,7 +40,7 @@ export default function useTowerDefenseV2MultiProblemState({
   chatActorId,
   resolveHasTowerType,
   submitSolution,
-  learningUnlockActive = false
+  learningUnlockActive = false,
 }) {
   const problemSlotStateRef = useRef({});
   const prevActiveSlugRef = useRef(activeTitleSlug);
@@ -71,26 +71,39 @@ export default function useTowerDefenseV2MultiProblemState({
     if (!problem?.titleSlug || !problem?.title) return;
     setProblemTabTitles((prev) => ({
       ...prev,
-      [problem.titleSlug]: problem.title
+      [problem.titleSlug]: problem.title,
     }));
   }, [problem?.title, problem?.titleSlug]);
 
-  const saveSlotState = useCallback((slug) => {
-    if (!slug) return;
-    const sharedUnlock = sharedEditorUnlockRef.current;
-    problemSlotStateRef.current[slug] = {
+  const saveSlotState = useCallback(
+    (slug) => {
+      if (!slug) return;
+      const sharedUnlock = sharedEditorUnlockRef.current;
+      problemSlotStateRef.current[slug] = {
+        code,
+        language,
+        initialCodeGenerated: initialCodeGenerated || Boolean(code),
+        functionTowerPlaced: sharedUnlock ? true : functionTowerPlaced,
+        objectTowerPlaced: sharedUnlock ? true : objectTowerPlaced,
+        terminalOutput,
+        terminalResetKey,
+        codeSubmitted,
+        codeSubmissionSuccess,
+        sharedEditorUnlock: sharedUnlock,
+      };
+    },
+    [
       code,
+      codeSubmissionSuccess,
+      codeSubmitted,
+      functionTowerPlaced,
+      initialCodeGenerated,
       language,
-      initialCodeGenerated: initialCodeGenerated || Boolean(code),
-      functionTowerPlaced: sharedUnlock ? true : functionTowerPlaced,
-      objectTowerPlaced: sharedUnlock ? true : objectTowerPlaced,
+      objectTowerPlaced,
       terminalOutput,
       terminalResetKey,
-      codeSubmitted,
-      codeSubmissionSuccess,
-      sharedEditorUnlock: sharedUnlock
-    };
-  }, [code, codeSubmissionSuccess, codeSubmitted, functionTowerPlaced, initialCodeGenerated, language, objectTowerPlaced, terminalOutput, terminalResetKey]);
+    ]
+  );
 
   useEffect(() => {
     if (!isMultiProblemTower) return;
@@ -109,9 +122,21 @@ export default function useTowerDefenseV2MultiProblemState({
       terminalResetKey,
       codeSubmitted,
       codeSubmissionSuccess,
-      sharedEditorUnlock: sharedUnlock
+      sharedEditorUnlock: sharedUnlock,
     };
-  }, [activeTitleSlug, code, codeSubmissionSuccess, codeSubmitted, functionTowerPlaced, initialCodeGenerated, isMultiProblemTower, language, objectTowerPlaced, terminalOutput, terminalResetKey]);
+  }, [
+    activeTitleSlug,
+    code,
+    codeSubmissionSuccess,
+    codeSubmitted,
+    functionTowerPlaced,
+    initialCodeGenerated,
+    isMultiProblemTower,
+    language,
+    objectTowerPlaced,
+    terminalOutput,
+    terminalResetKey,
+  ]);
 
   useEffect(() => {
     const prevSlug = prevActiveSlugRef.current;
@@ -121,41 +146,46 @@ export default function useTowerDefenseV2MultiProblemState({
     prevActiveSlugRef.current = activeTitleSlug;
   }, [activeTitleSlug, saveSlotState]);
 
-  const fetchLearningProblem = useCallback(async (slug) => {
-    if (!slug) return null;
-    if (problemCacheRef.current[slug]) return problemCacheRef.current[slug];
-    try {
-      const data = await api.learningProblems.getById(slug);
-      const processed = {
-        ...data,
-        content: data.content || data.description,
-        difficulty: data.difficulty?.toUpperCase(),
-        questionFrontendId: data.questionFrontendId || `LEARN-${data.id}`,
-        isAIProblem: false,
-        isLearningProblem: true,
-        source: 'LEARNING',
-        examples: data.examples || []
-      };
-      problemCacheRef.current[slug] = processed;
-      return processed;
-    } catch (error) {
-      return null;
-    }
-  }, [api]);
+  const fetchLearningProblem = useCallback(
+    async (slug) => {
+      if (!slug) return null;
+      if (problemCacheRef.current[slug]) return problemCacheRef.current[slug];
+      try {
+        const data = await api.learningProblems.getById(slug);
+        const processed = {
+          ...data,
+          content: data.content || data.description,
+          difficulty: data.difficulty?.toUpperCase(),
+          questionFrontendId: data.questionFrontendId || `LEARN-${data.id}`,
+          isAIProblem: false,
+          isLearningProblem: true,
+          source: 'LEARNING',
+          examples: data.examples || [],
+        };
+        problemCacheRef.current[slug] = processed;
+        return processed;
+      } catch (error) {
+        return null;
+      }
+    },
+    [api]
+  );
 
   useEffect(() => {
     if (!isMultiProblemTower || !learningProblemSlugs.length) return;
     let isActive = true;
 
     (async () => {
-      const results = await Promise.all(learningProblemSlugs.map((slug) => fetchLearningProblem(slug)));
+      const results = await Promise.all(
+        learningProblemSlugs.map((slug) => fetchLearningProblem(slug))
+      );
       if (!isActive) return;
       results.forEach((entry, index) => {
         const slug = learningProblemSlugs[index];
         if (!slug || !entry?.title) return;
         setProblemTabTitles((prev) => ({
           ...prev,
-          [slug]: entry.title
+          [slug]: entry.title,
         }));
       });
     })();
@@ -165,39 +195,53 @@ export default function useTowerDefenseV2MultiProblemState({
     };
   }, [fetchLearningProblem, isMultiProblemTower, learningProblemSlugs]);
 
-  const generateSlotTemplate = useCallback(async (slug, { applyToEditor = false } = {}) => {
-    if (!slug) return false;
-    const existing = problemSlotStateRef.current[slug] || {};
-    if (existing.initialCodeGenerated || existing.code) return true;
+  const generateSlotTemplate = useCallback(
+    async (slug, { applyToEditor = false } = {}) => {
+      if (!slug) return false;
+      const existing = problemSlotStateRef.current[slug] || {};
+      if (existing.initialCodeGenerated || existing.code) return true;
 
-    const problemData = slug === activeTitleSlug ? problem : await fetchLearningProblem(slug);
-    if (!problemData) return false;
+      const problemData = slug === activeTitleSlug ? problem : await fetchLearningProblem(slug);
+      if (!problemData) return false;
 
-    const resolvedLanguage = (problemData?.language
-      ? String(problemData.language).toLowerCase()
-      : (lockedLearningLanguage || language || 'python'));
+      const resolvedLanguage = problemData?.language
+        ? String(problemData.language).toLowerCase()
+        : lockedLearningLanguage || language || 'python';
 
-    const snippet = CodeSnippetManager.getCodeSnippetForLanguage(resolvedLanguage, problemData);
-    problemSlotStateRef.current[slug] = {
-      ...existing,
-      code: snippet,
-      language: resolvedLanguage,
-      initialCodeGenerated: true,
-      functionTowerPlaced: true,
-      objectTowerPlaced: true,
-      sharedEditorUnlock: true
-    };
+      const snippet = CodeSnippetManager.getCodeSnippetForLanguage(resolvedLanguage, problemData);
+      problemSlotStateRef.current[slug] = {
+        ...existing,
+        code: snippet,
+        language: resolvedLanguage,
+        initialCodeGenerated: true,
+        functionTowerPlaced: true,
+        objectTowerPlaced: true,
+        sharedEditorUnlock: true,
+      };
 
-    if (applyToEditor) {
-      setLanguage(resolvedLanguage);
-      setCode(snippet);
-      setInitialCodeGenerated(true);
-      setFunctionTowerPlaced(true);
-      setObjectTowerPlaced(true);
-    }
+      if (applyToEditor) {
+        setLanguage(resolvedLanguage);
+        setCode(snippet);
+        setInitialCodeGenerated(true);
+        setFunctionTowerPlaced(true);
+        setObjectTowerPlaced(true);
+      }
 
-    return true;
-  }, [activeTitleSlug, fetchLearningProblem, language, lockedLearningLanguage, problem, setCode, setFunctionTowerPlaced, setInitialCodeGenerated, setLanguage, setObjectTowerPlaced]);
+      return true;
+    },
+    [
+      activeTitleSlug,
+      fetchLearningProblem,
+      language,
+      lockedLearningLanguage,
+      problem,
+      setCode,
+      setFunctionTowerPlaced,
+      setInitialCodeGenerated,
+      setLanguage,
+      setObjectTowerPlaced,
+    ]
+  );
 
   const ensureSharedSlotTemplates = useCallback(async () => {
     if (!isMultiProblemTower) return;
@@ -208,20 +252,31 @@ export default function useTowerDefenseV2MultiProblemState({
     await Promise.all(learningProblemSlugs.map((slug) => generateSlotTemplate(slug)));
   }, [generateSlotTemplate, isMultiProblemTower, learningProblemSlugs]);
 
-  const updateSlotResult = useCallback((slug, success) => {
-    if (!slug) return;
-    const existing = problemSlotStateRef.current[slug] || {};
-    const nextState = {
-      ...existing,
-      codeSubmitted: true,
-      codeSubmissionSuccess: success
-    };
-    problemSlotStateRef.current[slug] = nextState;
-    if (slug === activeTitleSlug) {
-      setCodeSubmitted(true);
-      setCodeSubmissionSuccess(success);
-    }
-  }, [activeTitleSlug, setCodeSubmitted, setCodeSubmissionSuccess]);
+  const [slotResultsVersion, setSlotResultsVersion] = useState(0);
+
+  const getSlotResult = useCallback((slug) => {
+    if (!slug) return null;
+    return problemSlotStateRef.current[slug] || null;
+  }, []);
+
+  const updateSlotResult = useCallback(
+    (slug, success) => {
+      if (!slug) return;
+      const existing = problemSlotStateRef.current[slug] || {};
+      const nextState = {
+        ...existing,
+        codeSubmitted: true,
+        codeSubmissionSuccess: success,
+      };
+      problemSlotStateRef.current[slug] = nextState;
+      if (slug === activeTitleSlug) {
+        setCodeSubmitted(true);
+        setCodeSubmissionSuccess(success);
+      }
+      setSlotResultsVersion((prev) => prev + 1);
+    },
+    [activeTitleSlug, setCodeSubmitted, setCodeSubmissionSuccess]
+  );
 
   const runMultiTabVerification = useCallback(async () => {
     if (!isMultiProblemTower) {
@@ -237,13 +292,14 @@ export default function useTowerDefenseV2MultiProblemState({
 
     for (let index = 0; index < learningProblemSlugs.length; index += 1) {
       const slug = learningProblemSlugs[index];
-      const slotState = slug === activeTitleSlug
-        ? {
-            code,
-            language,
-            initialCodeGenerated
-          }
-        : (problemSlotStateRef.current[slug] || null);
+      const slotState =
+        slug === activeTitleSlug
+          ? {
+              code,
+              language,
+              initialCodeGenerated,
+            }
+          : problemSlotStateRef.current[slug] || null;
 
       if (!slotState?.initialCodeGenerated || !slotState?.code) {
         results.push({ slug, success: false, reason: 'missing_code' });
@@ -262,7 +318,7 @@ export default function useTowerDefenseV2MultiProblemState({
         problem: problemData,
         userId,
         addTerminalMessage: (message) => addTerminalMessage(`[TAB ${index + 1}] ${message}`),
-        onExecutionRateLimit: handleExecutionRateLimit
+        onExecutionRateLimit: handleExecutionRateLimit,
       });
 
       if (result?.status === 'vm_timeout') {
@@ -271,7 +327,9 @@ export default function useTowerDefenseV2MultiProblemState({
       }
 
       if (result?.status === 'rate_limited') {
-        addTerminalMessage(`[TAB ${index + 1}] Execution limit reached. Watch an ad or wait for reset.`);
+        addTerminalMessage(
+          `[TAB ${index + 1}] Execution limit reached. Watch an ad or wait for reset.`
+        );
         return 'rate_limited';
       }
 
@@ -281,12 +339,16 @@ export default function useTowerDefenseV2MultiProblemState({
 
     results.forEach((entry) => updateSlotResult(entry.slug, entry.success));
 
-    const failed = results.filter(entry => !entry.success);
+    const failed = results.filter((entry) => !entry.success);
     if (failed.length) {
-      addTerminalMessage('[VERIFY] Multi-problem verification failed. Fix the failing tabs and retry.');
+      addTerminalMessage(
+        '[VERIFY] Multi-problem verification failed. Fix the failing tabs and retry.'
+      );
       failed.forEach((entry, index) => {
-        const label = problemTabTitles[entry.slug] || `Problem ${learningProblemSlugs.indexOf(entry.slug) + 1}`;
-        const reason = entry.reason === 'missing_code' ? 'missing code or template' : 'tests failed';
+        const label =
+          problemTabTitles[entry.slug] || `Problem ${learningProblemSlugs.indexOf(entry.slug) + 1}`;
+        const reason =
+          entry.reason === 'missing_code' ? 'missing code or template' : 'tests failed';
         addTerminalMessage(`[VERIFY] ${label}: ${reason}.`);
       });
       audioManager.playSoundEffect('solution-failed');
@@ -310,7 +372,7 @@ export default function useTowerDefenseV2MultiProblemState({
     problemTabTitles,
     saveSlotState,
     submitSolution,
-    updateSlotResult
+    updateSlotResult,
   ]);
 
   useEffect(() => {
@@ -326,7 +388,15 @@ export default function useTowerDefenseV2MultiProblemState({
     }
 
     ensureSharedSlotTemplates();
-  }, [ensureSharedSlotTemplates, functionTowerPlaced, initialCodeGenerated, isMultiProblemTower, learningUnlockActive, objectTowerPlaced, setInitialCodeGenerated]);
+  }, [
+    ensureSharedSlotTemplates,
+    functionTowerPlaced,
+    initialCodeGenerated,
+    isMultiProblemTower,
+    learningUnlockActive,
+    objectTowerPlaced,
+    setInitialCodeGenerated,
+  ]);
 
   useEffect(() => {
     if (!isMultiProblemTower) return;
@@ -346,7 +416,15 @@ export default function useTowerDefenseV2MultiProblemState({
     }
 
     ensureSharedSlotTemplates();
-  }, [ensureSharedSlotTemplates, functionTowerPlaced, isMultiProblemTower, objectTowerPlaced, resolveHasTowerType, setFunctionTowerPlaced, setObjectTowerPlaced]);
+  }, [
+    ensureSharedSlotTemplates,
+    functionTowerPlaced,
+    isMultiProblemTower,
+    objectTowerPlaced,
+    resolveHasTowerType,
+    setFunctionTowerPlaced,
+    setObjectTowerPlaced,
+  ]);
 
   useEffect(() => {
     if (!isMultiProblemTower) return;
@@ -359,7 +437,8 @@ export default function useTowerDefenseV2MultiProblemState({
         setLanguage(savedState.language);
       }
       const hasSavedCode = Boolean(savedState.code);
-      const shouldUnlock = sharedUnlock || (savedState.functionTowerPlaced && savedState.objectTowerPlaced);
+      const shouldUnlock =
+        sharedUnlock || (savedState.functionTowerPlaced && savedState.objectTowerPlaced);
       setCode(savedState.code || '');
       if (savedState.terminalOutput !== undefined) {
         setTerminalOutput(savedState.terminalOutput || '');
@@ -371,7 +450,11 @@ export default function useTowerDefenseV2MultiProblemState({
       setCodeSubmissionSuccess(savedState.codeSubmissionSuccess ?? null);
       setFunctionTowerPlaced(shouldUnlock ? true : Boolean(savedState.functionTowerPlaced));
       setObjectTowerPlaced(shouldUnlock ? true : Boolean(savedState.objectTowerPlaced));
-      setInitialCodeGenerated(shouldUnlock ? Boolean(savedState.initialCodeGenerated || hasSavedCode) : Boolean(savedState.initialCodeGenerated));
+      setInitialCodeGenerated(
+        shouldUnlock
+          ? Boolean(savedState.initialCodeGenerated || hasSavedCode)
+          : Boolean(savedState.initialCodeGenerated)
+      );
       if (shouldUnlock && !hasSavedCode && !savedState.initialCodeGenerated) {
         generateSlotTemplate(activeTitleSlug, { applyToEditor: true });
       }
@@ -416,14 +499,14 @@ export default function useTowerDefenseV2MultiProblemState({
     setObjectTowerPlaced,
     setTerminalOutput,
     setTerminalResetKey,
-    terminalOutput
+    terminalOutput,
   ]);
 
   const problemTabs = useMemo(() => {
     if (!learningProblemSlugs.length) return [];
     return learningProblemSlugs.map((slug, index) => ({
       slug,
-      title: problemTabTitles[slug] || `Problem ${index + 1}`
+      title: problemTabTitles[slug] || `Problem ${index + 1}`,
     }));
   }, [learningProblemSlugs, problemTabTitles]);
 
@@ -450,7 +533,8 @@ export default function useTowerDefenseV2MultiProblemState({
     resetSharedUnlock,
     resetMultiProblemEditors,
     ensureSharedSlotTemplates,
-    saveSlotState
+    saveSlotState,
+    slotResultsVersion,
+    getSlotResult,
   };
 }
-

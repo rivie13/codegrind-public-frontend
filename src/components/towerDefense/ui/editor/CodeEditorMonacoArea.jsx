@@ -279,7 +279,7 @@ const CodeEditorMonacoArea = ({
               🔒 SYSTEM LOCKED
             </Box>
             <Box fontSize="xs" color="#4a4a4a">
-              Place a Boilerplate Core to initialize the code framework.
+              Place a Function to initialize the code framework.
             </Box>
           </Box>
         </Box>

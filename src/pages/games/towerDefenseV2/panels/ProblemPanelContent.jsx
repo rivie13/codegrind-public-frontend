@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { Box, Button, Flex, Tab, TabList, Tabs, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Tab, TabList, Tabs } from '@chakra-ui/react';
 
 import { TD_ONBOARDING_REQUEST_STEP_COMPLETE_EVENT } from '../../../../components/towerDefense/onboarding/inlineOnboardingEvents';
 import useInlineTowerDefenseOnboardingStep from '../../../../components/towerDefense/onboarding/useInlineTowerDefenseOnboardingStep';
@@ -13,15 +13,12 @@ import useGuestFunnel from '../../../../hooks/guest/useGuestFunnel';
 export default function ProblemPanelContent({
   problem,
   problemDescription,
-  currentWave,
-  totalWaves,
-  isMissionComplete,
+  isLearningMode = false,
+  formattedTime,
+  currentActionType,
   isHomepageDemo,
-  isSimpleDemo = false,
-  autoSwitchRemaining,
-  autoSwitchActive,
-  showIntroNote,
   problemTabs = [],
+  problemTabStatuses = [],
   activeProblemIndex = 0,
   onProblemTabChange = null,
   shellTheme = 'default',
@@ -31,13 +28,6 @@ export default function ProblemPanelContent({
 }) {
   const isRetroDesktopTheme = shellTheme === 'retro-desktop';
   const useCompactMobileChrome = isMobileSlotLayout;
-  const autoSwitchLabel = useMemo(() => {
-    if (!autoSwitchActive || autoSwitchRemaining === null || autoSwitchRemaining === undefined)
-      return null;
-    const minutes = Math.floor(autoSwitchRemaining / 60);
-    const seconds = autoSwitchRemaining % 60;
-    return `${minutes}:${String(seconds).padStart(2, '0')}`;
-  }, [autoSwitchActive, autoSwitchRemaining]);
   const inlineOnboardingStep = useInlineTowerDefenseOnboardingStep('problem');
   const isMissionBriefStep = inlineOnboardingStep?.id === 'mission-objective';
 
@@ -55,6 +45,14 @@ export default function ProblemPanelContent({
   }, [isHomepageDemo, funnel]);
 
   const continueButtonLabel = inlineOnboardingStep?.actionLabel || 'I READ THE BRIEF';
+
+  const tabStatusBySlug = useMemo(() => {
+    const map = {};
+    (problemTabStatuses || []).forEach((status) => {
+      if (status?.slug) map[status.slug] = status.done === true;
+    });
+    return map;
+  }, [problemTabStatuses]);
 
   const requestStepCompletion = () => {
     if (typeof window === 'undefined' || !inlineOnboardingStep?.id) return;
@@ -75,16 +73,6 @@ export default function ProblemPanelContent({
         borderBottom: '2px solid #5d636e',
         boxShadow:
           'inset 1px 1px 0 rgba(255, 255, 255, 0.72), inset -1px -1px 0 rgba(81, 88, 98, 0.24)',
-      }
-    : null;
-  const retroIntroPanelProps = isRetroDesktopTheme
-    ? {
-        borderRadius: '0',
-        border: '2px solid #5d636e',
-        bg: '#ece6db',
-        fontFamily: "'Tahoma', 'MS Sans Serif', sans-serif",
-        boxShadow:
-          'inset 1px 1px 0 rgba(255, 255, 255, 0.74), inset -1px -1px 0 rgba(110, 118, 128, 0.2)',
       }
     : null;
   const retroContinueButtonSx = isRetroDesktopTheme
@@ -205,6 +193,7 @@ export default function ProblemPanelContent({
                       : { bg: 'rgba(0, 255, 140, 0.2)', color: 'green.50' }
                   }
                 >
+                  {tabStatusBySlug[tab.slug] ? 'DONE: ' : 'NEEDED: '}
                   {tab.title || `Problem ${index + 1}`}
                 </Tab>
               ))}
@@ -212,56 +201,13 @@ export default function ProblemPanelContent({
           </Tabs>
         </Box>
       )}
-      {showIntroNote && !inlineOnboardingStep && (
-        <Box
-          mx={useCompactMobileChrome ? 2 : 3}
-          mt={useCompactMobileChrome ? 2 : 3}
-          mb={2}
-          px={4}
-          py={3}
-          borderRadius={isRetroDesktopTheme ? retroIntroPanelProps.borderRadius : 'md'}
-          border={isRetroDesktopTheme ? retroIntroPanelProps.border : '1px solid'}
-          borderColor={isRetroDesktopTheme ? undefined : 'rgba(0, 255, 140, 0.4)'}
-          bg={isRetroDesktopTheme ? retroIntroPanelProps.bg : 'rgba(0, 255, 140, 0.08)'}
-          fontFamily={isRetroDesktopTheme ? retroIntroPanelProps.fontFamily : "'Arial', sans-serif"}
-          boxShadow={isRetroDesktopTheme ? retroIntroPanelProps.boxShadow : undefined}
-          sx={
-            isHomepageDemo && !isRetroDesktopTheme
-              ? {
-                  animation: 'pulseGlow 2s ease-in-out infinite',
-                  '@keyframes pulseGlow': {
-                    '0%, 100%': {
-                      boxShadow:
-                        '0 0 6px rgba(0, 255, 140, 0.3), inset 0 0 6px rgba(0, 255, 140, 0.05)',
-                    },
-                    '50%': {
-                      boxShadow:
-                        '0 0 18px rgba(0, 255, 140, 0.7), inset 0 0 12px rgba(0, 255, 140, 0.15)',
-                    },
-                  },
-                }
-              : undefined
-          }
-        >
-          <Text color={isRetroDesktopTheme ? '#404957' : 'green.100'} fontSize="xs">
-            {isSimpleDemo
-              ? 'Read the mission brief, then press START WAVE on the Game panel. Your tower is deployed and your solution is written — watch it defend, then press Verify Solution.'
-              : 'Then switch to the Editor slot to solve the problem after unlocking. Use tower defense and code to defend against waves of enemies. You can generate code snippets by deploying towers, or you can write your own code from scratch to generate towers.'}
-          </Text>
-          {autoSwitchLabel && !isSimpleDemo && (
-            <Text color={isRetroDesktopTheme ? '#000082' : 'cyan.200'} fontSize="xs" mt={2}>
-              Auto-switching to the Editor in {autoSwitchLabel}.
-            </Text>
-          )}
-        </Box>
-      )}
       <Box flex="1" minH="0" display="flex" flexDirection="column">
         <TowerDefenseProblemPanel
           problem={problem}
           problemDescription={problemDescription}
-          currentWave={currentWave}
-          totalWaves={totalWaves}
-          isMissionComplete={isMissionComplete}
+          isLearningMode={isLearningMode}
+          formattedTime={formattedTime}
+          currentActionType={currentActionType}
           isDemo={isHomepageDemo}
           shellTheme={shellTheme}
           compactMobileLayout={useCompactMobileChrome}

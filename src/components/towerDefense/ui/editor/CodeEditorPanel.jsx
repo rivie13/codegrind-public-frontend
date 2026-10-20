@@ -57,22 +57,13 @@ const CodeEditorPanel = ({
   terminalAnimating,
   terminalRef,
   terminalResetKey,
-  codeSubmitted,
-  codeSubmissionSuccess,
-  canSubmitSolution,
-  currentWave,
   lives,
   adSlotId,
   selectedTowerType,
   isTowerPlacementMode,
   onCodeChange,
-  onStartWave,
-  onResetGame,
   onCancelTowerPlacement,
   gameStatus,
-  problemTitle,
-  difficulty,
-  isDemo = false,
   strictCodeGate = false,
   onTerminalCommand = null,
   terminalInputEnabled = false,
@@ -102,7 +93,6 @@ const CodeEditorPanel = ({
   const matrixIntensityRef = useRef(0);
   const matrixVisibleLinesRef = useRef(1);
   const { updateMatrixEffect, startMatrixBomb, stopMatrixBomb } = useMatrixBombEffect();
-  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [editorInstanceVersion, setEditorInstanceVersion] = useState(0);
   const [isLandscapeViewport, setIsLandscapeViewport] = useState(() => detectLandscapeViewport());
   const [isPhoneEditorMode, setIsPhoneEditorMode] = useState(() => detectPhoneFriendlyEditorMode());
@@ -255,21 +245,32 @@ const CodeEditorPanel = ({
     : internalCodeGenerated || initialCodeGenerated;
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
 
-    const isDismissed =
-      window.localStorage.getItem(WINDOWS_TOUCH_KEYBOARD_HINT_DISMISSED_KEY) === '1';
-    if (isDismissed) return;
+    const handleFirstScreenTap = () => {
+      const isDismissed =
+        window.localStorage.getItem(WINDOWS_TOUCH_KEYBOARD_HINT_DISMISSED_KEY) === '1';
+      if (isDismissed) return;
 
-    const hasTouch =
-      (window.navigator?.maxTouchPoints || 0) > 0 ||
-      (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    const isWindows = /Windows/i.test(window.navigator?.userAgent || '');
+      const hasTouch =
+        (window.navigator?.maxTouchPoints || 0) > 0 ||
+        (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+      const isWindows = /Windows/i.test(window.navigator?.userAgent || '');
 
-    if (isWindows && hasTouch) {
-      setShowWindowsTouchKeyboardHint(true);
-    }
-  }, []);
+      if (isWindows && hasTouch) {
+        setShowWindowsTouchKeyboardHint(true);
+      }
+    };
+
+    const container = containerRef.current;
+    if (!container) return undefined;
+
+    container.addEventListener('touchstart', handleFirstScreenTap);
+
+    return () => {
+      container.removeEventListener('touchstart', handleFirstScreenTap);
+    };
+  }, [containerRef]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -644,9 +645,6 @@ const CodeEditorPanel = ({
       }
     >
       <CodeEditorHeader
-        codeSubmitted={codeSubmitted}
-        codeSubmissionSuccess={codeSubmissionSuccess}
-        canSubmitSolution={canSubmitSolution}
         compactMobileLandscape={isMobileSlotLayout && isLandscapeViewport}
         showMobileKeyboardButton={effectivePhoneEditorMode}
         leftAddon={slotSwitcherControl}
@@ -714,17 +712,6 @@ const CodeEditorPanel = ({
           <CodeEditorSetupPanel
             showTerminal={showTerminal}
             terminalHeight={terminalHeight}
-            currentWave={currentWave}
-            onStartWave={onStartWave}
-            onResetGame={onResetGame}
-            selectedTowerType={selectedTowerType}
-            onCancelTowerPlacement={onCancelTowerPlacement}
-            problemTitle={problemTitle}
-            difficulty={difficulty}
-            isDemo={isDemo}
-            showHowToPlay={showHowToPlay}
-            setShowHowToPlay={setShowHowToPlay}
-            lives={lives}
             effectiveCodeGenerated={effectiveCodeGenerated}
             shellTheme={shellTheme}
           />

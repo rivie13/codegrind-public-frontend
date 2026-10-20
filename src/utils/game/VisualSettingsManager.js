@@ -54,6 +54,9 @@ class VisualSettingsManager {
       hitEffects: true, // Show hit effects
       combatText: true, // Show combat text (damage/status popups)
 
+      // Helper UI toggles
+      actionTooltips: true, // Show action tooltips on tower entries and controls
+
       // AI Code Snippet Generation setting
       aiCodeSnippetGeneration: true, // Enable AI-powered code snippet generation
       aiCodeSnippetBeta: true, // Indicates that AI snippet generation is in beta
@@ -91,6 +94,9 @@ class VisualSettingsManager {
         const mergedSettings = { ...this.defaultSettings, ...JSON.parse(savedSettings) };
         if (typeof mergedSettings.aiCodeSnippetGeneration !== 'boolean') {
           mergedSettings.aiCodeSnippetGeneration = true;
+        }
+        if (typeof mergedSettings.actionTooltips !== 'boolean') {
+          mergedSettings.actionTooltips = true;
         }
         if (typeof mergedSettings.aiCodeSnippetBeta !== 'boolean') {
           mergedSettings.aiCodeSnippetBeta = true;
@@ -360,6 +366,15 @@ class VisualSettingsManager {
       this.settings.combatText = combatText;
     }
     this.settings.qualityPreset = 'custom';
+    this.saveSettings();
+    return this.getSettings();
+  }
+
+  /**
+   * Update action tooltips toggle
+   */
+  updateActionTooltips(enabled) {
+    this.settings.actionTooltips = enabled === true;
     this.saveSettings();
     return this.getSettings();
   }

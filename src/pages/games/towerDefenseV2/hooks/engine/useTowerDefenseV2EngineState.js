@@ -78,7 +78,6 @@ export default function useTowerDefenseV2EngineState({
   } = useTowerDefenseGameEvents({
     addTerminalMessage,
     totalWavesByDifficulty,
-    livesRef,
   });
 
   const handleTowerSpecialUpgraded = useCallback(

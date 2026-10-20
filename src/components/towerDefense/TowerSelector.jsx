@@ -3,12 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import audioManager from '../../utils/audio/AudioManager';
 import { RETRO_DEFENSE_MATRIX_ICON_ASSET } from '../../utils/assets/towerDefenseAssetUrls';
 import {
-  formatCoreTowerList,
   getMissingCoreTowerLabels,
   isRequiredCoreTower,
 } from '../../utils/towerDefense/coreTowerRequirements';
 import { TOWER_TYPES } from './data/towerTypes';
 import useGuestFunnel from '../../hooks/guest/useGuestFunnel';
+import useActionTooltips from '../../hooks/towerDefense/ui/useActionTooltips';
 
 const getAffordabilitySignature = (items, credits) =>
   items
@@ -70,6 +70,7 @@ const TowerSelector = ({
 }) => {
   // Add internal state to track initialCodeGenerated as a backup
   const funnel = useGuestFunnel();
+  const showActionTooltips = useActionTooltips();
   const [internalCodeGenerated, setInternalCodeGenerated] = useState(initialCodeGenerated);
   const [activeError, setActiveError] = useState(null);
   const componentRef = useRef(null);
@@ -165,9 +166,6 @@ const TowerSelector = ({
         objectTowerPlaced,
       }),
     [coreTowerRequirements, functionTowerPlaced, objectTowerPlaced]
-  );
-  const coreTowerLabelText = formatCoreTowerList(
-    missingCoreTowerLabels.length ? missingCoreTowerLabels : ['core']
   );
 
   // Filter available tower types based on the code analysis and game state
@@ -454,52 +452,7 @@ const TowerSelector = ({
         </Heading>
       )}
 
-      {!effectiveCodeGenerated && gameStatus !== 'playing' && gameStatus !== 'wave-complete' ? (
-        <Box
-          p={3}
-          {...(isRetroDesktopTheme
-            ? retroInsetPanelProps
-            : {
-                bg: 'rgba(0, 30, 60, 0.7)',
-                borderRadius: 'md',
-                borderLeft: '2px solid #00ccff',
-              })}
-          width="100%"
-          position="relative"
-          _before={{
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: isRetroDesktopTheme
-              ? 'none'
-              : 'linear-gradient(45deg, transparent 0%, rgba(0, 204, 255, 0.05) 50%, transparent 100%)',
-            borderRadius: isRetroDesktopTheme ? '0' : 'md',
-            pointerEvents: 'none',
-          }}
-        >
-          <Text
-            color={isRetroDesktopTheme ? '#0b2ba8' : '#00ccff'}
-            fontWeight="bold"
-            fontFamily={uiFontFamily}
-            textShadow={isRetroDesktopTheme ? 'none' : '0 0 5px #00ccff'}
-            mb={1}
-            fontSize="sm"
-          >
-            INITIALIZATION REQUIRED
-          </Text>
-          <Text color={isRetroDesktopTheme ? '#35393f' : '#99ccff'} fontSize="xs" lineHeight="1.4">
-            <Box as="span" color={isRetroDesktopTheme ? '#0b2ba8' : '#ff3366'} fontWeight="bold">
-              ▶
-            </Box>{' '}
-            Deploy {coreTowerLabelText} {missingCoreTowerLabels.length === 1 ? 'module' : 'modules'}{' '}
-            to initialize core system architecture.
-          </Text>
-        </Box>
-      ) : !effectiveCodeGenerated &&
-        (gameStatus === 'playing' || gameStatus === 'wave-complete') ? (
+      {!effectiveCodeGenerated && (gameStatus === 'playing' || gameStatus === 'wave-complete') ? (
         <Box
           p={3}
           {...(isRetroDesktopTheme
@@ -598,10 +551,6 @@ const TowerSelector = ({
           const storeGate = towerUnlockGates[gateKey];
           const isStoreLocked = Boolean(storeGate?.locked);
           const isClickable = isAffordable && canPlaceTowers && !isStoreLocked;
-          const hasDisplayableSpecialUpgrades =
-            tower.conceptKey !== 'AI_ASSIST' &&
-            Array.isArray(tower.specialUpgrades) &&
-            tower.specialUpgrades.length > 0;
 
           // Create data-tutorial attribute based on tower type
           const getTutorialAttribute = (towerType) => {
@@ -654,365 +603,225 @@ const TowerSelector = ({
           const tutorialProps = tutorialAttr ? { 'data-tutorial': tutorialAttr } : {};
 
           return (
-            <Box
+            <Tooltip
               key={tower.type}
-              data-selected={isSelected ? 'true' : 'false'}
-              p={3}
-              bg={
-                isRetroDesktopTheme
-                  ? isSelected
-                    ? '#ece7dc'
-                    : '#d9d4ca'
-                  : isSelected
-                    ? 'rgba(20, 20, 40, 0.9)'
-                    : 'rgba(15, 15, 30, 0.7)'
-              }
-              borderRadius={isRetroDesktopTheme ? '0' : 'sm'}
-              cursor={isClickable ? 'pointer' : 'not-allowed'}
-              _hover={{
-                bg: isClickable
-                  ? isRetroDesktopTheme
-                    ? '#ece7dc'
-                    : 'rgba(25, 25, 50, 0.9)'
-                  : undefined,
-                transform: isClickable
-                  ? isRetroDesktopTheme
-                    ? 'translateY(1px)'
-                    : 'translateY(-1px)'
-                  : undefined,
-                boxShadow: isClickable
-                  ? isRetroDesktopTheme
-                    ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.62), inset -1px -1px 0 rgba(66, 72, 82, 0.28)'
-                    : `0 0 10px ${towerColor}50`
-                  : undefined,
-              }}
-              borderLeft={isRetroDesktopTheme ? undefined : `2px solid ${towerColor}`}
-              border={isRetroDesktopTheme ? '2px solid #232730' : undefined}
-              opacity={isClickable ? 1 : 0.6}
-              onClick={() => isClickable && handleSelectTower(tower.type)}
-              onMouseEnter={() => isClickable && handleTowerHover(tower.type)}
-              transition="all 0.2s"
-              width="100%"
-              position="relative"
-              outline={
-                isRetroDesktopTheme
-                  ? isSelected
-                    ? '2px solid #0b2ba8'
-                    : 'none'
-                  : isSelected
-                    ? `1px solid ${towerColor}70`
-                    : 'none'
-              }
-              _after={
-                isSelected
-                  ? {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '7px',
-                      height: '7px',
-                      background: isRetroDesktopTheme ? '#0b2ba8' : towerColor,
-                      boxShadow: isRetroDesktopTheme ? 'none' : `0 0 5px ${towerColor}`,
-                    }
-                  : {}
-              }
-              {...tutorialProps}
+              label={`Select ${tower.displayName || tower.type} to place on map`}
+              isDisabled={!isClickable || !showActionTooltips}
+              bg={isRetroDesktopTheme ? '#f4efe6' : 'rgba(0, 0, 30, 0.9)'}
+              color={isRetroDesktopTheme ? '#1f2128' : towerColor}
+              borderRadius="sm"
+              padding="5px 8px"
+              fontSize="xs"
+              placement="top"
             >
-              <Flex justify="space-between" align="center" mb={1} wrap="wrap">
-                <Tooltip
-                  label={
-                    isStoreLocked
-                      ? `Locked: ${storeGate?.minLevel ? `Level ${storeGate.minLevel}` : 'Level requirement'}${storeGate?.requiredDp ? ` + ${storeGate.requiredDp} DP unlock` : ' + Store purchase required'}`
-                      : !isAffordable
-                        ? `Insufficient bits (${tower.cost} required)`
-                        : !canPlaceTowers
-                          ? 'Deployment unavailable'
-                          : ''
-                  }
-                  isDisabled={isClickable}
-                  onOpen={() => audioManager.playSoundEffect('ui-hover')}
-                  bg={isRetroDesktopTheme ? '#f4efe6' : 'rgba(0, 0, 30, 0.9)'}
-                  color={isRetroDesktopTheme ? '#1f2128' : towerColor}
-                  borderRadius="sm"
-                  padding="5px 8px"
-                  fontSize="xs"
-                >
-                  <Text
+              <Box
+                data-selected={isSelected ? 'true' : 'false'}
+                p={3}
+                bg={
+                  isRetroDesktopTheme
+                    ? isSelected
+                      ? '#ece7dc'
+                      : '#d9d4ca'
+                    : isSelected
+                      ? 'rgba(20, 20, 40, 0.9)'
+                      : 'rgba(15, 15, 30, 0.7)'
+                }
+                borderRadius={isRetroDesktopTheme ? '0' : 'sm'}
+                cursor={isClickable ? 'pointer' : 'not-allowed'}
+                _hover={{
+                  bg: isClickable
+                    ? isRetroDesktopTheme
+                      ? '#ece7dc'
+                      : 'rgba(25, 25, 50, 0.9)'
+                    : undefined,
+                  transform: isClickable
+                    ? isRetroDesktopTheme
+                      ? 'translateY(1px)'
+                      : 'translateY(-1px)'
+                    : undefined,
+                  boxShadow: isClickable
+                    ? isRetroDesktopTheme
+                      ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.62), inset -1px -1px 0 rgba(66, 72, 82, 0.28)'
+                      : `0 0 10px ${towerColor}50`
+                    : undefined,
+                }}
+                borderLeft={isRetroDesktopTheme ? undefined : `2px solid ${towerColor}`}
+                border={isRetroDesktopTheme ? '2px solid #232730' : undefined}
+                opacity={isClickable ? 1 : 0.6}
+                onClick={() => isClickable && handleSelectTower(tower.type)}
+                onMouseEnter={() => isClickable && handleTowerHover(tower.type)}
+                transition="all 0.2s"
+                width="100%"
+                position="relative"
+                outline={
+                  isRetroDesktopTheme
+                    ? isSelected
+                      ? '2px solid #0b2ba8'
+                      : 'none'
+                    : isSelected
+                      ? `1px solid ${towerColor}70`
+                      : 'none'
+                }
+                _after={
+                  isSelected
+                    ? {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '7px',
+                        height: '7px',
+                        background: isRetroDesktopTheme ? '#0b2ba8' : towerColor,
+                        boxShadow: isRetroDesktopTheme ? 'none' : `0 0 5px ${towerColor}`,
+                      }
+                    : {}
+                }
+                {...tutorialProps}
+              >
+                <Flex justify="space-between" align="center" mb={1} wrap="wrap">
+                  <Tooltip
+                    label={
+                      isStoreLocked
+                        ? `Locked: ${storeGate?.minLevel ? `Level ${storeGate.minLevel}` : 'Level requirement'}${storeGate?.requiredDp ? ` + ${storeGate.requiredDp} DP unlock` : ' + Store purchase required'}`
+                        : !isAffordable
+                          ? `Insufficient bits (${tower.cost} required)`
+                          : !canPlaceTowers
+                            ? 'Deployment unavailable'
+                            : ''
+                    }
+                    isDisabled={isClickable}
+                    onOpen={() => audioManager.playSoundEffect('ui-hover')}
+                    bg={isRetroDesktopTheme ? '#f4efe6' : 'rgba(0, 0, 30, 0.9)'}
                     color={isRetroDesktopTheme ? '#1f2128' : towerColor}
-                    fontWeight="bold"
-                    fontFamily={uiFontFamily}
-                    textShadow={isRetroDesktopTheme ? 'none' : `0 0 5px ${towerColor}`}
-                    letterSpacing="0.5px"
-                    fontSize="sm"
-                  >
-                    {tower.displayName || tower.type}
-                  </Text>
-                </Tooltip>
-                <Flex align="center">
-                  <Text
-                    color={isRetroDesktopTheme ? '#7b5b13' : '#ffcc00'}
-                    mr={2}
-                    fontFamily={uiFontFamily}
-                    textShadow={isRetroDesktopTheme ? 'none' : '0 0 3px #ffcc00'}
+                    borderRadius="sm"
+                    padding="5px 8px"
                     fontSize="xs"
                   >
-                    {tower.cost}{' '}
-                    <Box as="span" fontSize={compactMetaFontSize}>
-                      BITS
-                    </Box>
-                  </Text>
-                  {tower.isNonCode && (
-                    <Badge
-                      bg={isRetroDesktopTheme ? '#e4d9bd' : '#2b1a00'}
-                      color={isRetroDesktopTheme ? '#6a4b12' : '#ffb703'}
-                      fontSize={compactMicroFontSize}
-                      borderRadius="sm"
-                      px={1}
+                    <Text
+                      color={isRetroDesktopTheme ? '#1f2128' : towerColor}
+                      fontWeight="bold"
+                      fontFamily={uiFontFamily}
+                      textShadow={isRetroDesktopTheme ? 'none' : `0 0 5px ${towerColor}`}
+                      letterSpacing="0.5px"
+                      fontSize="sm"
+                    >
+                      {tower.displayName || tower.type}
+                    </Text>
+                  </Tooltip>
+                  <Flex align="center">
+                    <Text
+                      color={isRetroDesktopTheme ? '#7b5b13' : '#ffcc00'}
                       mr={2}
+                      fontFamily={uiFontFamily}
+                      textShadow={isRetroDesktopTheme ? 'none' : '0 0 3px #ffcc00'}
+                      fontSize="xs"
                     >
-                      NO CODE GEN
-                    </Badge>
-                  )}
-                  {isStoreLocked && (
-                    <Badge
-                      bg={isRetroDesktopTheme ? '#ddd2ec' : '#1a0d2e'}
-                      color={isRetroDesktopTheme ? '#5d2e8c' : '#bf7fff'}
-                      fontSize={compactMetaFontSize}
-                      textShadow={isRetroDesktopTheme ? 'none' : '0 0 2px #bf7fff'}
-                      borderRadius="sm"
-                      px={1}
-                      mr={1}
-                    >
-                      LOCKED
-                    </Badge>
-                  )}
-                  {!isAffordable && (
-                    <Badge
-                      bg={isRetroDesktopTheme ? '#e8cbc8' : '#3d0a17'}
-                      color={isRetroDesktopTheme ? '#8b1f18' : '#ff3366'}
-                      fontSize={compactMetaFontSize}
-                      textShadow={isRetroDesktopTheme ? 'none' : '0 0 2px #ff3366'}
-                      borderRadius="sm"
-                      px={1}
-                    >
-                      LOCKED
-                    </Badge>
-                  )}
-                </Flex>
-              </Flex>
-
-              <Text
-                color={isRetroDesktopTheme ? '#35393f' : '#cceeff'}
-                fontSize={compactBodyFontSize}
-                mb={2}
-                opacity={0.9}
-              >
-                {tower.description}
-              </Text>
-              {isStoreLocked && (
-                <Text
-                  color={isRetroDesktopTheme ? '#5d2e8c' : '#d6a1ff'}
-                  fontSize={compactUiFontSize}
-                  mb={2}
-                  opacity={0.95}
-                >
-                  LOCKED: Requires Level {storeGate?.minLevel ?? '?'}
-                  {storeGate?.requiredDp ? ` • ${storeGate.requiredDp} DP` : ' • Store Unlock'}
-                </Text>
-              )}
-
-              <Flex
-                justify="space-between"
-                fontSize={compactMetaFontSize}
-                color={isRetroDesktopTheme ? '#4d5562' : '#88AACC'}
-                wrap="wrap"
-                borderTop={
-                  isRetroDesktopTheme
-                    ? '1px solid rgba(33, 37, 44, 0.24)'
-                    : '1px dashed rgba(0, 204, 255, 0.2)'
-                }
-                pt={1}
-              >
-                <Text mr={2}>DMG: {tower.damage}</Text>
-                <Text mr={2}>RNG: {tower.range}</Text>
-                <Text>SPD: {tower.attackSpeed}/s</Text>
-              </Flex>
-
-              {/* Core upgrades */}
-              {tower.upgradeCosts && tower.upgradeCosts.length > 0 && (
-                <Box
-                  mt={2}
-                  pt={1}
-                  borderTop={
-                    isRetroDesktopTheme
-                      ? '1px solid rgba(33, 37, 44, 0.24)'
-                      : '1px dashed rgba(0, 204, 255, 0.2)'
-                  }
-                  width="100%"
-                >
-                  <Text
-                    fontSize={compactMetaFontSize}
-                    color={isRetroDesktopTheme ? '#0b2ba8' : '#00ccff'}
-                    mb={1}
-                    opacity={0.8}
-                  >
-                    CORE UPGRADES:
-                  </Text>
-                  {tower.upgradeCosts.slice(0, 2).map((cost, index) => (
-                    <Flex
-                      key={`core-${index}`}
-                      justify="space-between"
-                      fontSize={compactMetaFontSize}
-                      color={isRetroDesktopTheme ? '#4d5562' : '#88AACC'}
-                      opacity={0.8}
-                    >
-                      <Text>Core Upgrade {index + 1}</Text>
-                      <Text>{cost}</Text>
-                    </Flex>
-                  ))}
-                  <Text
-                    fontSize={compactMetaFontSize}
-                    color={isRetroDesktopTheme ? '#4d5562' : '#88AACC'}
-                    mt={1}
-                    opacity={0.7}
-                  >
-                    +20% DMG · +0.5 RNG · +10% SPD per level
-                  </Text>
-                </Box>
-              )}
-
-              {/* Special upgrades */}
-              {hasDisplayableSpecialUpgrades && (
-                <Box
-                  mt={2}
-                  pt={1}
-                  borderTop={
-                    isRetroDesktopTheme
-                      ? '1px solid rgba(33, 37, 44, 0.24)'
-                      : '1px dashed rgba(0, 204, 255, 0.2)'
-                  }
-                  width="100%"
-                >
-                  <Text
-                    fontSize={compactMetaFontSize}
-                    color={isRetroDesktopTheme ? '#5d2e8c' : '#c38cff'}
-                    mb={1}
-                    opacity={0.9}
-                  >
-                    SPECIAL UPGRADES:
-                  </Text>
-                  {tower.specialUpgrades.slice(0, 2).map((upgrade, index) => (
-                    <Box key={`special-${index}`} mb={1}>
-                      <Flex
-                        justify="space-between"
-                        fontSize={compactMetaFontSize}
-                        color={isRetroDesktopTheme ? '#5d2e8c' : '#bfa6ff'}
-                        opacity={0.85}
+                      {tower.cost}{' '}
+                      <Box as="span" fontSize={compactMetaFontSize}>
+                        BITS
+                      </Box>
+                    </Text>
+                    {tower.isNonCode && (
+                      <Badge
+                        bg={isRetroDesktopTheme ? '#e4d9bd' : '#2b1a00'}
+                        color={isRetroDesktopTheme ? '#6a4b12' : '#ffb703'}
+                        fontSize={compactMicroFontSize}
+                        borderRadius="sm"
+                        px={1}
+                        mr={2}
                       >
-                        <Text>{upgrade.name}</Text>
-                        <Text>{upgrade.cost}</Text>
-                      </Flex>
-                      {upgrade.effect && (
-                        <Text
-                          fontSize={compactMicroFontSize}
-                          color={isRetroDesktopTheme ? '#6a5a7f' : '#b8a6ff'}
-                          opacity={0.7}
-                        >
-                          {upgrade.effect}
-                        </Text>
-                      )}
-                    </Box>
-                  ))}
-                  {tower.specialUpgrades.length > 2 && (
+                        NO CODE GEN
+                      </Badge>
+                    )}
+                    {isStoreLocked && (
+                      <Badge
+                        bg={isRetroDesktopTheme ? '#ddd2ec' : '#1a0d2e'}
+                        color={isRetroDesktopTheme ? '#5d2e8c' : '#bf7fff'}
+                        fontSize={compactMetaFontSize}
+                        textShadow={isRetroDesktopTheme ? 'none' : '0 0 2px #bf7fff'}
+                        borderRadius="sm"
+                        px={1}
+                        mr={1}
+                      >
+                        LOCKED
+                      </Badge>
+                    )}
+                    {!isAffordable && (
+                      <Badge
+                        bg={isRetroDesktopTheme ? '#e8cbc8' : '#3d0a17'}
+                        color={isRetroDesktopTheme ? '#8b1f18' : '#ff3366'}
+                        fontSize={compactMetaFontSize}
+                        textShadow={isRetroDesktopTheme ? 'none' : '0 0 2px #ff3366'}
+                        borderRadius="sm"
+                        px={1}
+                      >
+                        LOCKED
+                      </Badge>
+                    )}
+                  </Flex>
+                </Flex>
+
+                <Text
+                  color={isRetroDesktopTheme ? '#35393f' : '#cceeff'}
+                  fontSize={compactBodyFontSize}
+                  mb={2}
+                  opacity={0.9}
+                >
+                  {tower.description}
+                </Text>
+                {isStoreLocked && (
+                  <Text
+                    color={isRetroDesktopTheme ? '#5d2e8c' : '#d6a1ff'}
+                    fontSize={compactUiFontSize}
+                    mb={2}
+                    opacity={0.95}
+                  >
+                    LOCKED: Requires Level {storeGate?.minLevel ?? '?'}
+                    {storeGate?.requiredDp ? ` • ${storeGate.requiredDp} DP` : ' • Store Unlock'}
+                  </Text>
+                )}
+
+                <Flex
+                  justify="space-between"
+                  fontSize={compactMetaFontSize}
+                  color={isRetroDesktopTheme ? '#4d5562' : '#88AACC'}
+                  wrap="wrap"
+                  borderTop={
+                    isRetroDesktopTheme
+                      ? '1px solid rgba(33, 37, 44, 0.24)'
+                      : '1px dashed rgba(0, 204, 255, 0.2)'
+                  }
+                  pt={1}
+                >
+                  <Text mr={2}>DMG: {tower.damage}</Text>
+                  <Text mr={2}>RNG: {tower.range}</Text>
+                  <Text>SPD: {tower.attackSpeed}/s</Text>
+                </Flex>
+
+                {tower.conceptKey === 'AI_ASSIST' && (
+                  <Box
+                    mt={2}
+                    pt={1}
+                    borderTop={
+                      isRetroDesktopTheme
+                        ? '1px solid rgba(33, 37, 44, 0.24)'
+                        : '1px dashed rgba(0, 204, 255, 0.2)'
+                    }
+                    width="100%"
+                  >
                     <Text
                       fontSize={compactMetaFontSize}
-                      color={isRetroDesktopTheme ? '#5d2e8c' : '#bfa6ff'}
-                      textAlign="center"
-                      mt={1}
-                      opacity={0.7}
+                      color={isRetroDesktopTheme ? '#4d5562' : '#8ce0ff'}
+                      opacity={0.85}
                     >
-                      +{tower.specialUpgrades.length - 2} more...
+                      Adaptive ability: inherits special behavior from the transformed tower.
                     </Text>
-                  )}
-                </Box>
-              )}
-              {tower.conceptKey === 'AI_ASSIST' && (
-                <Box
-                  mt={2}
-                  pt={1}
-                  borderTop={
-                    isRetroDesktopTheme
-                      ? '1px solid rgba(33, 37, 44, 0.24)'
-                      : '1px dashed rgba(0, 204, 255, 0.2)'
-                  }
-                  width="100%"
-                >
-                  <Text
-                    fontSize={compactMetaFontSize}
-                    color={isRetroDesktopTheme ? '#4d5562' : '#8ce0ff'}
-                    opacity={0.85}
-                  >
-                    Adaptive ability: inherits special behavior from the transformed tower.
-                  </Text>
-                </Box>
-              )}
-            </Box>
+                  </Box>
+                )}
+              </Box>
+            </Tooltip>
           );
         })
-      )}
-
-      {/* Information about code generation */}
-      {!effectiveCodeGenerated && (
-        <Box
-          p={3}
-          {...(isRetroDesktopTheme
-            ? retroInsetPanelProps
-            : {
-                bg: 'rgba(0, 20, 40, 0.7)',
-                borderRadius: 'sm',
-                borderLeft: '2px solid #00ccff',
-              })}
-          fontSize="xs"
-          color={isRetroDesktopTheme ? '#1f2128' : '#00ccff'}
-          mt="auto"
-          minHeight="auto"
-          flexShrink={0}
-          width="100%"
-          position="relative"
-          _before={{
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: isRetroDesktopTheme
-              ? 'none'
-              : 'linear-gradient(135deg, transparent 0%, rgba(0, 204, 255, 0.05) 50%, transparent 100%)',
-            borderRadius: isRetroDesktopTheme ? '0' : 'sm',
-            pointerEvents: 'none',
-          }}
-        >
-          <Text
-            fontWeight="bold"
-            mb={2}
-            fontFamily={uiFontFamily}
-            textShadow={isRetroDesktopTheme ? 'none' : '0 0 4px #00ccff'}
-            fontSize="sm"
-            color={isRetroDesktopTheme ? '#0b2ba8' : '#00ccff'}
-          >
-            SYS_INITIALIZATION
-          </Text>
-          <Text
-            color={isRetroDesktopTheme ? '#35393f' : '#99ccff'}
-            fontSize={compactBodyFontSize}
-            lineHeight="1.5"
-          >
-            Deploy {coreTowerLabelText} {missingCoreTowerLabels.length === 1 ? 'module' : 'modules'}{' '}
-            to generate core architecture. Additional modules augment defensive capabilities.
-          </Text>
-        </Box>
       )}
 
       {/* Information about restricted towers */}

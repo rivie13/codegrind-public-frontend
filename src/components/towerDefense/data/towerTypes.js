@@ -208,7 +208,7 @@ export const TOWER_TYPES = {
   },
   FUNCTION: {
     type: 'Function',
-    displayName: 'Boilerplate Core',
+    displayName: 'Function',
     cost: 110,
     damage: 42,
     range: 2.4,
@@ -285,7 +285,7 @@ export const TOWER_TYPES = {
   },
   OBJECT: {
     type: 'Object',
-    displayName: 'Boilerplate Instance',
+    displayName: 'Object',
     cost: 120,
     damage: 30,
     range: 2.4,

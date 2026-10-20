@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Button, Flex, HStack, Text, VStack } from '@chakra-ui/react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Box, Button, Flex, HStack, Text, Tooltip, VStack } from '@chakra-ui/react';
+import { FaClock } from 'react-icons/fa';
 
 import TowerSelector from '../../../../components/towerDefense/TowerSelector';
 import DeployableSelector from '../../../../components/towerDefense/ui/DeployableSelector';
 import useGuestFunnel from '../../../../hooks/guest/useGuestFunnel';
-import { TowerUpgradePanel } from '../../../../components/towerDefense/ui';
+import { SettingsButton, TowerUpgradePanel } from '../../../../components/towerDefense/ui';
 import GameBoard from '../../../../components/towerDefense/ui/board/GameBoard';
 import MobileTowerDefenseDock from './MobileTowerDefenseDock';
 import { resolveCanvasFitScale, resolveMobileCanvasViewportHeight } from './gamePanelSizing';
@@ -106,10 +107,10 @@ export default function GamePanelContent({
   towerUnlockGates = {},
   deployableUnlockGates = {},
   isSpecialUpgradeUnlocked,
-  _gameSettings,
-  _onGameSettingsChange,
-  _canEditGameSettings,
-  _difficultyMinimums,
+  gameSettings,
+  onGameSettingsChange,
+  canEditGameSettings,
+  difficultyMinimums,
   towerSelectorEnabled = true,
   deployableMenuEnabled = true,
   _upgradeMenuEnabled = true,
@@ -128,6 +129,7 @@ export default function GamePanelContent({
   isExecuting = false,
   codeSubmitted = false,
   isLearningMode = false,
+  xpProgress = null,
   terminalOutput = '',
   isDemo: _isDemo = false,
   isHomepageDemo = false,
@@ -153,7 +155,9 @@ export default function GamePanelContent({
       }
     : null;
   const [visualSettings, setVisualSettings] = useState(() => visualSettingsManager.getSettings());
+  const showActionTooltips = visualSettings.actionTooltips !== false;
   const [isMobileSelectorOpen, setIsMobileSelectorOpen] = useState(!isMobileSlotLayout);
+  const [isDesktopLoadoutOpen, setIsDesktopLoadoutOpen] = useState(true);
   const [isMobileHudMenuVisible, setIsMobileHudMenuVisible] = useState(true);
   const [isMobileActionDockExpanded, setIsMobileActionDockExpanded] = useState(false);
   const [isLandscapeViewport, setIsLandscapeViewport] = useState(() => {
@@ -166,6 +170,16 @@ export default function GamePanelContent({
   });
   const [canvasViewportSize, setCanvasViewportSize] = useState({ width: 0, height: 0 });
   const canvasViewportRef = useRef(null);
+  const handleCanvasRef = useCallback(
+    (node) => {
+      if (typeof canvasRefCallback === 'function') {
+        canvasRefCallback(node);
+      } else if (canvasRefCallback) {
+        canvasRefCallback.current = node;
+      }
+    },
+    [canvasRefCallback]
+  );
   const missingCoreTowerLabels = useMemo(
     () =>
       getMissingCoreTowerLabels(coreTowerRequirements, {
@@ -353,7 +367,7 @@ export default function GamePanelContent({
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = canvasViewportRef.current;
     if (!element) return undefined;
 
@@ -389,6 +403,7 @@ export default function GamePanelContent({
   const runTestsCost = Number(verificationActionCosts?.runTests || 0);
   const stdoutCost = Number(verificationActionCosts?.stdout || 0);
   const stderrCost = Number(verificationActionCosts?.stderr || 0);
+  const showPathControls = !isHomepageDemo && (onShortenPath || onLengthenPath) && !hardcoreMode;
 
   const canvasGlitch = useMemo(() => {
     const maxLives = Math.max(1, initialLives || gameState?.lives || 1);
@@ -553,6 +568,17 @@ export default function GamePanelContent({
       !isSpecialUpgradeUnlocked(selectedTower?.type, nextSelectedTowerSpecialTier)
     );
   const isMobileCanvasMode = isMobileSlotLayout;
+  const prevSelectedTowerRef = useRef(selectedTower);
+
+  // When an already-placed tower gets selected (e.g. clicked on the map),
+  // open the desktop drawer so its upgrade screen is visible. Only reacts to
+  // a *new* selection so a manual close always sticks.
+  useEffect(() => {
+    if (!isMobileCanvasMode && selectedTower && selectedTower !== prevSelectedTowerRef.current) {
+      setIsDesktopLoadoutOpen(true);
+    }
+    prevSelectedTowerRef.current = selectedTower;
+  }, [isMobileCanvasMode, selectedTower]);
   const canQuickPlaceTowers =
     towerSelectorEnabled && ['ready', 'playing', 'wave-complete'].includes(gameState.status);
   const canQuickPlaceDeployables =
@@ -610,7 +636,7 @@ export default function GamePanelContent({
     isMobileCanvasMode && (mobileTerminalFeedLines.length > 0 || isExecuting);
 
   const showGameHudControls =
-    (!hardcoreMode && (onShortenPath || onLengthenPath)) ||
+    (isMobileCanvasMode && showPathControls) ||
     showMobileSelectorToggle ||
     Boolean(slotSwitcherControl) ||
     Boolean(slotChrome) ||
@@ -639,9 +665,7 @@ export default function GamePanelContent({
       : showMobileHudMenuToggle
         ? 36
         : 16
-    : showGameHudControls
-      ? 138
-      : 84;
+    : 8;
   const bottomHudClearance = isMobileCanvasMode
     ? showMobileContinuePrompt
       ? 36
@@ -652,16 +676,15 @@ export default function GamePanelContent({
           !initialCodeGenerated &&
           !isGameOver &&
           !isVictory)
-      ? 96
-      : 20;
+      ? 64
+      : 8;
   const availableCanvasWidth = Math.max(
     0,
     canvasViewportSize.width - (isMobileCanvasMode ? 0 : 16)
   );
   const availableCanvasHeight = Math.max(
     0,
-    canvasViewportSize.height -
-      (topHudClearance + bottomHudClearance + (isMobileCanvasMode ? 8 : 24))
+    canvasViewportSize.height - (topHudClearance + bottomHudClearance + 8)
   );
   const canvasFitScale = useMemo(() => {
     return resolveCanvasFitScale({
@@ -750,6 +773,8 @@ export default function GamePanelContent({
       onSelectTowerType?.(towerType);
       if (isMobileCanvasMode) {
         setIsMobileSelectorOpen(false);
+      } else {
+        setIsDesktopLoadoutOpen(false);
       }
       if (isHomepageDemo) {
         funnel.towerSelected(towerType);
@@ -763,6 +788,8 @@ export default function GamePanelContent({
       onSelectDeployableType?.(deployableType);
       if (isMobileCanvasMode) {
         setIsMobileSelectorOpen(false);
+      } else {
+        setIsDesktopLoadoutOpen(false);
       }
     },
     [isMobileCanvasMode, onSelectDeployableType]
@@ -932,6 +959,99 @@ export default function GamePanelContent({
     );
   };
 
+  const renderPathControlButtons = () => {
+    if (!showPathControls) return null;
+
+    return (
+      <HStack spacing={2} alignItems="center" flexWrap="nowrap" flexShrink={0}>
+        {!isMobileCanvasMode && (
+          <Text
+            color={isRetroDesktopTheme ? '#0b2ba8' : '#00ccff'}
+            fontSize="xs"
+            fontFamily={hudFontFamily}
+            letterSpacing="0.5px"
+            whiteSpace="nowrap"
+          >
+            PATH CTRL
+          </Text>
+        )}
+        <Tooltip
+          label={`Shorten the enemy path for ${shortenCost} bits. Shorter path means less travel time but tighter kill zone.`}
+          isDisabled={!showActionTooltips}
+          fontSize="xs"
+        >
+          <Button
+            size="xs"
+            colorScheme={isRetroDesktopTheme ? undefined : 'cyan'}
+            variant={isRetroDesktopTheme ? 'unstyled' : 'solid'}
+            onClick={onShortenPath}
+            isDisabled={!canAdjustPath || isAdjustingPath || gameState.credits < shortenCost}
+            fontFamily={hudFontFamily}
+            sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
+          >
+            SHORTEN ({shortenCost})
+          </Button>
+        </Tooltip>
+        <Tooltip
+          label={`Lengthen the enemy path for ${lengthenCost} bits. Longer path gives towers more time to fire.`}
+          isDisabled={!showActionTooltips}
+          fontSize="xs"
+        >
+          <Button
+            size="xs"
+            colorScheme={isRetroDesktopTheme ? undefined : 'green'}
+            variant={isRetroDesktopTheme ? 'unstyled' : 'solid'}
+            onClick={onLengthenPath}
+            isDisabled={!canAdjustPath || isAdjustingPath || gameState.credits < lengthenCost}
+            fontFamily={hudFontFamily}
+            sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
+          >
+            LENGTHEN ({lengthenCost})
+          </Button>
+        </Tooltip>
+      </HStack>
+    );
+  };
+
+  const renderXpReadout = () => {
+    const level = Number(xpProgress?.level) || 1;
+    const into = Math.max(0, Number(xpProgress?.into) || 0);
+    const toNext = Math.max(0, Number(xpProgress?.toNext) || 0);
+    const percent = toNext > 0 ? Math.min(100, Math.round((into / toNext) * 100)) : 0;
+
+    return (
+      <HStack spacing={1.5} alignItems="center" flexShrink={0}>
+        <Text
+          color={isRetroDesktopTheme ? '#0b2ba8' : '#00ff8c'}
+          fontWeight="bold"
+          fontSize="inherit"
+          whiteSpace="nowrap"
+        >
+          LVL {level}
+        </Text>
+        <Box
+          w={isMobileCanvasMode ? '56px' : '76px'}
+          h="8px"
+          bg={isRetroDesktopTheme ? '#12161f' : 'rgba(0, 0, 0, 0.5)'}
+          border={isRetroDesktopTheme ? '1px solid #232730' : '1px solid rgba(0, 255, 140, 0.4)'}
+          borderRadius={isRetroDesktopTheme ? '0' : 'full'}
+          overflow="hidden"
+          title={toNext > 0 ? `${into} / ${toNext} XP` : 'Level progress'}
+        >
+          <Box
+            h="100%"
+            w={`${percent}%`}
+            bg={
+              isRetroDesktopTheme
+                ? 'linear-gradient(90deg, #0a2c9a 0%, #1084d0 55%, #0f6f17 100%)'
+                : 'linear-gradient(90deg, #00D4FF 0%, #00FF8C 100%)'
+            }
+          />
+        </Box>
+      </HStack>
+    );
+  };
+
   const renderGameStatusSummary = () => (
     <HStack
       spacing={isMobileCanvasMode ? 2 : 3}
@@ -939,6 +1059,7 @@ export default function GamePanelContent({
       fontFamily={hudFontFamily}
       flexWrap="wrap"
     >
+      {renderXpReadout()}
       <Text color={isRetroDesktopTheme ? '#7b5b13' : '#FFCC00'} fontWeight="bold">
         BITS: {gameState.credits}
       </Text>
@@ -966,6 +1087,113 @@ export default function GamePanelContent({
     </HStack>
   );
 
+  const renderDesktopHudBar = () => {
+    if (isMobileCanvasMode) return null;
+
+    return (
+      <HStack
+        data-testid="game-hud-bar"
+        spacing={2}
+        flexWrap="wrap"
+        alignItems="center"
+        px={isRetroDesktopTheme ? 2 : 3}
+        py={1.5}
+        mb={2}
+        bg={isRetroDesktopTheme ? '#d4d0c8' : 'rgba(0, 20, 40, 0.8)'}
+        border={isRetroDesktopTheme ? '2px solid #232730' : '1px solid rgba(0, 255, 140, 0.3)'}
+        borderRadius={isRetroDesktopTheme ? '0' : 'md'}
+        boxShadow={
+          isRetroDesktopTheme
+            ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.62), inset -1px -1px 0 rgba(66, 72, 82, 0.28)'
+            : undefined
+        }
+      >
+        <HStack
+          spacing={1.5}
+          px={2}
+          py={1}
+          minH="32px"
+          alignItems="center"
+          bg={isRetroDesktopTheme ? '#d4d0c8' : 'rgba(0, 0, 0, 0.34)'}
+          border={isRetroDesktopTheme ? '2px solid #5d636e' : '1px solid rgba(0, 255, 255, 0.24)'}
+          borderRadius={isRetroDesktopTheme ? '0' : 'md'}
+        >
+          <FaClock color={isRetroDesktopTheme ? '#0b2ba8' : '#00ccff'} />
+          <Text
+            color={isRetroDesktopTheme ? '#1f2430' : 'cyan.300'}
+            fontFamily={
+              isRetroDesktopTheme
+                ? "'Tahoma', 'MS Sans Serif', sans-serif"
+                : "'Share Tech Mono', 'JetBrains Mono', monospace"
+            }
+            fontSize="xs"
+            letterSpacing="0.08em"
+            minW="60px"
+            textAlign="center"
+            fontWeight={isRetroDesktopTheme ? '700' : undefined}
+          >
+            {formattedTime}
+          </Text>
+        </HStack>
+
+        <Button
+          size="xs"
+          variant={isRetroDesktopTheme ? 'unstyled' : 'outline'}
+          colorScheme={isRetroDesktopTheme ? undefined : 'red'}
+          onClick={onResetGame}
+          data-tutorial="reset-button"
+          sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
+        >
+          Reset
+        </Button>
+
+        <SettingsButton
+          gameSettings={gameSettings}
+          onGameSettingsChange={onGameSettingsChange}
+          canEditGameSettings={canEditGameSettings}
+          difficultyMinimums={difficultyMinimums}
+          buttonProps={{
+            size: 'xs',
+            minW: '28px',
+            h: '28px',
+            px: 0,
+            ...(isRetroDesktopTheme
+              ? {
+                  variant: 'unstyled',
+                  bgImage: `url(${RETRO_WINDOW_BUTTON_ASSET})`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                  backgroundSize: '100% 100%',
+                  bg: '#d4d0c8',
+                  color: '#1f2430',
+                  border: '1px solid rgba(31, 33, 40, 0.35)',
+                  borderRadius: '0',
+                }
+              : {}),
+          }}
+        />
+
+        {(towerSelectorEnabled || deployableMenuEnabled) && (
+          <Button
+            size="xs"
+            variant={isRetroDesktopTheme ? 'unstyled' : 'outline'}
+            colorScheme={isRetroDesktopTheme ? undefined : 'cyan'}
+            onClick={() => setIsDesktopLoadoutOpen((previous) => !previous)}
+            data-tutorial="loadout-toggle"
+            fontFamily={hudFontFamily}
+            sx={isRetroDesktopTheme ? createRetroWindowsButtonSx(isDesktopLoadoutOpen) : undefined}
+          >
+            {isDesktopLoadoutOpen ? 'HIDE LOADOUT' : 'LOADOUT'}
+          </Button>
+        )}
+
+        {renderGameStatusSummary()}
+
+        {showPathControls && renderPathControlButtons()}
+      </HStack>
+    );
+  };
+
   const renderHudControlsContent = () => (
     <VStack spacing={1} align="stretch">
       <HStack
@@ -979,42 +1207,7 @@ export default function GamePanelContent({
             : 'flex-start'
         }
       >
-        {!isHomepageDemo && (onShortenPath || onLengthenPath) && !hardcoreMode && (
-          <>
-            {!isMobileCanvasMode && (
-              <Text
-                color={isRetroDesktopTheme ? '#0b2ba8' : '#00ccff'}
-                fontSize="xs"
-                fontFamily={hudFontFamily}
-                letterSpacing="0.5px"
-              >
-                PATH CTRL
-              </Text>
-            )}
-            <Button
-              size="xs"
-              colorScheme={isRetroDesktopTheme ? undefined : 'cyan'}
-              variant={isRetroDesktopTheme ? 'unstyled' : 'solid'}
-              onClick={onShortenPath}
-              isDisabled={!canAdjustPath || isAdjustingPath || gameState.credits < shortenCost}
-              fontFamily={hudFontFamily}
-              sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
-            >
-              SHORTEN ({shortenCost})
-            </Button>
-            <Button
-              size="xs"
-              colorScheme={isRetroDesktopTheme ? undefined : 'green'}
-              variant={isRetroDesktopTheme ? 'unstyled' : 'solid'}
-              onClick={onLengthenPath}
-              isDisabled={!canAdjustPath || isAdjustingPath || gameState.credits < lengthenCost}
-              fontFamily={hudFontFamily}
-              sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
-            >
-              LENGTHEN ({lengthenCost})
-            </Button>
-          </>
-        )}
+        {isMobileCanvasMode && renderPathControlButtons()}
         {showMobileStartWaveAction && (
           <Button
             size="xs"
@@ -1263,7 +1456,8 @@ export default function GamePanelContent({
   );
 
   const shouldRenderMobileLoadoutOverlay = isMobileCanvasMode && shouldRenderSidePanel;
-  const shouldRenderDesktopSidePanel = !isMobileCanvasMode && shouldRenderSidePanel;
+  const showDesktopLoadoutDrawer =
+    !isMobileCanvasMode && shouldRenderSidePanel && isDesktopLoadoutOpen;
 
   return (
     <Flex
@@ -1275,12 +1469,13 @@ export default function GamePanelContent({
     >
       <Flex
         direction="column"
-        flex={isMobileCanvasMode ? '0 0 auto' : isMobileSlotLayout ? '1 1 auto' : '3'}
+        flex="1"
         minW="0"
         minH={mobileCanvasViewportHeightPx || '0'}
         h={isMobileCanvasMode ? 'auto' : '100%'}
         gap={0}
       >
+        {renderDesktopHudBar()}
         <GameBoard
           playerLost={isGameOver}
           playerWon={isVictory}
@@ -1353,7 +1548,7 @@ export default function GamePanelContent({
               </>
             )}
             <canvas
-              ref={canvasRefCallback}
+              ref={handleCanvasRef}
               data-tutorial="game-grid"
               width={canvasWidth}
               height={canvasHeight}
@@ -1456,28 +1651,30 @@ export default function GamePanelContent({
             )}
 
             {/* In-game status overlay */}
-            <Box
-              position="absolute"
-              top="8px"
-              left={isMobileCanvasMode ? '8px' : 'auto'}
-              right={isMobileCanvasMode ? 'auto' : '8px'}
-              zIndex={7}
-              maxW={isMobileCanvasMode ? 'calc(100% - 92px)' : 'none'}
-            >
+            {isMobileCanvasMode && (
               <Box
-                {...(isRetroDesktopTheme
-                  ? retroSurfaceProps
-                  : {
-                      bg: 'rgba(0, 20, 40, 0.8)',
-                      borderRadius: 'md',
-                      border: '1px solid rgba(0, 255, 140, 0.3)',
-                    })}
-                px={isMobileCanvasMode ? 2 : 3}
-                py={isMobileCanvasMode ? 1.5 : 2}
+                position="absolute"
+                top="8px"
+                left={isMobileCanvasMode ? '8px' : 'auto'}
+                right={isMobileCanvasMode ? 'auto' : '8px'}
+                zIndex={7}
+                maxW={isMobileCanvasMode ? 'calc(100% - 92px)' : 'none'}
               >
-                {renderGameStatusSummary()}
+                <Box
+                  {...(isRetroDesktopTheme
+                    ? retroSurfaceProps
+                    : {
+                        bg: 'rgba(0, 20, 40, 0.8)',
+                        borderRadius: 'md',
+                        border: '1px solid rgba(0, 255, 140, 0.3)',
+                      })}
+                  px={isMobileCanvasMode ? 2 : 3}
+                  py={isMobileCanvasMode ? 1.5 : 2}
+                >
+                  {renderGameStatusSummary()}
+                </Box>
               </Box>
-            </Box>
+            )}
 
             {showMobileHudMenuToggle && (
               <Box position="absolute" top="8px" right="8px" zIndex={7}>
@@ -1624,6 +1821,65 @@ export default function GamePanelContent({
               </Box>
             )}
 
+            {showDesktopLoadoutDrawer && (
+              <Box
+                position="absolute"
+                top="0"
+                right="0"
+                bottom="0"
+                w="320px"
+                maxW="88%"
+                zIndex={5}
+                display="flex"
+                flexDirection="column"
+                overflow="hidden"
+                bg={isRetroDesktopTheme ? '#d4d0c8' : 'rgba(0, 20, 40, 0.94)'}
+                borderLeft={
+                  isRetroDesktopTheme ? '2px solid #232730' : '1px solid rgba(0, 255, 140, 0.3)'
+                }
+                boxShadow={
+                  isRetroDesktopTheme
+                    ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.62)'
+                    : '-12px 0 28px rgba(0, 0, 0, 0.45)'
+                }
+                data-testid="desktop-loadout-drawer"
+              >
+                <Flex
+                  align="center"
+                  justify="space-between"
+                  px={3}
+                  py={2}
+                  flexShrink={0}
+                  borderBottom={
+                    isRetroDesktopTheme ? '2px solid #232730' : '1px solid rgba(0, 255, 140, 0.25)'
+                  }
+                  bg={isRetroDesktopTheme ? '#000080' : 'rgba(0, 20, 40, 0.88)'}
+                >
+                  <Text
+                    color={isRetroDesktopTheme ? '#f4f4f4' : '#9feaff'}
+                    fontSize="xs"
+                    fontFamily={hudFontFamily}
+                    letterSpacing="0.08em"
+                    fontWeight="700"
+                  >
+                    {isRetroDesktopTheme ? 'Loadout' : 'LOADOUT'}
+                  </Text>
+                  <Button
+                    size="xs"
+                    variant={isRetroDesktopTheme ? 'unstyled' : 'outline'}
+                    colorScheme={isRetroDesktopTheme ? undefined : 'red'}
+                    onClick={() => setIsDesktopLoadoutOpen(false)}
+                    sx={isRetroDesktopTheme ? createRetroWindowsButtonSx() : undefined}
+                  >
+                    CLOSE
+                  </Button>
+                </Flex>
+                <Box flex="1" minH="0" overflowY="auto" overflowX="hidden">
+                  {loadoutPanelBody}
+                </Box>
+              </Box>
+            )}
+
             {/* Placement Mode Indicator */}
             {isTowerPlacementMode && (
               <Box
@@ -1685,26 +1941,6 @@ export default function GamePanelContent({
           </Box>
         )}
       </Flex>
-
-      {shouldRenderDesktopSidePanel && (
-        <Box
-          w="320px"
-          minW="320px"
-          flexShrink={0}
-          minH="0"
-          {...(isRetroDesktopTheme
-            ? retroSurfaceProps
-            : {
-                bg: 'rgba(0, 20, 40, 0.9)',
-                borderRadius: 'md',
-                border: '1px solid rgba(0, 255, 140, 0.2)',
-              })}
-          overflow="auto"
-          overflowX="hidden"
-        >
-          {loadoutPanelBody}
-        </Box>
-      )}
 
       {showMobileActionDock && (
         <MobileTowerDefenseDock

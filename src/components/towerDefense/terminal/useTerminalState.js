@@ -667,12 +667,9 @@ const useTerminalState = ({
     };
   }, [displayedText, isTyping, typingSpeed, visualSettings]);
 
-  useEffect(() => {
-    if (!displayedText && executionResult) {
-      setDisplayedText(executionResult);
-      lastResultRef.current = executionResult;
-    }
-  }, [displayedText, executionResult]);
+  // NOTE: displayedText is fed ONLY through messageQueueRef (see the
+  // executionResult effect above). Do not dump executionResult directly
+  // here — that double-prints lines already queued for typing.
 
   useEffect(() => {
     const cursorInterval = setInterval(() => {

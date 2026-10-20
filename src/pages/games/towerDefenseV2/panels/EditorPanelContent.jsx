@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Button, HStack, Tab, TabList, Tabs } from '@chakra-ui/react';
-
 import { CodeEditorPanel } from '../../../../components/towerDefense/ui';
 import {
   RETRO_WINDOW_BUTTON_ASSET,
@@ -19,23 +18,17 @@ export default function EditorPanelContent({
   terminalOutput,
   terminalRef,
   terminalResetKey,
-  codeSubmitted,
-  codeSubmissionSuccess,
   selectedTowerType,
   isTowerPlacementMode,
   onCodeChange,
   onCodeLineCommitted,
-  onStartWave,
-  onResetGame,
   onCancelPlacement,
-  problemTitle,
-  difficulty,
-  isDemo,
   onTerminalCommand,
   terminalInputEnabled,
   terminalInputPlaceholder,
   terminalInputDisabledReason,
   problemTabs = [],
+  problemTabStatuses = [],
   activeProblemIndex = 0,
   onProblemTabChange = null,
   // Refine Solution controls
@@ -54,6 +47,14 @@ export default function EditorPanelContent({
   functionTowerPlaced = false,
 }) {
   const isRetroDesktopTheme = shellTheme === 'retro-desktop';
+
+  const tabStatusBySlug = React.useMemo(() => {
+    const map = {};
+    (problemTabStatuses || []).forEach((status) => {
+      if (status?.slug) map[status.slug] = status.done === true;
+    });
+    return map;
+  }, [problemTabStatuses]);
 
   const funnel = useGuestFunnel();
   const hasTypedRef = React.useRef(false);
@@ -217,6 +218,7 @@ export default function EditorPanelContent({
                       : { bg: 'rgba(0, 255, 255, 0.2)', color: 'cyan.50' }
                   }
                 >
+                  {tabStatusBySlug[tab.slug] ? '✓ ' : problemTabs.length > 1 ? '• ' : ''}
                   {tab.title || `Problem ${index + 1}`}
                 </Tab>
               ))}
@@ -237,22 +239,13 @@ export default function EditorPanelContent({
           terminalAnimating={false}
           terminalRef={terminalRef}
           terminalResetKey={terminalResetKey}
-          codeSubmitted={codeSubmitted}
-          codeSubmissionSuccess={codeSubmissionSuccess}
-          canSubmitSolution={shouldShowVerificationControls}
-          currentWave={gameState.wave}
           lives={gameState.lives}
           selectedTowerType={selectedTowerType}
           isTowerPlacementMode={isTowerPlacementMode}
           onCodeChange={handleCodeChange}
           onCodeLineCommitted={onCodeLineCommitted}
-          onStartWave={onStartWave}
-          onResetGame={onResetGame}
           onCancelTowerPlacement={onCancelPlacement}
           gameStatus={gameState.status}
-          problemTitle={problemTitle}
-          difficulty={difficulty}
-          isDemo={isDemo}
           strictCodeGate={true}
           onTerminalCommand={onTerminalCommand}
           terminalInputEnabled={terminalInputEnabled}

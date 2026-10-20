@@ -118,16 +118,16 @@ const getTowerUnlockCalloutCopy = (towerType) => {
       };
     case 'FUNCTION':
       return {
-        title: 'BOILERPLATE CORE UNLOCKED',
+        title: 'FUNCTION TOWER UNLOCKED',
         message:
-          'Boilerplate Cores package logic into reusable blocks. This tower fits problems where you want named behavior you can call more than once.',
+          'Functions package logic into reusable blocks. This tower fits problems where you want named behavior you can call more than once.',
         subtext: 'Use it when you are organizing solution steps into clean, reusable chunks.',
       };
     case 'OBJECT':
       return {
-        title: 'BOILERPLATE INSTANCE UNLOCKED',
+        title: 'OBJECT TOWER UNLOCKED',
         message:
-          'Boilerplate Instances group related data and behavior. This tower is useful when a problem models entities with properties.',
+          'Objects group related data and behavior. This tower is useful when a problem models entities with properties.',
         subtext: 'Use it when you need structured state instead of loose standalone values.',
       };
     default:

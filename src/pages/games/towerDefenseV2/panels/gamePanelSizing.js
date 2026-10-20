@@ -14,7 +14,7 @@ export const resolveCanvasFitScale = ({
   const heightScale = availableCanvasHeight
     ? availableCanvasHeight / canvasHeight
     : Number.POSITIVE_INFINITY;
-  const maxCanvasFitScale = isMobileCanvasMode ? 2.25 : 1;
+  const maxCanvasFitScale = isMobileCanvasMode ? 2.25 : 2;
   const fitScale = Math.min(maxCanvasFitScale, widthScale, heightScale);
 
   if (isMobileCanvasMode) {

@@ -20,6 +20,7 @@ describe('VisualSettingsManager', () => {
     expect(settings.maxProjectiles).toBeGreaterThan(0);
     expect(settings.aiCodeSnippetGeneration).toBe(true);
     expect(settings.aiSnippetModel).toBe(null);
+    expect(settings.actionTooltips).toBe(true);
   });
 
   it('loads saved settings and merges missing ai flags', async () => {
@@ -39,6 +40,7 @@ describe('VisualSettingsManager', () => {
     expect(settings.aiCodeSnippetGeneration).toBe(true);
     expect(settings.aiCodeSnippetBeta).toBe(true);
     expect(settings.aiSnippetModel).toBe(null);
+    expect(settings.actionTooltips).toBe(true);
   });
 
   it('applies quality presets and persists via custom event', async () => {
@@ -71,6 +73,7 @@ describe('VisualSettingsManager', () => {
     manager.updateAICodeSnippetGeneration(false);
     manager.updateAIBasicSnippetFallback(true);
     manager.updateAISnippetModel('gpt-4.1');
+    manager.updateActionTooltips(false);
 
     const settings = manager.getSettings();
     expect(settings.renderScale).toBe(1.5);
@@ -81,6 +84,7 @@ describe('VisualSettingsManager', () => {
     expect(settings.aiCodeSnippetGeneration).toBe(false);
     expect(settings.aiBasicSnippetFallbackEnabled).toBe(true);
     expect(settings.aiSnippetModel).toBe('gpt-4.1');
+    expect(settings.actionTooltips).toBe(false);
     expect(settings.qualityPreset).toBe('custom');
   });
 

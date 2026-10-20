@@ -5,15 +5,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CodeEditorHeader from './CodeEditorHeader';
 
+vi.mock('../overlays/RateLimitIndicator', () => ({
+  default: () => <div>AI rate limit</div>,
+}));
+
 const renderHeader = (props = {}) =>
   render(
     <ChakraProvider>
-      <CodeEditorHeader
-        codeSubmitted={false}
-        codeSubmissionSuccess={null}
-        canSubmitSolution={true}
-        {...props}
-      />
+      <CodeEditorHeader {...props} />
     </ChakraProvider>
   );
 
@@ -60,25 +59,22 @@ describe('CodeEditorHeader mobile keyboard control', () => {
 
   it('renders a stable desktop header layout for fixed editor chrome', () => {
     renderHeader({
-      leftAddon: <div data-testid="left-addon">RIGHT: EDITOR</div>,
       rightAddon: <div data-testid="right-addon">NEURAL SYNTHESIS</div>,
     });
 
     const topRow = screen.getByTestId('code-editor-header-desktop-top-row');
     const controlRow = screen.getByTestId('code-editor-header-desktop-control-row');
 
-    expect(within(topRow).getByTestId('left-addon')).toBeInTheDocument();
     expect(within(topRow).getByText(/CODE_MATRIX/i)).toBeInTheDocument();
     expect(within(topRow).queryByTestId('right-addon')).not.toBeInTheDocument();
     expect(within(controlRow).getByTestId('right-addon')).toBeInTheDocument();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-    expect(within(controlRow).getByText(/READY_FOR_VERIFY/i)).toBeInTheDocument();
+    expect(within(controlRow).getByText(/AI rate limit/i)).toBeInTheDocument();
   });
 
   it('keeps the rate limit chrome while omitting desktop slot labels in portrait mobile mode', () => {
     renderHeader({
       showMobileKeyboardButton: true,
-      leftAddon: <div data-testid="left-addon">RIGHT: EDITOR</div>,
       rightAddon: <div data-testid="right-addon">NEURAL SYNTHESIS</div>,
     });
 
@@ -89,9 +85,9 @@ describe('CodeEditorHeader mobile keyboard control', () => {
       'code-editor-header-mobile-portrait-secondary-controls'
     );
 
-    expect(screen.queryByTestId('left-addon')).not.toBeInTheDocument();
+    expect(screen.getByText(/CODE_MATRIX/i)).toBeInTheDocument();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-    expect(within(primaryControls).getByText(/READY_FOR_VERIFY/i)).toBeInTheDocument();
+    expect(within(primaryControls).getByText(/AI rate limit/i)).toBeInTheDocument();
     expect(within(secondaryControls).getByTestId('right-addon')).toBeInTheDocument();
     expect(
       within(secondaryControls).getByRole('button', { name: /hide keyboard/i })

@@ -179,6 +179,29 @@ export default function useTowerDefenseV2GameState({
     user,
   ]);
 
+  const xpProgress = useMemo(() => {
+    if (isDemo || learningPathOnboarding) return { level: 1, into: 0, toNext: 0 };
+
+    const guestSummary = guestCtx?.xpSummary;
+    if (!user && guestSummary) {
+      return {
+        level: playerLevel,
+        into: Number(guestSummary.xpIntoLevel) || 0,
+        toNext: Number(guestSummary.xpToNextLevel) || 0,
+      };
+    }
+
+    const summary = user?.progress && typeof user.progress === 'object' ? user.progress : null;
+    const toNext =
+      Number.isFinite(Number(summary?.xpToNextLevel)) && Number(summary.xpToNextLevel) > 0
+        ? Number(summary.xpToNextLevel)
+        : 150;
+    const into = Number.isFinite(Number(summary?.xpIntoLevel))
+      ? Math.max(0, Math.min(Number(summary.xpIntoLevel), toNext))
+      : 0;
+    return { level: playerLevel, into, toNext };
+  }, [guestCtx?.xpSummary, isDemo, learningPathOnboarding, playerLevel, user]);
+
   const learningUnlockKey = useMemo(() => {
     if (!isLearningMode) return null;
     const pathId =
@@ -699,6 +722,8 @@ export default function useTowerDefenseV2GameState({
     sharedUnlockActive,
     resetSharedUnlock,
     resetMultiProblemEditors,
+    slotResultsVersion,
+    getSlotResult,
   } = useTowerDefenseV2MultiProblemState({
     isMultiProblemTower,
     learningProblemSlugs,
@@ -732,6 +757,24 @@ export default function useTowerDefenseV2GameState({
     submitSolution,
     learningUnlockActive,
   });
+
+  const problemTabStatuses = useMemo(() => {
+    if (!problemTabs.length) return [];
+    return problemTabs.map((tab, index) => {
+      const isActiveTab = index === activeProblemIndex;
+      const done = isActiveTab
+        ? Boolean(codeSubmitted && codeSubmissionSuccess === true)
+        : getSlotResult(tab.slug)?.codeSubmissionSuccess === true;
+      return { slug: tab.slug, title: tab.title, done };
+    });
+  }, [
+    problemTabs,
+    activeProblemIndex,
+    codeSubmitted,
+    codeSubmissionSuccess,
+    slotResultsVersion,
+    getSlotResult,
+  ]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -1391,6 +1434,7 @@ export default function useTowerDefenseV2GameState({
     shouldShowVerificationControls,
     setCode,
     handleCodeLineCommitted,
+    xpProgress,
     lockedLearningLanguage,
     isDemo,
     isHomepageDemo,
@@ -1403,6 +1447,7 @@ export default function useTowerDefenseV2GameState({
     showProblemIntroNote,
     activeTitleSlug,
     problemTabs,
+    problemTabStatuses,
     activeProblemIndex,
     setActiveProblemIndex,
     problemError,
@@ -1420,6 +1465,7 @@ export default function useTowerDefenseV2GameState({
     codeSubmitted,
     codeSubmissionSuccess,
     playerLevel,
+    xpProgress,
     initialCodeGenerated: effectiveInitialCodeGenerated,
     functionTowerPlaced,
     objectTowerPlaced,

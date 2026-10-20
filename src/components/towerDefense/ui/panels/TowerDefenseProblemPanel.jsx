@@ -7,13 +7,13 @@
  */
 
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { Box, Flex, Heading, List, ListIcon, ListItem, Progress, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, List, ListIcon, ListItem, Text } from '@chakra-ui/react';
 import React from 'react';
 import { FaShieldAlt, FaTerminal } from 'react-icons/fa';
 import MarkdownMessage from '../../../chat/MarkdownMessage';
+import BugReportButton from '../../../feedback/BugReportButton';
 import {
   RETRO_DESKTOP_BADGE_ASSET,
-  RETRO_PROGRESS_FILL_ASSET,
   RETRO_WINDOW_BASE_ASSET,
 } from '../../../../utils/assets/towerDefenseAssetUrls';
 
@@ -140,29 +140,12 @@ const buildLearningFallbackExamples = (problem) => {
   });
 };
 
-const getBreachProgress = ({ currentWave = 1, totalWaves = 5, isMissionComplete = false }) => {
-  const parsedTotalWaves = Number(totalWaves);
-  const safeTotalWaves =
-    Number.isFinite(parsedTotalWaves) && parsedTotalWaves > 0 ? parsedTotalWaves : 1;
-
-  if (isMissionComplete) {
-    return 100;
-  }
-
-  const parsedCurrentWave = Number(currentWave);
-  const safeCurrentWave =
-    Number.isFinite(parsedCurrentWave) && parsedCurrentWave > 0 ? parsedCurrentWave : 1;
-  const completedWaves = Math.min(Math.max(safeCurrentWave - 1, 0), safeTotalWaves);
-
-  return Math.round((completedWaves / safeTotalWaves) * 100);
-};
-
 const TowerDefenseProblemPanel = ({
   problem,
   problemDescription,
-  currentWave = 1,
-  totalWaves = 5,
-  isMissionComplete = false,
+  isLearningMode = false,
+  formattedTime,
+  currentActionType,
   isDemo = false,
   shellTheme = 'default',
   compactMobileLayout = false,
@@ -189,8 +172,6 @@ const TowerDefenseProblemPanel = ({
 
   const displayTitle = problemDescription?.title || problem?.title || 'Tower Defense Hack';
   const classicReferenceName = getClassicReferenceName(problem, problemDescription);
-  const hackingContext =
-    problemDescription?.hackingContext || 'Breach the system by building a tower defense solution.';
   const isLearningProblem = problem?.source === 'LEARNING' || problem?.isLearningProblem;
   const baseExamples =
     problemDescription?.examples?.length > 0
@@ -210,7 +191,6 @@ const TowerDefenseProblemPanel = ({
     : isLearningProblem
       ? buildLearningFallbackExamples(problem)
       : baseExamples;
-  const breachProgress = getBreachProgress({ currentWave, totalWaves, isMissionComplete });
 
   if (!hasProblemLoaded) {
     return (
@@ -317,41 +297,71 @@ const TowerDefenseProblemPanel = ({
                   {displayTitle}
                 </Text>
               </Flex>
-              <Box
-                px={compactMobileLayout ? 1.5 : 2}
-                py={compactMobileLayout ? 0.75 : 1}
-                bg="#efeae0"
-                border="1px solid #7a7a7a"
-                boxShadow="inset 1px 1px 0 rgba(255,255,255,0.72), inset -1px -1px 0 rgba(84,84,84,0.22)"
-                flexShrink={0}
-              >
-                <Text
-                  color="#4a4f57"
-                  fontFamily="'Tahoma', 'MS Sans Serif', sans-serif"
-                  fontSize={compactMobileLayout ? '9px' : '10px'}
-                  fontWeight="700"
-                  letterSpacing="0.08em"
-                  textTransform="uppercase"
-                >
-                  Mission File
-                </Text>
-              </Box>
+              <BugReportButton
+                pageType="tower-defense"
+                pageContext={{
+                  mode: isLearningMode ? 'learning' : 'standard',
+                  formattedTime,
+                }}
+                clientState={{
+                  actionState: currentActionType,
+                }}
+                buttonLabel="Report Bug"
+                buttonProps={{
+                  size: 'md',
+                  bg: '#d4d0c8',
+                  color: '#1f2430',
+                  border: '1px solid rgba(31, 36, 48, 0.35)',
+                  borderRadius: '0',
+                  fontFamily: "'Tahoma', 'MS Sans Serif', sans-serif",
+                  fontSize: '10px',
+                  fontWeight: '700',
+                  px: 2,
+                  py: 1,
+                }}
+              />
             </Flex>
           </Box>
         ) : (
-          <Flex alignItems="center" gap={2} p={compactMobileLayout ? 2 : 3}>
-            <FaTerminal color="#00ccff" />
-            <Text
-              bgGradient="linear(to-r, cyan.400, green.400)"
-              bgClip="text"
-              fontFamily="'Orbitron', sans-serif"
-              textShadow="0 0 5px #00ccff"
-              letterSpacing="1px"
-              fontSize={compactMobileLayout ? 'sm' : 'md'}
-              fontWeight="bold"
-            >
-              Mission: {displayTitle}
-            </Text>
+          <Flex
+            alignItems="center"
+            justifyContent="space-between"
+            gap={2}
+            p={compactMobileLayout ? 2 : 3}
+          >
+            <Flex alignItems="center" gap={2} minW="0" flex="1">
+              <FaTerminal color="#00ccff" />
+              <Text
+                bgGradient="linear(to-r, cyan.400, green.400)"
+                bgClip="text"
+                fontFamily="'Orbitron', sans-serif"
+                textShadow="0 0 5px #00ccff"
+                letterSpacing="1px"
+                fontSize={compactMobileLayout ? 'sm' : 'md'}
+                fontWeight="bold"
+                noOfLines={1}
+              >
+                Mission: {displayTitle}
+              </Text>
+            </Flex>
+            <BugReportButton
+              pageType="tower-defense"
+              pageContext={{
+                mode: isLearningMode ? 'learning' : 'standard',
+                formattedTime,
+              }}
+              clientState={{
+                actionState: currentActionType,
+              }}
+              buttonLabel="Report Bug"
+              buttonProps={{
+                size: 'md',
+                bg: 'transparent',
+                color: '#ffcc00',
+                border: '1px solid #ffcc00',
+                _hover: { bg: 'rgba(255, 204, 0, 0.1)' },
+              }}
+            />
           </Flex>
         )}
         {classicReferenceName && (
@@ -371,58 +381,6 @@ const TowerDefenseProblemPanel = ({
 
       {/* Content */}
       <Box p={contentPadding}>
-        {/* Hacking Context */}
-        <Box
-          mb={sectionSpacing}
-          p={insetPanelPadding}
-          {...(isRetroDesktopTheme
-            ? retroInsetPanelProps
-            : {
-                bg: 'rgba(0,200,255,0.1)',
-                borderRadius: 'md',
-                border: '1px solid',
-                borderColor: 'cyan.900',
-                boxShadow: '0 0 10px rgba(0, 170, 255, 0.2) inset',
-              })}
-        >
-          <Text
-            fontStyle={isRetroDesktopTheme ? 'normal' : 'italic'}
-            color={isRetroDesktopTheme ? '#1f2128' : 'cyan.300'}
-            mb={2}
-            fontFamily={uiFontFamily}
-            textShadow={isRetroDesktopTheme ? 'none' : '0 0 3px #00ccff'}
-            fontSize="sm"
-          >
-            {hackingContext}
-          </Text>
-          {isRetroDesktopTheme ? (
-            <Box>
-              <Text mb={1} fontSize="10px" color="#3f4550" fontFamily={uiFontFamily}>
-                Progress
-              </Text>
-              <Box h="14px" border="2px solid #1d2128" bg="#12161f" overflow="hidden">
-                <Box
-                  h="100%"
-                  w={`${breachProgress}%`}
-                  bgImage={`url(${RETRO_PROGRESS_FILL_ASSET})`}
-                  bgRepeat="repeat-x"
-                  bgSize="auto 100%"
-                />
-              </Box>
-              <Text mt={1.5} fontSize="10px" color="#0b2ba8" fontFamily={uiFontFamily}>
-                Mission Progress: {breachProgress}%
-              </Text>
-            </Box>
-          ) : (
-            <>
-              <Progress size="xs" colorScheme="cyan" value={breachProgress} mb={1} />
-              <Text fontSize="xs" color="#00ccff" fontFamily="'Orbitron', sans-serif">
-                Breach Progress: {breachProgress}%
-              </Text>
-            </>
-          )}
-        </Box>
-
         {/* Problem Content */}
         <Box
           p={insetPanelPadding}

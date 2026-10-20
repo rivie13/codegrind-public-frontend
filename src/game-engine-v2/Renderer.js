@@ -186,9 +186,9 @@ export class Renderer {
     this.logicalWidth = this.gridCols * this.cellSize;
     this.logicalHeight = this.gridRows * this.cellSize;
 
-    // Set CSS size once
-    this.canvas.style.width = `${this.logicalWidth}px`;
-    this.canvas.style.height = `${this.logicalHeight}px`;
+    // NOTE: CSS display size is owned by layout (React). The engine must not
+    // write canvas.style here — doing so stomps the fitted size and React
+    // never repairs it because its own values did not change.
 
     // Resize backing store with current scale
     this.updateRenderScale(this.renderScale);

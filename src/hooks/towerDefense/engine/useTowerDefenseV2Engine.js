@@ -308,7 +308,6 @@ export default function useTowerDefenseV2Engine({
       bootSequenceRef.current = bootSequenceId;
       addTerminalMessage('[KERNEL] _/// CYBERSPACE DEFENSE MATRIX V2 ////_');
       addTerminalMessage('[SYSTEM] Neural interface compiled. Intrusion vectors loaded.');
-      addTerminalMessage('[SYSTEM] Jack in: use terminal or tower selector to deploy defenses.');
       addTerminalMessage(`[KERNEL] Path lattice synced: ${pathNodes.length} waypoints locked.`);
     }
 

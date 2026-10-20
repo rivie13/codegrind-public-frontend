@@ -19,7 +19,7 @@ import {
   SliderTrack,
   Switch,
   Text,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
 import React from 'react';
 import { cyberpunkSwitchStyle } from './SettingsMenuShared';
@@ -55,14 +55,16 @@ const VisualSettingsSection = ({
   setHitEffects,
   combatText,
   setCombatText,
+  actionTooltips,
+  handleActionTooltipsToggle,
   handleProjectileSettingsChange,
-  handleSpecialEffectsChange
+  handleSpecialEffectsChange,
 }) => (
   <AccordionItem border="none" mt={2}>
     <h2>
-      <AccordionButton 
-        _expanded={{ bg: "#0f4667", color: "white" }}
-        _hover={{ bg: "#0D1321" }}
+      <AccordionButton
+        _expanded={{ bg: '#0f4667', color: 'white' }}
+        _hover={{ bg: '#0D1321' }}
         borderRadius="md"
         sx={{
           position: 'relative',
@@ -76,12 +78,23 @@ const VisualSettingsSection = ({
             width: '3px',
             background: '#00ffcc',
             boxShadow: '0 0 8px #00ffcc',
-          }
+          },
         }}
       >
         <Box flex="1" textAlign="left" fontWeight="bold">
           <Flex align="center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ffcc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#00ffcc"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginRight: '8px' }}
+            >
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
             </svg>
@@ -94,9 +107,9 @@ const VisualSettingsSection = ({
     <AccordionPanel pb={4}>
       <VStack spacing={6} align="stretch" py={4}>
         <Box>
-          <Heading 
-            size="sm" 
-            mb={4} 
+          <Heading
+            size="sm"
+            mb={4}
             color="#00ffcc"
             textShadow="0 0 5px rgba(0, 255, 204, 0.4)"
             fontFamily="'Orbitron', sans-serif"
@@ -104,45 +117,45 @@ const VisualSettingsSection = ({
           >
             Visual Quality
           </Heading>
-          
+
           <HStack spacing={2} mb={4}>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               colorScheme={qualityPreset === 'high' ? 'green' : 'gray'}
               onClick={() => handleQualityPresetChange('high')}
             >
               High
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               colorScheme={qualityPreset === 'medium' ? 'blue' : 'gray'}
               onClick={() => handleQualityPresetChange('medium')}
             >
               Medium
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               colorScheme={qualityPreset === 'low' ? 'yellow' : 'gray'}
               onClick={() => handleQualityPresetChange('low')}
             >
               Low
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               colorScheme={qualityPreset === 'minimal' ? 'red' : 'gray'}
               onClick={() => handleQualityPresetChange('minimal')}
             >
               Minimal
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               colorScheme={qualityPreset === 'auto' ? 'purple' : 'gray'}
               onClick={() => handleQualityPresetChange('auto')}
             >
               Auto
             </Button>
           </HStack>
-          
+
           <FormControl mb={4}>
             <FormLabel htmlFor="render-scale" mb={2}>
               Render Scale
@@ -166,19 +179,23 @@ const VisualSettingsSection = ({
               </SliderThumb>
             </Slider>
           </FormControl>
-          
+
           {qualityPreset === 'custom' && (
-            <Badge colorScheme="purple" mb={2}>Custom Settings</Badge>
+            <Badge colorScheme="purple" mb={2}>
+              Custom Settings
+            </Badge>
           )}
         </Box>
-        
+
         {/* Projectile and Effects Accordion */}
         <Accordion allowToggle defaultIndex={[]} mt={2}>
           <AccordionItem border="1px solid" borderColor="#3D4756" borderRadius="md" mb={3}>
             <h2>
-              <AccordionButton _hover={{ bg: "#2D3748" }}>
+              <AccordionButton _hover={{ bg: '#2D3748' }}>
                 <Box flex="1" textAlign="left">
-                  <Heading size="sm" color="#00ccff">Projectile & Effects Settings</Heading>
+                  <Heading size="sm" color="#00ccff">
+                    Projectile & Effects Settings
+                  </Heading>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
@@ -211,7 +228,7 @@ const VisualSettingsSection = ({
                     </SliderThumb>
                   </Slider>
                 </FormControl>
-                
+
                 <FormControl display="flex" alignItems="center" mb={2}>
                   <FormLabel htmlFor="particle-effects-toggle" mb="0">
                     Particle Effects
@@ -227,7 +244,7 @@ const VisualSettingsSection = ({
                     sx={cyberpunkSwitchStyle}
                   />
                 </FormControl>
-                
+
                 <FormControl isDisabled={!particleEffects}>
                   <FormLabel htmlFor="particle-intensity" mb={2}>
                     Particle Intensity
@@ -254,9 +271,9 @@ const VisualSettingsSection = ({
                     </SliderThumb>
                   </Slider>
                 </FormControl>
-                
+
                 <Divider borderColor="#3D4756" />
-                
+
                 <FormControl>
                   <FormLabel htmlFor="projectile-complexity" mb={2}>
                     Projectile Detail Level
@@ -286,7 +303,7 @@ const VisualSettingsSection = ({
                     </SliderThumb>
                   </Slider>
                 </FormControl>
-                
+
                 <HStack spacing={4}>
                   <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="projectile-trails-toggle" mb="0" fontSize="sm">
@@ -304,7 +321,7 @@ const VisualSettingsSection = ({
                       sx={cyberpunkSwitchStyle}
                     />
                   </FormControl>
-                  
+
                   <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="projectile-glow-toggle" mb="0" fontSize="sm">
                       Glow
@@ -321,7 +338,7 @@ const VisualSettingsSection = ({
                       sx={cyberpunkSwitchStyle}
                     />
                   </FormControl>
-                  
+
                   <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="projectile-animations-toggle" mb="0" fontSize="sm">
                       Animations
@@ -339,7 +356,7 @@ const VisualSettingsSection = ({
                     />
                   </FormControl>
                 </HStack>
-                
+
                 <FormControl>
                   <FormLabel htmlFor="explosion-size" mb={2}>
                     Explosion Size
@@ -366,7 +383,7 @@ const VisualSettingsSection = ({
                     </SliderThumb>
                   </Slider>
                 </FormControl>
-                
+
                 <FormControl display="flex" alignItems="center">
                   <FormLabel htmlFor="explosion-particles-toggle" mb="0">
                     Explosion Particles
@@ -441,7 +458,24 @@ const VisualSettingsSection = ({
                     sx={cyberpunkSwitchStyle}
                   />
                 </FormControl>
-                
+
+                <FormControl display="flex" alignItems="center">
+                  <FormLabel htmlFor="action-tooltips-toggle" mb="0" fontSize="sm">
+                    Action Tooltips
+                    <Text fontSize="xs" color="gray.400">
+                      What towers & controls do
+                    </Text>
+                  </FormLabel>
+                  <Switch
+                    id="action-tooltips-toggle"
+                    isChecked={actionTooltips}
+                    onChange={handleActionTooltipsToggle}
+                    colorScheme="cyan"
+                    size="sm"
+                    sx={cyberpunkSwitchStyle}
+                  />
+                </FormControl>
+
                 <FormControl>
                   <FormLabel htmlFor="projectile-duration" mb={2}>
                     Projectile Duration

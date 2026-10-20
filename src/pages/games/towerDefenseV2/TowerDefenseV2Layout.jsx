@@ -17,7 +17,6 @@ import {
 } from 'react-icons/fa';
 import { releaseScreenOrientation } from '../../../utils/mobile/screenOrientation';
 import { buildResponsiveProfile } from '../../../utils/web/responsiveProfile';
-import { EditorPanelSlotChrome, GamePanelSlotChrome, ProblemPanelSlotChrome } from './panels';
 import { RETRO_DESKTOP_BADGE_ASSET } from '../../../utils/assets/towerDefenseAssetUrls';
 import {
   readTowerDefenseShellVisible,
@@ -71,10 +70,104 @@ const detectHandheldRuntimeDevice = () => {
   return buildResponsiveProfile().isHandheldDevice;
 };
 
-function CollapsiblePanel({ panelKey, title, meta, open, onToggle, chrome, children, shellTheme }) {
+const getClientY = (event) => {
+  if (typeof event?.clientY === 'number') return event.clientY;
+  if (event?.touches?.length) return event.touches[0].clientY;
+  if (event?.changedTouches?.length) return event.changedTouches[0].clientY;
+  return null;
+};
+
+function CollapsiblePanel({
+  panelKey,
+  title,
+  meta,
+  open,
+  onToggle,
+  chrome,
+  children,
+  shellTheme,
+  defaultOpenHeight = 320,
+  maxOpenHeight = 720,
+  resizeHandlePosition = 'bottom',
+  overlayBody = false,
+}) {
   const isRetro = shellTheme === 'retro-desktop';
   const Icon = meta?.icon;
   const OpenIcon = open ? FaChevronDown : FaChevronRight;
+  const [openHeight, setOpenHeight] = useState(defaultOpenHeight);
+  const resizingRef = useRef(false);
+  const resizeStartRef = useRef({ y: 0, height: defaultOpenHeight });
+
+  const handleVerticalResizeStart = useCallback(
+    (event) => {
+      if (event?.cancelable) event.preventDefault();
+      const clientY = getClientY(event);
+      if (clientY === null) return;
+      resizingRef.current = true;
+      resizeStartRef.current = { y: clientY, height: openHeight };
+    },
+    [openHeight]
+  );
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const handlePointerMove = (event) => {
+      if (!resizingRef.current) return;
+      const clientY = getClientY(event);
+      if (clientY === null) return;
+      if (event?.type === 'touchmove' && event.cancelable) event.preventDefault();
+      const delta =
+        resizeHandlePosition === 'top'
+          ? resizeStartRef.current.y - clientY
+          : clientY - resizeStartRef.current.y;
+      setOpenHeight(Math.min(maxOpenHeight, Math.max(160, resizeStartRef.current.height + delta)));
+    };
+    const handlePointerUp = () => {
+      resizingRef.current = false;
+    };
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchmove', handlePointerMove, { passive: false });
+    window.addEventListener('touchend', handlePointerUp);
+    window.addEventListener('touchcancel', handlePointerUp);
+    return () => {
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchend', handlePointerUp);
+      window.removeEventListener('touchcancel', handlePointerUp);
+    };
+  }, [open, maxOpenHeight, resizeHandlePosition]);
+
+  const resizeHandle = (
+    <Box
+      data-collapsible-resize-handle={panelKey}
+      h="10px"
+      cursor="row-resize"
+      flexShrink={0}
+      bg={isRetro ? '#b6b0a4' : 'rgba(255,255,255,0.06)'}
+      borderTop={isRetro ? '1px solid #7b7468' : '1px solid rgba(255,255,255,0.1)'}
+      borderBottom={
+        resizeHandlePosition === 'top'
+          ? isRetro
+            ? '2px solid #686868'
+            : '1px solid rgba(255,255,255,0.1)'
+          : undefined
+      }
+      onMouseDown={handleVerticalResizeStart}
+      onTouchStart={handleVerticalResizeStart}
+      onDoubleClick={() => setOpenHeight(defaultOpenHeight)}
+      sx={{ touchAction: 'none' }}
+      _hover={{ bg: isRetro ? '#c0baaf' : 'rgba(255,255,255,0.12)' }}
+      title="Drag to resize"
+    >
+      <Box w="36px" h="2px" mx="auto" mt="4px" bg={isRetro ? '#4d4d4d' : 'rgba(255,255,255,0.4)'} />
+    </Box>
+  );
+
+  const clampedOpenHeight = Math.min(openHeight, maxOpenHeight);
+  const overlayBodyActive = open && overlayBody;
+
   return (
     <Box
       data-collapsible-panel={panelKey}
@@ -83,9 +176,12 @@ function CollapsiblePanel({ panelKey, title, meta, open, onToggle, chrome, child
       borderRadius={isRetro ? '0' : 'md'}
       border={isRetro ? '2px solid' : '1px solid'}
       borderColor={isRetro ? '#686868' : `${meta?.color || '#00ccff'}44`}
-      overflow="hidden"
+      overflow={overlayBodyActive ? 'visible' : 'hidden'}
+      position="relative"
       display="flex"
       flexDirection="column"
+      flexShrink={0}
+      zIndex={overlayBodyActive ? 6 : undefined}
       boxShadow={
         isRetro
           ? 'inset 1px 1px 0 rgba(255, 255, 255, 0.76), inset -1px -1px 0 rgba(110, 110, 110, 0.34), 0 10px 20px rgba(0, 0, 0, 0.14)'
@@ -130,10 +226,72 @@ function CollapsiblePanel({ panelKey, title, meta, open, onToggle, chrome, child
         </Text>
       </Button>
       {open ? (
-        <Box display="flex" flexDirection="column" minH="0" overflow="hidden">
-          {chrome}
-          {children}
-        </Box>
+        overlayBodyActive ? (
+          <>
+            <Box
+              data-collapsible-resize-handle={panelKey}
+              position="absolute"
+              left={0}
+              right={0}
+              bottom={`calc(100% + ${clampedOpenHeight}px)`}
+              h="10px"
+              cursor="row-resize"
+              bg={isRetro ? '#b6b0a4' : 'rgba(255,255,255,0.06)'}
+              borderTop={isRetro ? '1px solid #7b7468' : '1px solid rgba(255,255,255,0.1)'}
+              borderBottom={isRetro ? '2px solid #686868' : '1px solid rgba(255,255,255,0.1)'}
+              onMouseDown={handleVerticalResizeStart}
+              onTouchStart={handleVerticalResizeStart}
+              onDoubleClick={() => setOpenHeight(defaultOpenHeight)}
+              sx={{ touchAction: 'none' }}
+              _hover={{ bg: isRetro ? '#c0baaf' : 'rgba(255,255,255,0.12)' }}
+              title="Drag to resize"
+              zIndex={7}
+            >
+              <Box
+                w="36px"
+                h="2px"
+                mx="auto"
+                mt="4px"
+                bg={isRetro ? '#4d4d4d' : 'rgba(255,255,255,0.4)'}
+              />
+            </Box>
+            <Box
+              display="flex"
+              flexDirection="column"
+              minH="0"
+              position="absolute"
+              data-overlay-body={panelKey}
+              left={0}
+              right={0}
+              bottom="100%"
+              height={`${clampedOpenHeight}px`}
+              overflowY="auto"
+              overflowX="hidden"
+              bg={isRetro ? '#d4d0c8' : 'rgba(0, 10, 20, 0.97)'}
+              borderTop={isRetro ? '2px solid #686868' : '1px solid rgba(255,255,255,0.1)'}
+              zIndex={6}
+            >
+              {chrome}
+              {children}
+            </Box>
+          </>
+        ) : (
+          <>
+            {resizeHandlePosition === 'top' ? resizeHandle : null}
+            <Box
+              display="flex"
+              flexDirection="column"
+              minH="0"
+              height={`${clampedOpenHeight}px`}
+              overflowY="auto"
+              overflowX="hidden"
+            >
+              {chrome}
+              {children}
+            </Box>
+            {resizeHandlePosition === 'top' ? null : resizeHandle}
+          </>
+        )
       ) : null}
     </Box>
   );
@@ -144,7 +302,6 @@ export default function TowerDefenseV2Layout({
   editorContent,
   chatContent,
   problemContent,
-  panelActionsProps,
   shellTheme = 'default',
   allowEmbeddedHandheldPageScroll = false,
   desktopShellSizingMode = 'embedded',
@@ -156,11 +313,6 @@ export default function TowerDefenseV2Layout({
   onProblemOpenChange,
   onChatOpenChange,
 }) {
-  const panelChromeByType = {
-    game: <GamePanelSlotChrome {...panelActionsProps} shellTheme={shellTheme} />,
-    editor: <EditorPanelSlotChrome {...panelActionsProps} shellTheme={shellTheme} />,
-    problem: <ProblemPanelSlotChrome {...panelActionsProps} shellTheme={shellTheme} />,
-  };
   const isRetroDesktopTheme = shellTheme === 'retro-desktop';
   const retroDesktopStageMinHeight = resolveRetroDesktopStageMinHeight(desktopShellSizingMode);
 
@@ -171,6 +323,8 @@ export default function TowerDefenseV2Layout({
   );
   const [internalProblemOpen, setInternalProblemOpen] = useState(defaultProblemOpen);
   const [internalChatOpen, setInternalChatOpen] = useState(defaultChatOpen);
+  const [stageHeight, setStageHeight] = useState(0);
+  const stageRef = useRef(null);
   const isResizingRef = useRef(false);
   const leftContainerRef = useRef(null);
   const chatFocusShellVisibilityRef = useRef(null);
@@ -194,6 +348,23 @@ export default function TowerDefenseV2Layout({
     },
     [controlledChatOpen, onChatOpenChange]
   );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const element = stageRef.current;
+    if (!element || typeof ResizeObserver === 'undefined') return undefined;
+    const updateStageHeight = () => {
+      setStageHeight(element.getBoundingClientRect().height || 0);
+    };
+    updateStageHeight();
+    const observer = new ResizeObserver(updateStageHeight);
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const maxCollapsibleHeight = stageHeight > 0 ? Math.max(220, stageHeight - 320) : 720;
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -331,14 +502,12 @@ export default function TowerDefenseV2Layout({
         ...(extraSx || {}),
       }}
     >
-      {panelChromeByType?.game}
       {withMobileProp(gameContent)}
     </Box>
   );
 
   const renderEditorPanel = () => (
     <Box data-fixed-panel="editor" flex="1" minH="0" sx={panelBoxSx(PANEL_META.editor.color)}>
-      {panelChromeByType?.editor}
       {withMobileProp(editorContent)}
     </Box>
   );
@@ -351,8 +520,10 @@ export default function TowerDefenseV2Layout({
         meta={PANEL_META.problem}
         open={problemOpen}
         onToggle={() => setProblemOpen(!problemOpen)}
-        chrome={panelChromeByType?.problem}
+        chrome={null}
         shellTheme={shellTheme}
+        defaultOpenHeight={400}
+        maxOpenHeight={maxCollapsibleHeight}
       >
         {withMobileProp(problemContent)}
       </CollapsiblePanel>
@@ -368,6 +539,10 @@ export default function TowerDefenseV2Layout({
         onToggle={() => setChatOpen(!chatOpen)}
         chrome={null}
         shellTheme={shellTheme}
+        defaultOpenHeight={280}
+        maxOpenHeight={maxCollapsibleHeight}
+        resizeHandlePosition="top"
+        overlayBody={!isMobileLayout}
       >
         {chatContent}
       </CollapsiblePanel>
@@ -413,32 +588,6 @@ export default function TowerDefenseV2Layout({
             {isHandheldRuntimeDevice ? 'CodeGrind Mobile Runtime' : 'CodeGrind Desktop Runtime'}
           </Text>
         </HStack>
-      </Flex>
-      <Flex
-        align={{ base: 'start', md: 'center' }}
-        justify="space-between"
-        direction={{ base: 'column', md: 'row' }}
-        gap={2}
-        px={{ base: 3, md: 4 }}
-        py={{ base: 2.5, md: 3 }}
-      >
-        <Text
-          color="#1a1a1a"
-          fontFamily="'Tahoma', 'MS Sans Serif', sans-serif"
-          fontSize="xs"
-          letterSpacing="0.04em"
-          textTransform="uppercase"
-        >
-          Tower defense mission workspace
-        </Text>
-        <Text
-          color="#3f3f3f"
-          fontFamily="'Tahoma', 'MS Sans Serif', sans-serif"
-          fontSize="xs"
-          letterSpacing="0.04em"
-        >
-          Retro shell active
-        </Text>
       </Flex>
     </Flex>
   ) : null;
@@ -519,15 +668,21 @@ export default function TowerDefenseV2Layout({
         }
       >
         <Flex
+          ref={stageRef}
+          data-td-stage="workspace"
           gap={isRetroDesktopTheme ? 2.5 : 4}
-          flex="1"
-          minH={isRetroDesktopTheme ? retroDesktopStageMinHeight : 0}
-          h={isRetroDesktopTheme ? undefined : 'clamp(620px, 80vh, 1000px)'}
-          sx={{
-            '@media (max-height: 800px)': {
-              height: isRetroDesktopTheme ? undefined : '900px',
-            },
-          }}
+          flex={desktopShellSizingMode === 'standalone' ? 'none' : '1'}
+          minH={0}
+          h={
+            desktopShellSizingMode === 'standalone'
+              ? //even in retro mode, we seem to be in standalone always.... - 70 px is what got me to 'proper height' of the content on the page
+                //question is why? and how do we clean it up?
+                'clamp(620px, calc(100dvh - 70px), 1200px)'
+              : isRetroDesktopTheme
+                ? retroDesktopStageMinHeight
+                : 'clamp(620px, 80vh, 1000px)'
+          }
+          overflow="hidden"
         >
           <Box
             flex="0 0 auto"

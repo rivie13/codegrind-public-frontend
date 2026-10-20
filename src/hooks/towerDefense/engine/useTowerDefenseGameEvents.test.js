@@ -18,22 +18,19 @@ import useTowerDefenseGameEvents from './useTowerDefenseGameEvents';
 describe('useTowerDefenseGameEvents', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('coalesces combat terminal events into batched summaries', () => {
+  it('keeps combat terminal-silent while preserving combat sounds', () => {
     const addTerminalMessage = vi.fn();
-    const livesRef = { current: 5 };
 
     const { result } = renderHook(() =>
       useTowerDefenseGameEvents({
         addTerminalMessage,
         totalWavesByDifficulty: 7,
-        livesRef,
       })
     );
 
@@ -47,39 +44,17 @@ describe('useTowerDefenseGameEvents', () => {
 
     expect(addTerminalMessage).not.toHaveBeenCalled();
     expect(processGameEvent).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(180);
-    });
-
-    expect(addTerminalMessage).toHaveBeenCalledTimes(3);
-    expect(addTerminalMessage).toHaveBeenNthCalledWith(
-      1,
-      expect.stringContaining('1 Security daemon, 1 Edge-case scanner deployed')
-    );
-    expect(addTerminalMessage).toHaveBeenNthCalledWith(
-      2,
-      '[BREACH] 2 security protocols neutralized. [12] databits extracted.'
-    );
-    expect(addTerminalMessage).toHaveBeenNthCalledWith(
-      3,
-      expect.stringContaining(
-        '[ALERT] SYSTEM BREACH! 1 intrusion countermeasure bypassed defenses.'
-      )
-    );
     expect(audioManager.playSoundEffect).toHaveBeenCalledWith('enemy-defeated');
     expect(audioManager.playSoundEffect).toHaveBeenCalledWith('enemy-reach-end');
   });
 
-  it('flushes pending combat events before wave completion messaging', () => {
+  it('prints one wave-complete line with no combat spam', () => {
     const addTerminalMessage = vi.fn();
-    const livesRef = { current: 9 };
 
     const { result } = renderHook(() =>
       useTowerDefenseGameEvents({
         addTerminalMessage,
         totalWavesByDifficulty: 7,
-        livesRef,
       })
     );
 
@@ -88,12 +63,8 @@ describe('useTowerDefenseGameEvents', () => {
       result.current.handleWaveComplete({ wave: 2, bonus: 40 });
     });
 
-    expect(addTerminalMessage).toHaveBeenNthCalledWith(
-      1,
-      '[BREACH] Security protocol neutralized. [9] databits extracted.'
-    );
-    expect(addTerminalMessage).toHaveBeenNthCalledWith(
-      2,
+    expect(addTerminalMessage).toHaveBeenCalledTimes(1);
+    expect(addTerminalMessage).toHaveBeenCalledWith(
       '[SUCCESS] Wave 2 neutralized. System stability maintained. +40 databits extracted.'
     );
     expect(audioManager.playSoundEffect).toHaveBeenCalledWith('enemy-defeated');
@@ -102,13 +73,11 @@ describe('useTowerDefenseGameEvents', () => {
 
   it('still delegates wave start events through the existing game event manager', () => {
     const addTerminalMessage = vi.fn();
-    const livesRef = { current: 10 };
 
     const { result } = renderHook(() =>
       useTowerDefenseGameEvents({
         addTerminalMessage,
         totalWavesByDifficulty: 7,
-        livesRef,
       })
     );
 
@@ -123,4 +92,3 @@ describe('useTowerDefenseGameEvents', () => {
     );
   });
 });
-

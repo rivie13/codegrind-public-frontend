@@ -100,6 +100,9 @@ const SettingsMenu = ({
   const [hitEffects, setHitEffects] = useState(true);
   const [combatText, setCombatText] = useState(true);
 
+  // Helper UI
+  const [actionTooltips, setActionTooltips] = useState(true);
+
   // AI Code Snippet Generation
   const [aiCodeSnippetGeneration, setAICodeSnippetGeneration] = useState(true);
   const [basicSnippetFallbackEnabled, setBasicSnippetFallbackEnabled] = useState(false);
@@ -212,6 +215,7 @@ const SettingsMenu = ({
     setExplosionEffects(visualSettings.explosionEffects);
     setHitEffects(visualSettings.hitEffects);
     setCombatText(visualSettings.combatText !== undefined ? visualSettings.combatText : true);
+    setActionTooltips(visualSettings.actionTooltips !== false);
 
     // Load AI code snippet generation setting
     setAICodeSnippetGeneration(
@@ -399,6 +403,14 @@ const SettingsMenu = ({
     visualSettingsManager.updateSpecialEffects(explosionEffects, hitEffects, combatText);
 
     setQualityPreset('custom');
+  };
+
+  // Update action tooltips toggle
+  const handleActionTooltipsToggle = () => {
+    const nextValue = !actionTooltips;
+    setActionTooltips(nextValue);
+    visualSettingsManager.updateActionTooltips(nextValue);
+    audioManager.playSoundEffect('ui-hover');
   };
 
   const syncAICodeSnippetSetting = (nextValue, { updateGameSettings = false } = {}) => {
@@ -763,6 +775,8 @@ const SettingsMenu = ({
                 setHitEffects,
                 combatText,
                 setCombatText,
+                actionTooltips,
+                handleActionTooltipsToggle,
                 handleProjectileSettingsChange,
                 handleSpecialEffectsChange,
               }}
